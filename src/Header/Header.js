@@ -47,7 +47,10 @@ export class Header extends Component {
             isActive={isActive}
             searchQuery={searchQuery}
             onChangeText={searchQuery => this.setState({ searchQuery })}
-            onFocus={() => this.setActive(true)}
+            onFocus={e => {
+              this.setActive(true);
+              e.preventDefault();
+            }}
             refProp={this.searchBar}
             onSubmitEditing={this.search}
             resetToHome={this.resetToHome}
@@ -61,11 +64,8 @@ export class Header extends Component {
   }
 
   handleGoBack = () => {
-    if (!this.state.isActive) {
-      this.props.navigation.navigate("Home");
-    } else {
-      this.setActive(false);
-    }
+    this.setActive(false, false);
+    this.props.navigation.goBack(null);
   };
 
   resetToHome = () => {
@@ -74,25 +74,22 @@ export class Header extends Component {
     });
     this.props.searchRedux("");
     this.setActive(false);
-    this.props.navigation.navigate("Home");
   };
 
   search = () => {
     this.props.searchRedux(this.state.searchQuery);
     this.setActive(false);
-    this.props.navigation.navigate("Home");
   };
 
-  setActive = isActive => {
-    this.setState(
-      {
-        isActive: isActive
-      },
-      () => {
-        if (isActive) this.searchBar.current.focus();
-      }
-    );
-    this.props.setActiveRedux(isActive);
+  setActive = (isActive, doNavigate = true) => {
+    this.setState({
+      isActive: isActive
+    });
+    //this.props.setActiveRedux(isActive);
+    if (doNavigate) {
+      if (isActive) this.props.navigation.navigate("Search");
+      else this.props.navigation.navigate("Home");
+    }
   };
 }
 

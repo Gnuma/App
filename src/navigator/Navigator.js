@@ -7,10 +7,10 @@ import {
 } from "react-navigation";
 import HomeScreen from "../views/Home";
 import ItemScreen from "../views/Item";
+import SearchScreen from "../views/Search";
 import VendiScreen from "../views/Vendi";
 
 import Header from "../Header/Header";
-import colors from "../styles/colors";
 
 const app = createBottomTabNavigator({
   SEARCH: {
@@ -23,15 +23,18 @@ const app = createBottomTabNavigator({
         Item: {
           screen: ItemScreen,
           path: "/item/:itemid"
+        },
+        Search: {
+          screen: SearchScreen,
+          path: "/search"
         }
       },
       {
-        defaultNavigationOptions: ({ navigation }) => {
-          return {
-            header: <Header />
-          };
+        defaultNavigationOptions: {
+          header: <Header />
         },
-        headerMode: "float"
+        headerMode: "float",
+        initialRouteName: "Home"
       }
     ),
     defaultNavigationOptions: {

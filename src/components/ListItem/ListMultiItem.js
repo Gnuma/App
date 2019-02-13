@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Text, View, Image } from "react-native";
 import { withNavigation } from "react-navigation";
-import Button from "../Button/Button";
+import Button from "../Button";
 import PropTypes from "prop-types";
 import styles from "./styles";
 
-export class ListItem extends Component {
+export class ListMultiItem extends Component {
   static propTypes = {
     data: PropTypes.object.isRequired
   };
@@ -32,4 +32,4 @@ export class ListItem extends Component {
   }
 }
 
-export default withNavigation(ListItem);
+export default withNavigation(ListMultiItem);

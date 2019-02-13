@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import styles from "./styles";
 import Icon from "react-native-vector-icons/FontAwesome";
-import Button from "../components/Button/Button";
+import Button from "../components/Button";
 
 export class LeftHeader extends Component {
   static propTypes = {

@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { View, TextInput } from "react-native";
+import { View } from "react-native";
+import TextInput from "../components/TextInput";
 import styles from "./styles";
 import Icon from "react-native-vector-icons/FontAwesome";
-import Button from "../components/Button/Button";
+import Button from "../components/Button";
 import Logo from "./Logo";
 
 export class CenterHeader extends Component {
@@ -38,9 +39,10 @@ export class CenterHeader extends Component {
             onChangeText={onChangeText}
             onFocus={onFocus}
             value={searchQuery}
-            ref={refProp}
+            focus={isActive}
             style={styles.searchInput}
             onSubmitEditing={onSubmitEditing}
+            blurOnSubmit={false}
           />
           <Button onPress={resetToHome}>
             <Icon name="times" size={24} style={[styles.icon, styles.p5]} />

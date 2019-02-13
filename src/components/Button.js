@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { TouchableOpacity } from "react-native";
-import styles from "./styles";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
 export class Button extends Component {
   render() {
@@ -16,6 +15,13 @@ export class Button extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  wideButton: {
+    justifyContent: "center",
+    alignItems: "center"
+  }
+});
 
 Button.defaultProps = { disabled: false };
 

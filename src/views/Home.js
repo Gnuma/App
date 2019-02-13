@@ -1,11 +1,9 @@
 import React, { Component } from "react";
-import { View, Text } from "react-native";
 import { withNavigation } from "react-navigation";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import Button from "../components/Button/Button";
 import MainList from "../components/MainList/MainList";
-import SearchResults from "../components/SearchResults/SearchResults";
+import { Header1 } from "../components/Text";
 
 export class Home extends Component {
   static propTypes = {
@@ -14,10 +12,9 @@ export class Home extends Component {
   };
 
   getContent = () => {
-    if (this.props.isSearchActive) return <SearchResults />;
-    else if (this.props.results !== null)
-      return <MainList data={this.props.results} />;
-    else return <Text>Home</Text>;
+    if (this.props.results !== null)
+      return <MainList data={this.props.results} isSingle={false} />;
+    else return <Header1>Home</Header1>;
   };
 
   render() {
