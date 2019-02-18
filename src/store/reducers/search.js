@@ -49,9 +49,6 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SEARCH_FAIL:
       return searchFail(state, action);
 
-    case actionTypes.SEARCH_SET_ACTIVE:
-      return searchSetActive(state, action);
-
     default:
       return state;
   }

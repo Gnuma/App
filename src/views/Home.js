@@ -7,13 +7,13 @@ import { Header1 } from "../components/Text";
 
 export class Home extends Component {
   static propTypes = {
-    results: PropTypes.array,
+    results: PropTypes.object,
     isSearchActive: PropTypes.bool
   };
 
   getContent = () => {
     if (this.props.results !== null)
-      return <MainList data={this.props.results} isSingle={false} />;
+      return <MainList data={this.props.results} />;
     else return <Header1>Home</Header1>;
   };
 

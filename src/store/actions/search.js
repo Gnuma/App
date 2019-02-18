@@ -1,6 +1,8 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
-import results from "../../mockData/SearchResults";
+import { singleResults, multiResults } from "../../mockData/SearchResults";
+
+const isOffline = true;
 
 export const searchStart = search_query => {
   return {
@@ -29,10 +31,28 @@ export const searchFail = error => {
   };
 };
 
+export const searchSuggest = suggestions => {
+  return {
+    type: actionTypes.SEARCH_SUGGEST,
+    payload: {
+      suggestions
+    }
+  };
+};
+
 export const search = (search_query, cap) => {
   return dispatch => {
     dispatch(searchSetActive(false));
-    dispatch(searchStart(search_query));
+    dispatch(searchStart(search_query)); //Unificare
+
+    if (isOffline) {
+      if (search_query) {
+        dispatch(
+          searchSuccess(search_query.length > 3 ? singleResults : multiResults)
+        );
+      } else dispatch(searchSuccess(null));
+    } else {
+    }
     /* Query to search
     axios
     .post("http://127.0.0.1:8000/gnuma/v1/auth/login/", {
@@ -45,8 +65,6 @@ export const search = (search_query, cap) => {
     .catch(err => {
       dispatch(searchFail(err));
     }); */
-    if (search_query) dispatch(searchSuccess(results));
-    else dispatch(searchSuccess(null));
   };
 };
 

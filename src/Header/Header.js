@@ -12,9 +12,6 @@ import RightHeader from "./RightHeader";
 export class Header extends Component {
   constructor(props) {
     super(props);
-
-    this.searchBar = React.createRef();
-    if (props.searchQueryRedux) this.state.searchQuery = props.searchQueryRedux;
   }
 
   static propTypes = {
@@ -47,24 +44,23 @@ export class Header extends Component {
             isActive={isActive}
             searchQuery={searchQuery}
             onChangeText={searchQuery => this.setState({ searchQuery })}
-            onFocus={e => {
-              this.setActive(true);
-              e.preventDefault();
-            }}
-            refProp={this.searchBar}
             onSubmitEditing={this.search}
             resetToHome={this.resetToHome}
+            setRef={this.setSearchBarRef}
+            onFocus={this.setActiveByFocus}
           />
         </View>
         <View style={styles.secondary}>
-          <RightHeader setActive={() => this.setActive(true)} />
+          <RightHeader setActive={this.setActive} />
         </View>
       </View>
     );
   }
 
   handleGoBack = () => {
-    this.setActive(false, false);
+    this.setState({
+      isActive: false
+    });
     this.props.navigation.goBack(null);
   };
 
@@ -73,23 +69,33 @@ export class Header extends Component {
       searchQuery: ""
     });
     this.props.searchRedux("");
-    this.setActive(false);
+    this.setInactive();
   };
 
   search = () => {
     this.props.searchRedux(this.state.searchQuery);
-    this.setActive(false);
+    this.setInactive();
   };
 
-  setActive = (isActive, doNavigate = true) => {
+  setActive = async () => {
+    await this.props.navigation.navigate("Search");
     this.setState({
-      isActive: isActive
+      isActive: true
     });
-    //this.props.setActiveRedux(isActive);
-    if (doNavigate) {
-      if (isActive) this.props.navigation.navigate("Search");
-      else this.props.navigation.navigate("Home");
-    }
+  };
+
+  setActiveByFocus = async () => {
+    await this.props.navigation.navigate("Search");
+    this.setState({
+      isActive: true
+    });
+  };
+
+  setInactive = async () => {
+    await this.props.navigation.navigate("Home");
+    this.setState({
+      isActive: false
+    });
   };
 }
 

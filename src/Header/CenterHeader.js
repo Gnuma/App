@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { View } from "react-native";
-import TextInput from "../components/TextInput";
+import { View, TextInput, TouchableWithoutFeedback } from "react-native";
 import styles from "./styles";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Button from "../components/Button";
 import Logo from "./Logo";
+import { Header3 } from "../components/Text";
 
 export class CenterHeader extends Component {
   static propTypes = {
@@ -23,9 +23,9 @@ export class CenterHeader extends Component {
       searchQuery,
       onChangeText,
       onFocus,
-      refProp,
       onSubmitEditing,
-      resetToHome
+      resetToHome,
+      setRef
     } = this.props;
     if (isActive || searchQuery) {
       return (
@@ -35,15 +35,23 @@ export class CenterHeader extends Component {
             flexDirection: "row"
           }}
         >
-          <TextInput
-            onChangeText={onChangeText}
-            onFocus={onFocus}
-            value={searchQuery}
-            focus={isActive}
-            style={styles.searchInput}
-            onSubmitEditing={onSubmitEditing}
-            blurOnSubmit={false}
-          />
+          {!isActive ? (
+            <TouchableWithoutFeedback onPress={onFocus}>
+              <View style={styles.searchInput}>
+                <Header3>{searchQuery}</Header3>
+              </View>
+            </TouchableWithoutFeedback>
+          ) : (
+            <TextInput
+              onChangeText={onChangeText}
+              value={searchQuery}
+              style={styles.searchInput}
+              onSubmitEditing={onSubmitEditing}
+              blurOnSubmit={false}
+              autoFocus={true}
+            />
+          )}
+
           <Button onPress={resetToHome}>
             <Icon name="times" size={24} style={[styles.icon, styles.p5]} />
           </Button>
