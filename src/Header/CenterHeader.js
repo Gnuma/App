@@ -35,22 +35,16 @@ export class CenterHeader extends Component {
             flexDirection: "row"
           }}
         >
-          {!isActive ? (
-            <TouchableWithoutFeedback onPress={onFocus}>
-              <View style={styles.searchInput}>
-                <Header3>{searchQuery}</Header3>
-              </View>
-            </TouchableWithoutFeedback>
-          ) : (
-            <TextInput
-              onChangeText={onChangeText}
-              value={searchQuery}
-              style={styles.searchInput}
-              onSubmitEditing={onSubmitEditing}
-              blurOnSubmit={false}
-              autoFocus={true}
-            />
-          )}
+          <TextInput
+            onChangeText={onChangeText}
+            value={searchQuery}
+            style={styles.searchInput}
+            onSubmitEditing={onSubmitEditing}
+            blurOnSubmit={true}
+            ref={setRef}
+            autoFocus={true}
+            onFocus={onFocus}
+          />
 
           <Button onPress={resetToHome}>
             <Icon name="times" size={24} style={[styles.icon, styles.p5]} />

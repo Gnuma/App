@@ -23,22 +23,20 @@ const AppStack = createBottomTabNavigator({
       {
         Home: {
           screen: HomeScreen,
-          path: "/home"
+          path: "/home",
+          navigationOptions: () => ({
+            header: <Header />
+          })
         },
         Item: {
           screen: ItemScreen,
-          path: "/item/:itemid"
-        },
-        Search: {
-          screen: SearchScreen,
-          path: "/search"
+          path: "/item/:itemid",
+          navigationOptions: () => ({
+            header: null
+          })
         }
       },
       {
-        defaultNavigationOptions: {
-          header: <Header />
-        },
-        headerMode: "float",
         initialRouteName: "Home"
       }
     ),

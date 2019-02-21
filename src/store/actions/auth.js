@@ -51,7 +51,7 @@ export const authLogin = (username, password) => {
         dispatch(loginSuccess(token, true));
         NavigatorService.navigate("Home");
       } else {
-        dispatch(authFail(err));
+        dispatch(authFail("Invalid authentication"));
       }
     } else {
       //Online

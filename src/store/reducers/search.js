@@ -5,15 +5,22 @@ const initialState = {
   results: null, //search items results
   error: null, //errors
   loading: false, //is loading results
-  searchQuery: null, //search query
-  isActive: false //is search view showing
+  searchQuery: "", //search query,
+  isActive: false
+};
+
+const searchSetSearchQuery = (state, action) => {
+  return updateObject(state, {
+    searchQuery: action.payload.search_query
+  });
 };
 
 const searchStart = (state, action) => {
   return updateObject(state, {
     error: null,
     loading: true,
-    searchQuery: action.payload.search_query
+    searchQuery: action.payload.search_query,
+    isActive: false
   });
 };
 
@@ -32,6 +39,12 @@ const searchFail = (state, action) => {
   });
 };
 
+const searchSuggest = (state, action) => {
+  return updateObject(state, {
+    suggestions: action.payload.suggestions
+  });
+};
+
 const searchSetActive = (state, action) => {
   return updateObject(state, {
     isActive: action.payload.isActive
@@ -40,6 +53,9 @@ const searchSetActive = (state, action) => {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case actionTypes.SEARCH_SET_SEARCHQUERY:
+      return searchSetSearchQuery(state, action);
+
     case actionTypes.SEARCH_START:
       return searchStart(state, action);
 
@@ -48,6 +64,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SEARCH_FAIL:
       return searchFail(state, action);
+
+    case actionTypes.SEARCH_SUGGEST:
+      return searchSuggest(state, action);
 
     case actionTypes.SEARCH_SET_ACTIVE:
       return searchSetActive(state, action);

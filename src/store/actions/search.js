@@ -1,8 +1,18 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
 import { singleResults, multiResults } from "../../mockData/SearchResults";
+import { Keyboard } from "react-native";
 
 const isOffline = true;
+
+export const searchSetSearchQuery = search_query => {
+  return {
+    type: actionTypes.SEARCH_SET_SEARCHQUERY,
+    payload: {
+      search_query: search_query
+    }
+  };
+};
 
 export const searchStart = search_query => {
   return {
@@ -40,11 +50,19 @@ export const searchSuggest = suggestions => {
   };
 };
 
+export const searchSetActive = isActive => {
+  return {
+    type: actionTypes.SEARCH_SET_ACTIVE,
+    payload: {
+      isActive: isActive
+    }
+  };
+};
+
 export const search = (search_query, cap) => {
   return dispatch => {
-    dispatch(searchSetActive(false));
     dispatch(searchStart(search_query)); //Unificare
-
+    Keyboard.dismiss();
     if (isOffline) {
       if (search_query) {
         dispatch(
@@ -68,11 +86,16 @@ export const search = (search_query, cap) => {
   };
 };
 
-export const searchSetActive = isActive => {
-  return {
-    type: actionTypes.SEARCH_SET_ACTIVE,
-    payload: {
-      isActive: isActive
+export const handleSearchQueryChange = search_query => {
+  return dispatch => {
+    dispatch(searchSetSearchQuery(search_query));
+    if (isOffline) {
+      let suggestions = [];
+      for (let i = 0; i < 10; i++) {
+        suggestions.push(search_query + " " + i);
+      }
+      dispatch(searchSuggest(suggestions));
+    } else {
     }
   };
 };

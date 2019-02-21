@@ -17,16 +17,13 @@ export class Header extends Component {
   static propTypes = {
     searchRedux: PropTypes.func,
     setActiveRedux: PropTypes.func,
-    searchQueryRedux: PropTypes.string
-  };
-
-  state = {
-    isActive: false,
-    searchQuery: ""
+    searchQuery: PropTypes.string,
+    isActive: PropTypes.bool,
+    handleSearchQueryChange: PropTypes.func
   };
 
   render() {
-    const { isActive, searchQuery } = this.state;
+    const { isActive, searchQuery } = this.props;
     const isItem =
       this.props.navigation &&
       this.props.navigation.state.routes[
@@ -38,69 +35,58 @@ export class Header extends Component {
           <LeftHeader
             isActive={isActive}
             isItem={isItem}
-            handleGoBack={this.handleGoBack}
+            handleGoBack={this.setInactive}
           />
           <CenterHeader
             isActive={isActive}
             searchQuery={searchQuery}
-            onChangeText={searchQuery => this.setState({ searchQuery })}
+            onChangeText={this.handleChangeText}
             onSubmitEditing={this.search}
             resetToHome={this.resetToHome}
-            setRef={this.setSearchBarRef}
-            onFocus={this.setActiveByFocus}
+            onFocus={this.setActive}
+            setRef={this.setSearchRef}
           />
         </View>
         <View style={styles.secondary}>
-          <RightHeader setActive={this.setActive} />
+          <RightHeader setActive={this.openSearchField} />
         </View>
       </View>
     );
   }
 
-  handleGoBack = () => {
-    this.setState({
-      isActive: false
-    });
-    this.props.navigation.goBack(null);
+  setSearchRef = input => {
+    this.searchField = input;
+  };
+
+  handleChangeText = searchQuery => {
+    this.props.handleSearchQueryChange(searchQuery);
   };
 
   resetToHome = () => {
-    this.setState({
-      searchQuery: ""
-    });
     this.props.searchRedux("");
-    this.setInactive();
   };
 
   search = () => {
-    this.props.searchRedux(this.state.searchQuery);
-    this.setInactive();
+    this.props.searchRedux(this.props.searchQuery);
   };
 
-  setActive = async () => {
-    await this.props.navigation.navigate("Search");
-    this.setState({
-      isActive: true
-    });
+  setActive = () => {
+    this.props.setActiveRedux(true);
+    this.searchField.focus();
   };
 
-  setActiveByFocus = async () => {
-    await this.props.navigation.navigate("Search");
-    this.setState({
-      isActive: true
-    });
+  setInactive = () => {
+    this.props.setActiveRedux(false);
   };
 
-  setInactive = async () => {
-    await this.props.navigation.navigate("Home");
-    this.setState({
-      isActive: false
-    });
+  openSearchField = () => {
+    this.props.setActiveRedux(true);
   };
 }
 
 const mapStateToProps = state => ({
-  searchQueryRedux: state.search.searchQuery
+  searchQuery: state.search.searchQuery,
+  isActive: state.search.isActive
 });
 
 const mapDispatchToProps = dispatch => {
@@ -108,7 +94,9 @@ const mapDispatchToProps = dispatch => {
     searchRedux: (search_query, cap) =>
       dispatch(searchActions.search(search_query, cap)),
     setActiveRedux: isActive =>
-      dispatch(searchActions.searchSetActive(isActive))
+      dispatch(searchActions.searchSetActive(isActive)),
+    handleSearchQueryChange: searchQuery =>
+      dispatch(searchActions.handleSearchQueryChange(searchQuery))
   };
 };
 
