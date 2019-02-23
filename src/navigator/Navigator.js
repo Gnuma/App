@@ -14,62 +14,82 @@ import VendiScreen from "../views/Vendi";
 import AppLoaderScreen from "../views/AppLoader";
 import LoginScreen from "../views/Auth/Login";
 import SignupScreen from "../views/Auth/Signup";
+import CameraScreen from "../views/Camera";
 
 import Header from "../Header/Header";
 
-const AppStack = createBottomTabNavigator({
-  SEARCH: {
-    screen: createStackNavigator(
-      {
-        Home: {
-          screen: HomeScreen,
-          path: "/home",
-          navigationOptions: () => ({
-            header: <Header />
-          })
-        },
-        Item: {
-          screen: ItemScreen,
-          path: "/item/:itemid",
-          navigationOptions: () => ({
-            header: null
-          })
-        }
+const SearchNavigator = {
+  screen: createStackNavigator(
+    {
+      Home: {
+        screen: HomeScreen,
+        path: "/home",
+        navigationOptions: () => ({
+          header: <Header />
+        })
       },
-      {
-        initialRouteName: "Home"
-      }
-    ),
-    defaultNavigationOptions: {
-      tabBarLabel: "Cerca"
-    }
-  },
-  VENDI: {
-    screen: VendiScreen,
-    defaultNavigationOptions: {
-      tabBarLabel: "Vendi"
-    }
-  },
-  AUTH: {
-    screen: createStackNavigator(
-      {
-        Login: {
-          screen: LoginScreen,
-          path: "/login"
-        },
-        Signup: {
-          screen: SignupScreen,
-          path: "/signup"
-        }
-      },
-      {
-        defaultNavigationOptions: {
-          initialRouteName: "Login",
+      Item: {
+        screen: ItemScreen,
+        path: "/item/:itemid",
+        navigationOptions: () => ({
           header: null
-        }
+        })
       }
-    )
+    },
+    {
+      initialRouteName: "Home"
+    }
+  ),
+  defaultNavigationOptions: {
+    tabBarLabel: "Cerca"
   }
+};
+
+const VendiNavigator = {
+  screen: createStackNavigator(
+    {
+      Camera: {
+        screen: CameraScreen,
+        path: "/vendi/camera"
+      },
+      Home: {
+        screen: VendiScreen,
+        path: "/vendi"
+      }
+    },
+    {
+      defaultNavigationOptions: {
+        header: null
+      }
+    }
+  )
+};
+
+const ProfileNavigator = {
+  screen: createStackNavigator(
+    {
+      Login: {
+        screen: LoginScreen,
+        path: "/login"
+      },
+      Signup: {
+        screen: SignupScreen,
+        path: "/signup"
+      }
+    },
+    {
+      defaultNavigationOptions: {
+        initialRouteName: "Login",
+        header: null
+      }
+    }
+  )
+};
+
+const AppStack = createBottomTabNavigator({
+  SEARCH: SearchNavigator,
+  VENDI: VendiNavigator,
+  AUTH: ProfileNavigator
 });
 
 const FullApp = createSwitchNavigator(

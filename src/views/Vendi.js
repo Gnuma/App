@@ -2,16 +2,15 @@ import React, { Component } from "react";
 import { View, Text } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import Button from "../components/Button";
 
 export class Vendi extends Component {
-  static propTypes = {
-    prop: PropTypes
-  };
-
   render() {
     return (
       <View>
-        <Text> Vendi </Text>
+        <Button onPress={() => this.props.navigation.navigate("Camera")}>
+          <Text>Camera</Text>
+        </Button>
       </View>
     );
   }

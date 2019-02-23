@@ -55,9 +55,6 @@ export class MainList extends Component {
     );
   }
 
-  _keyExtractor = item => {
-    return item.id;
-  };
 }
 
 export default MainList;
