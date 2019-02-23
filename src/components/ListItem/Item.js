@@ -49,16 +49,20 @@ export default class Item extends Component {
         <View style={{ flex: 1, marginLeft: 5 }}>
           <View style={{ flex: 2, flexDirection: "row" }}>
             <View style={{ flex: 3 }}>
-              <Header3>{seller}</Header3>
-              <Header1>EUR {price}</Header1>
+              <Header3 color="black">{seller}</Header3>
+              <Header1 color="primary">EUR {price}</Header1>
             </View>
             <View style={{ margin: 10 }}>
-              <ConditionCircle conditions={conditions} />
+              <ConditionCircle
+                conditions={conditions}
+                radius={35}
+                style={{ margin: 10 }}
+              />
             </View>
           </View>
           <View style={{ flex: 1 }}>
-            <Header4>{office.name}</Header4>
-            <Header5 style={{ marginLeft: 4 }}>{office.address}</Header5>
+            <Header4 color="black">{office.name}</Header4>
+            <Header5 style={{ marginLeft: 15 }}>{office.address}</Header5>
           </View>
         </View>
       </View>

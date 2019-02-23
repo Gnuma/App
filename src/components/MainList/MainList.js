@@ -27,8 +27,10 @@ export class MainList extends Component {
                 backgroundColor: "#fff"
               }}
             >
-              <Header2>{data.object.title}</Header2>
-              <Header4 style={{ padding: 5 }}>{data.object.authors}</Header4>
+              <Header2 color={"primary"}>{data.object.title}</Header2>
+              <Header4 style={{ paddingBottom: 5, paddingLeft: 10 }}>
+                {data.object.authors}
+              </Header4>
             </View>
             <FlatList
               style={{ flex: 1 }}

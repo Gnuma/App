@@ -23,19 +23,25 @@ const conditionsTable = {
 };
 
 export default function ConditionCircle(props) {
-  const { text, percentage, color } = conditionsTable[props.conditions];
+  const { conditions, style, radius, fontSize } = props;
+  const { text, percentage, color } = conditionsTable[conditions];
+  const calculatedFontSize = fontSize ? fontSize : radius * fontRatio;
   return (
     <ProgressCircle
       percent={percentage}
-      radius={35}
+      radius={radius}
       borderWidth={5}
       color={color}
       shadowColor="#C4C4C4"
       bgColor="#fff"
       outerCircleStyle={{ elevation: 2 }}
-      style={{ margin: 10 }}
+      style={style}
     >
-      <Header5 style={{ color: colors.primary }}>{text}</Header5>
+      <Header5 color={"primary"} style={{ fontSize: calculatedFontSize }}>
+        {text}
+      </Header5>
     </ProgressCircle>
   );
 }
+
+const fontRatio = 0.4;

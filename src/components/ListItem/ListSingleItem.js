@@ -20,9 +20,20 @@ export class ListSingleItem extends Component {
 
     return (
       <Button
-        onPress={() => this.props.navigation.navigate("Item")}
-        style={{ flex: 1, margin: 10, elevation: 3, borderRadius: 10, 
-          backgroundColor: "white", }}
+        onPress={() =>
+          this.props.navigation.navigate("Item", {
+            itemID: id,
+            name: name,
+            authors: authors
+          })
+        }
+        style={{
+          flex: 1,
+          margin: 10,
+          elevation: 3,
+          borderRadius: 10,
+          backgroundColor: "white"
+        }}
       >
         <Item data={this.props.data} isSingle={this.props.isSingle} />
       </Button>

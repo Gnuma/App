@@ -1,15 +1,7 @@
 import React, { Component } from "react";
-import {
-  View,
-  Image,
-  Dimensions,
-  PanResponder,
-  Animated,
-  StyleSheet
-} from "react-native";
+import { View, Image, Dimensions, StyleSheet } from "react-native";
 import PropTypes from "prop-types";
-import Carousel, { ParallaxImage } from "react-native-snap-carousel";
-import { Header1 } from "../Text";
+import Carousel from "react-native-snap-carousel";
 
 const imgRation = 0.92855;
 const imgMargin = 50;
@@ -24,21 +16,8 @@ export class ImageSlider extends Component {
 
   _renderItem = ({ item, index }) => {
     return (
-      <View
-        style={{
-          borderRadius: 8,
-
-          backgroundColor: "white",
-          margin: 10,
-          elevation: 4
-        }}
-      >
-        <View
-          style={{
-            overflow: "hidden",
-            borderRadius: 8
-          }}
-        >
+      <View style={styles.itemContainer}>
+        <View style={styles.imageContainer}>
           <Image
             style={{
               width: this.state.width - imgMargin,
@@ -54,21 +33,32 @@ export class ImageSlider extends Component {
   render() {
     const { width, height } = this.state;
     return (
-      <View style={[{ flex: 1 }, this.props.style]}>
-        <View style={{ minHeight: height }}>
-          <Carousel
-            data={this.data}
-            renderItem={this._renderItem}
-            itemWidth={this.state.width - imgMargin}
-            sliderWidth={width}
-            sliderHeight={height + 10}
-            inactiveSlideScale={1}
-            inactiveSlideOpacity={1}
-          />
-        </View>
+      <View style={[this.props.style]}>
+        <Carousel
+          data={this.data}
+          renderItem={this._renderItem}
+          itemWidth={width - imgMargin}
+          sliderWidth={width}
+          sliderHeight={height + 10}
+          inactiveSlideScale={1}
+          inactiveSlideOpacity={1}
+        />
       </View>
     );
   }
 }
 
 export default ImageSlider;
+
+const styles = StyleSheet.create({
+  itemContainer: {
+    borderRadius: 8,
+    backgroundColor: "white",
+    margin: 10,
+    elevation: 4
+  },
+  imageContainer: {
+    overflow: "hidden",
+    borderRadius: 8
+  }
+});

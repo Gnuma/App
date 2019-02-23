@@ -14,10 +14,16 @@ export class ListMultiItem extends Component {
   };
 
   render() {
-    const { name, authors } = this.props.data;
+    const { name, authors, id } = this.props.data;
     return (
       <Button
-        onPress={() => this.props.navigation.navigate("Item")}
+        onPress={() =>
+          this.props.navigation.navigate("Item", {
+            itemID: id,
+            name: name,
+            authors: authors
+          })
+        }
         style={{
           flex: 1,
           margin: 10,
@@ -36,7 +42,7 @@ export class ListMultiItem extends Component {
             backgroundColor: "white"
           }}
         >
-          <Header2>{name}</Header2>
+          <Header2 color={"primary"}>{name}</Header2>
           <Header5>{authors}</Header5>
         </View>
         <Item data={this.props.data} isSingle={this.props.isSingle} />
