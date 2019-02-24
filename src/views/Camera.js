@@ -10,9 +10,6 @@ const imgWidth = 720;
 const imgHeight = 1280;
 
 export class Camera extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   state = {
     flashMode: RNCamera.Constants.FlashMode.on,

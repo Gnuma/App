@@ -1,54 +1,85 @@
 import React, { Component } from "react";
-import { Text, View, FlatList, Image } from "react-native";
+import {
+  Text,
+  View,
+  FlatList,
+  Image,
+  Animated,
+  PanResponder
+} from "react-native";
 import { Header2 } from "../Text";
 import colors from "../../styles/colors";
 import Icon from "react-native-vector-icons/FontAwesome";
+import ImagePreview from "./ImagePreview";
+import MovablePreview from "./MovablePreview";
 
 export class CameraPreviews extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      draggedFocus: null
+    };
+  }
+
   render() {
+    const isDragging = this.state.draggedFocus !== null;
     const { previews } = this.props;
     return (
-      <FlatList
+      <View
         style={{
-          flex: 1
-        }}
-        data={previews}
-        renderItem={this._renderItem}
-        keyExtractor={this._keyExtractor}
-        horizontal={true}
-        contentContainerStyle={{
-          justifyContent: "center",
           flex: 1,
-          flexDirection: "row"
+          overflow: "visible"
         }}
-      />
+      >
+        <FlatList
+          data={previews}
+          renderItem={this._renderItem}
+          keyExtractor={this._keyExtractor}
+          horizontal={true}
+          contentContainerStyle={{
+            justifyContent: "center",
+            flex: 1,
+            flexDirection: "row"
+          }}
+        />
+
+        {isDragging ? (
+          <MovablePreview
+            item={this.state.draggedFocus}
+            setDragging={this.setDragging}
+          />
+        ) : null}
+      </View>
     );
   }
+
+  setDragging = (item, view) => {
+    if (item === null) {
+      this.setState({
+        draggedFocus: null
+      });
+    } else {
+      console.log(view);
+      this.setState({
+        draggedFocus: {
+          item: item,
+          fx: view.pressInLocation.locationX,
+          fy: view.pressInLocation.locationY
+        }
+      });
+    }
+  };
 
   _renderItem = ({ item, index }) => {
     if (item)
       return (
-        <View
-          style={{
-            borderRadius: 4,
-            overflow: "hidden",
-            marginHorizontal: 6,
-            elevation: 4,
-            borderColor: index === 0 ? colors.secondary : "white",
-            borderWidth: 2
-          }}
-        >
-          <Image
-            style={{
-              height: 70,
-              width: 52,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-            source={item}
-            resizeMode="stretch"
-          />
-        </View>
+        <ImagePreview
+          item={item}
+          index={index}
+          draggedFocus={this.state.draggedFocus}
+          setDragging={this.setDragging}
+        />
       );
     else
       return (
