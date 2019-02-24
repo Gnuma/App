@@ -11,7 +11,7 @@ const imgHeight = 1280;
 
 export class Camera extends Component {
   state = {
-    flashMode: RNCamera.Constants.FlashMode.on,
+    flashMode: RNCamera.Constants.FlashMode.off,
     previews: [null, null, null, null, null]
   };
 
@@ -56,10 +56,31 @@ export class Camera extends Component {
           _reorderPreviews={this._reorderPreviews}
         />
         <View style={{ flex: 1, justifyContent: "flex-end" }}>
-          <CameraBottom takePicture={() => this.takePicture(camera)} />
+          <CameraBottom
+            takePicture={() => this.takePicture(camera)}
+            flashMode={this.state.flashMode}
+            changeFlashMode={this.changeFlashMode}
+            handleGoNext={this.handleGoNext}
+          />
         </View>
       </View>
     );
+  };
+
+  handleGoNext = () => {
+    console.log("AO");
+    this.props.navigation.navigate("SelectBook");
+  };
+
+  changeFlashMode = () => {
+    if (this.state.flashMode === RNCamera.Constants.FlashMode.off)
+      this.setState({
+        flashMode: RNCamera.Constants.FlashMode.on
+      });
+    else
+      this.setState({
+        flashMode: RNCamera.Constants.FlashMode.off
+      });
   };
 
   handleGoBack = () => {

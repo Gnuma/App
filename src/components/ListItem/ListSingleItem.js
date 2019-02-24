@@ -11,11 +11,10 @@ const itemHeight = 130;
 export class ListSingleItem extends Component {
   static propTypes = {
     data: PropTypes.object.isRequired,
-    isSingle: PropTypes.bool
   };
 
   render() {
-    const { isSingle, data } = this.props;
+    const { data } = this.props;
     const { name, id, img, authors, price, seller } = data;
 
     return (

@@ -1,18 +1,6 @@
 import React, { Component } from "react";
-import {
-  Text,
-  View,
-  FlatList,
-  Image,
-  Animated,
-  PanResponder,
-  ScrollView
-} from "react-native";
-import { Header2 } from "../Text";
-import colors from "../../styles/colors";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { Text, View } from "react-native";
 import ImagePreview from "./ImagePreview";
-import MovablePreview from "./MovablePreview";
 import SortableList from "react-native-sortable-list";
 
 export class CameraPreviews extends Component {

@@ -15,34 +15,27 @@ import AppLoaderScreen from "../views/AppLoader";
 import LoginScreen from "../views/Auth/Login";
 import SignupScreen from "../views/Auth/Signup";
 import CameraScreen from "../views/Camera";
+import SelectBookScreen from "../views/SelectBook";
 
 import Header from "../Header/Header";
 
 const SearchNavigator = {
-  screen: createStackNavigator(
-    {
-      Home: {
-        screen: HomeScreen,
-        path: "/home",
-        navigationOptions: () => ({
-          header: <Header />
-        })
-      },
-      Item: {
-        screen: ItemScreen,
-        path: "/item/:itemid",
-        navigationOptions: () => ({
-          header: null
-        })
-      }
+  screen: createStackNavigator({
+    Home: {
+      screen: HomeScreen,
+      path: "/home",
+      navigationOptions: () => ({
+        header: <Header />
+      })
     },
-    {
-      initialRouteName: "Home"
+    Item: {
+      screen: ItemScreen,
+      path: "/item/:itemid",
+      navigationOptions: () => ({
+        header: null
+      })
     }
-  ),
-  defaultNavigationOptions: {
-    tabBarLabel: "Cerca"
-  }
+  })
 };
 
 const VendiNavigator = {
@@ -55,6 +48,10 @@ const VendiNavigator = {
       Home: {
         screen: VendiScreen,
         path: "/vendi"
+      },
+      SelectBook: {
+        screen: SelectBookScreen,
+        path: "/vendi/selectbook"
       }
     },
     {
@@ -62,7 +59,10 @@ const VendiNavigator = {
         header: null
       }
     }
-  )
+  ),
+  navigationOptions: {
+    tabBarVisible: false
+  }
 };
 
 const ProfileNavigator = {

@@ -35,9 +35,7 @@ export class MainList extends Component {
             <FlatList
               style={{ flex: 1 }}
               data={results}
-              renderItem={({ item }) => (
-                <ListSingleItem data={item} isSingle={isSingle} />
-              )}
+              renderItem={this._renderSingleItem}
               keyExtractor={this._keyExtractor}
             />
           </View>
@@ -45,9 +43,7 @@ export class MainList extends Component {
           <FlatList
             style={{ flex: 1 }}
             data={results}
-            renderItem={({ item }) => (
-              <ListMultiItem data={item} isSingle={isSingle} />
-            )}
+            renderItem={this._renderMultiItem}
             keyExtractor={this._keyExtractor}
           />
         )}
@@ -55,6 +51,17 @@ export class MainList extends Component {
     );
   }
 
+  _keyExtractor = item => {
+    return item.id;
+  };
+
+  _renderMultiItem = ({ item }) => {
+    return <ListMultiItem data={item} />;
+  };
+
+  _renderSingleItem = ({ item }) => {
+    return <ListSingleItem data={item} />;
+  };
 }
 
 export default MainList;
