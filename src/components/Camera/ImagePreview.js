@@ -5,48 +5,79 @@ import {
   Animated,
   Image,
   TouchableWithoutFeedback,
-  PanResponder
+  PanResponder,
+  Easing,
+  Dimensions,
+  Platform
 } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export default class ImagePreview extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      initAni: new Animated.Value(0)
+    this._active = new Animated.Value(0);
+
+    this._style = {
+      ...Platform.select({
+        ios: {
+          transform: [
+            {
+              scale: this._active.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 1.1]
+              })
+            }
+          ],
+          shadowRadius: this._active.interpolate({
+            inputRange: [0, 1],
+            outputRange: [2, 10]
+          })
+        },
+
+        android: {
+          transform: [
+            {
+              scale: this._active.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 1.07]
+              })
+            }
+          ],
+          elevation: this._active.interpolate({
+            inputRange: [0, 1],
+            outputRange: [2, 6]
+          })
+        }
+      })
     };
   }
 
-  componentDidMount() {
-    Animated.timing(this.state.initAni, {
-      toValue: 1,
-      duration: 200
-    }).start();
+  componentWillReceiveProps(nextProps) {
+    if (this.props.active !== nextProps.active) {
+      Animated.timing(this._active, {
+        duration: 300,
+        easing: Easing.bounce,
+        toValue: Number(nextProps.active)
+      }).start();
+    }
   }
 
   render() {
-    const { item, index, draggedFocus, setDragging } = this.props;
-    const isDragged = draggedFocus === item;
-    return (
-      <TouchableWithoutFeedback
-        onPressIn={() => setDragging(item, this.view)}
-        ref={view => {
-          this.view = view;
-        }}
-      >
+    const { item } = this.props;
+    if (item)
+      return (
         <Animated.View
           style={[
             {
               borderRadius: 4,
-              overflow: "hidden",
               marginHorizontal: 6,
               elevation: 4,
-              borderColor: isDragged ? "red" : "white",
-              borderWidth: 2
+              borderColor: "white",
+              borderWidth: 2,
+              marginTop: 5
             },
-            {
-              transform: [{ scale: this.state.initAni }]
-            }
+            this._style
           ]}
         >
           <Image
@@ -60,7 +91,24 @@ export default class ImagePreview extends Component {
             resizeMode="stretch"
           />
         </Animated.View>
-      </TouchableWithoutFeedback>
-    );
+      );
+    else
+      return (
+        <View
+          style={{
+            height: 74,
+            width: 56,
+            borderWidth: 2,
+            borderColor: "white",
+            justifyContent: "center",
+            alignItems: "center",
+            marginHorizontal: 6,
+            borderRadius: 4,
+            marginTop: 5
+          }}
+        >
+          <Icon name="camera" size={20} style={{ color: "white" }} />
+        </View>
+      );
   }
 }
