@@ -13,7 +13,7 @@ export class CameraPreviews extends Component {
   }
 
   render() {
-    const { previews, _reorderPreviews } = this.props;
+    const { previews, _reorderPreviews, previewsOrder } = this.props;
     return (
       <SortableList
         horizontal
@@ -22,12 +22,19 @@ export class CameraPreviews extends Component {
         renderRow={this._renderItem}
         rowActivationTime={0}
         onChangeOrder={_reorderPreviews}
+        order={previewsOrder}
       />
     );
   }
 
-  _renderItem = ({ data, active }) => {
-    return <ImagePreview item={data} active={active} />;
+  _renderItem = ({ data, index }) => {
+    return (
+      <ImagePreview
+        item={data}
+        index={index}
+        deleteItem={this.props.deleteItem}
+      />
+    );
   };
 
   _keyExtractor = (item, index) => {

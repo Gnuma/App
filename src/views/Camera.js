@@ -5,18 +5,15 @@ import { RNCamera } from "react-native-camera";
 import { Header2 } from "../components/Text";
 import CameraBottom from "../components/Camera/CameraBottom";
 import CameraHeader from "../components/Camera/CameraHeader";
+import * as sellActions from "../store/actions/sell";
 
 const imgWidth = 720;
 const imgHeight = 1280;
 
 export class Camera extends Component {
   state = {
-    flashMode: RNCamera.Constants.FlashMode.off,
-    previews: [null, null, null, null, null]
+    flashMode: RNCamera.Constants.FlashMode.off
   };
-
-  previewsOrder = [0, 1, 2, 3, 4];
-  imgCounter = 0;
 
   componentDidMount() {
     const { navigation } = this.props;
@@ -48,12 +45,16 @@ export class Camera extends Component {
 
   getOverlay = ({ camera, status }) => {
     if (status !== "READY") return <Header2>Waiting for permission</Header2>;
+    const { previews, previewsOrder } = this.props;
     return (
       <View style={{ flex: 1 }}>
         <CameraHeader
-          previews={this.state.previews}
+          previews={previews}
+          previewsOrder={previewsOrder}
           handleGoBack={this.handleGoBack}
           _reorderPreviews={this._reorderPreviews}
+          deleteItem={this.deleteItem}
+          previewsOrder={previewsOrder}
         />
         <View style={{ flex: 1, justifyContent: "flex-end" }}>
           <CameraBottom
@@ -68,7 +69,6 @@ export class Camera extends Component {
   };
 
   handleGoNext = () => {
-    console.log("AO");
     this.props.navigation.navigate("SelectBook");
   };
 
@@ -84,24 +84,15 @@ export class Camera extends Component {
   };
 
   handleGoBack = () => {
-    console.log("going back");
     this.props.navigation.goBack(null);
   };
 
+  deleteItem = index => {
+    this.props.deletePreviewRedux(index);
+  };
+
   _reorderPreviews = nextOrder => {
-    if (!nextOrder) nextOrder = this.previewsOrder;
-    console.log("NextOrder", nextOrder);
-    let flagged = false;
-    for (let i = 0; i < nextOrder.length; i++) {
-      if (this.state.previews[Number(nextOrder[i])] === null) {
-        console.log("I", i);
-        this.imgCounter = nextOrder[i];
-        flagged = true;
-        break;
-      }
-    }
-    if (!flagged) this.imgCounter = -1;
-    this.previewsOrder = nextOrder;
+    this.props.setPreviewsOrderRedux(nextOrder);
   };
 
   takePicture = async camera => {
@@ -120,8 +111,7 @@ export class Camera extends Component {
           .takePictureAsync(options)
           .then(data => {
             console.log(data);
-            this.state.previews[this.imgCounter] = data;
-            this.forceUpdate(this._reorderPreviews);
+            this.props.takePreviewRedux(data);
           })
           .catch(err => {
             console.log(err);
@@ -131,9 +121,19 @@ export class Camera extends Component {
   };
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  previews: state.sell.previews,
+  previewsOrder: state.sell.previewsOrder
+});
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = dispatch => {
+  return {
+    takePreviewRedux: data => dispatch(sellActions.takePreview(data)),
+    setPreviewsOrderRedux: nextOrder =>
+      dispatch(sellActions.setPreviewsOrder(nextOrder)),
+    deletePreviewRedux: index => dispatch(sellActions.deletePreview(index))
+  };
+};
 
 export default connect(
   mapStateToProps,

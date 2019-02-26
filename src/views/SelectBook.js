@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import SBHeader from "../components/MainSelectBook/SelectBookHeader";
 import { bookList } from "../mockData/Book";
 import SBList from "../components/MainSelectBook/SelectBookList";
+import * as sellActions from "../store/actions/sell";
 
 export class SelectBook extends Component {
   state = {
@@ -18,8 +19,9 @@ export class SelectBook extends Component {
           onChangeText={this.handleChange}
           searchQuery={this.state.searchQuery}
           resetSearchBar={this.resetSearchBar}
+          handleGoBack={this.handleGoBack}
         />
-        <SBList results={bookList} handleSelection={this.handleSelection}/>
+        <SBList results={bookList} handleSelection={this.handleSelection} />
       </View>
     );
   }
@@ -37,13 +39,22 @@ export class SelectBook extends Component {
   };
 
   handleSelection = isbn => {
-    this.props.navigation.navigate("Home");
+    this.props.selectBookRedux(isbn);
+    this.props.navigation.navigate("VendiInfos");
+  };
+
+  handleGoBack = () => {
+    this.props.navigation.goBack(null);
   };
 }
 
 const mapStateToProps = state => ({});
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = dispatch => {
+  return {
+    selectBookRedux: book => dispatch(sellActions.selectBook(book))
+  };
+};
 
 export default connect(
   mapStateToProps,

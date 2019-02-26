@@ -4,6 +4,7 @@ import {
   View,
   Animated,
   Image,
+  ImageBackground,
   TouchableWithoutFeedback,
   PanResponder,
   Easing,
@@ -11,6 +12,7 @@ import {
   Platform
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Button from "../Button";
 
 export default class ImagePreview extends Component {
   constructor(props) {
@@ -80,7 +82,7 @@ export default class ImagePreview extends Component {
             this._style
           ]}
         >
-          <Image
+          <ImageBackground
             style={{
               height: 70,
               width: 52,
@@ -89,7 +91,20 @@ export default class ImagePreview extends Component {
             }}
             source={item}
             resizeMode="stretch"
-          />
+          >
+            <Button
+              style={{ right: 3, top: 2, position: "absolute" }}
+              onPress={this._local_deleteItem}
+            >
+              <Icon
+                name="times-circle"
+                size={20}
+                style={{
+                  color: "white"
+                }}
+              />
+            </Button>
+          </ImageBackground>
         </Animated.View>
       );
     else
@@ -111,4 +126,8 @@ export default class ImagePreview extends Component {
         </View>
       );
   }
+
+  _local_deleteItem = () => {
+    this.props.deleteItem(this.props.index);
+  };
 }

@@ -9,14 +9,15 @@ import colors from "../../styles/colors";
 
 export default class ItemHeader extends Component {
   static propTypes = {
-    navigation: PropTypes.object,
+    handleGoBack: PropTypes.func,
     title: PropTypes.string,
     authors: PropTypes.string
   };
+
   render() {
     return (
       <View style={styles.container}>
-        <Button onPress={this.handleGoBack} style={styles.goBack}>
+        <Button onPress={this.props.handleGoBack} style={styles.goBack}>
           <Icon name="chevron-left" size={24} style={{ color: colors.black }} />
         </Button>
         <View style={styles.content}>
@@ -26,8 +27,4 @@ export default class ItemHeader extends Component {
       </View>
     );
   }
-
-  handleGoBack = () => {
-    this.props.navigation.goBack(null);
-  };
 }

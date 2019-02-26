@@ -9,13 +9,14 @@ import {
 
 import HomeScreen from "../views/Home";
 import ItemScreen from "../views/Item";
-import SearchScreen from "../views/Search";
 import VendiScreen from "../views/Vendi";
 import AppLoaderScreen from "../views/AppLoader";
 import LoginScreen from "../views/Auth/Login";
 import SignupScreen from "../views/Auth/Signup";
 import CameraScreen from "../views/Camera";
 import SelectBookScreen from "../views/SelectBook";
+import VendiInfosScreen from "../views/VendiInfos";
+import ChatHomeScreen from "../views/ChatHome";
 
 import Header from "../Header/Header";
 
@@ -45,13 +46,13 @@ const VendiNavigator = {
         screen: CameraScreen,
         path: "/vendi/camera"
       },
-      Home: {
-        screen: VendiScreen,
-        path: "/vendi"
-      },
       SelectBook: {
         screen: SelectBookScreen,
         path: "/vendi/selectbook"
+      },
+      VendiInfos: {
+        screen: VendiInfosScreen,
+        path: "/vendi/vendiinfos"
       }
     },
     {
@@ -86,10 +87,27 @@ const ProfileNavigator = {
   )
 };
 
+const ChatNavigator = {
+  screen: createStackNavigator(
+    {
+      Home: {
+        screen: ChatHomeScreen,
+        path: "/chat"
+      }
+    },
+    {
+      defaultNavigationOptions: {
+        header: null
+      }
+    }
+  )
+};
+
 const AppStack = createBottomTabNavigator({
   SEARCH: SearchNavigator,
   VENDI: VendiNavigator,
-  AUTH: ProfileNavigator
+  AUTH: ProfileNavigator,
+  CHAT: ChatNavigator
 });
 
 const FullApp = createSwitchNavigator(

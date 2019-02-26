@@ -33,7 +33,7 @@ export class Item extends Component {
     return (
       <View style={{ flex: 1 }}>
         <ItemHeader
-          navigation={this.props.navigation}
+          handleGoBack={this._handleGoBack}
           title={title}
           authors={authors}
         />
@@ -50,6 +50,10 @@ export class Item extends Component {
       </View>
     );
   }
+
+  _handleGoBack = () => {
+    this.props.navigation.goBack(null);
+  };
 }
 
 const mapStateToProps = state => ({});

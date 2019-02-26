@@ -7,7 +7,13 @@ import Icon from "react-native-vector-icons/FontAwesome";
 
 export class CameraHeader extends Component {
   render() {
-    const { previews, handleGoBack, _reorderPreviews } = this.props;
+    const {
+      previews,
+      handleGoBack,
+      _reorderPreviews,
+      deleteItem,
+      previewsOrder
+    } = this.props;
     return (
       <View
         style={{
@@ -24,6 +30,8 @@ export class CameraHeader extends Component {
         <CameraPreviews
           previews={previews}
           _reorderPreviews={_reorderPreviews}
+          deleteItem={deleteItem}
+          previewsOrder={previewsOrder}
         />
       </View>
     );
