@@ -5,19 +5,32 @@ import { connect } from "react-redux";
 import { chats } from "../mockData/Chat";
 import HomeHeader from "../components/MainChat/HomeHeader";
 import ChatsList from "../components/MainChat/ChatsList";
-
 export class ChatHome extends Component {
   render() {
+    const { sellerChats, buyerChats } = this.props;
     return (
       <View style={{ flex: 1 }}>
         <HomeHeader />
-        <ChatsList chats={chats} />
+        <ChatsList
+          sellerChatsData={sellerChats}
+          buyerChatsData={buyerChats}
+          inspectChat={this.inspectChat}
+        />
       </View>
     );
   }
+
+  inspectChat = data => {
+    this.props.navigation.navigate("Chat", {
+      data
+    });
+  };
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  sellerChats: state.messaging.sellerChats,
+  buyerChats: state.messaging.buyerChats
+});
 
 const mapDispatchToProps = {};
 

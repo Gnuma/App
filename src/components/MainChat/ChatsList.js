@@ -4,20 +4,22 @@ import ChatLink from "./ChatLink";
 
 export default class ChatsList extends Component {
   render() {
-    const { chats } = this.props;
-    console.log(chats);
+    const { sellerChatsData, buyerChatsData } = this.props;
+    const data = Object.values(sellerChatsData).concat(
+      Object.values(buyerChatsData)
+    );
     return (
       <FlatList
         style={{ flex: 1 }}
-        data={chats}
+        data={data}
         renderItem={this._renderItem}
         keyExtractor={this._keyExtractor}
       />
     );
   }
 
-  _renderItem = item => {
-    return <ChatLink />;
+  _renderItem = ({ item }) => {
+    return <ChatLink data={item} inspectChat={this.props.inspectChat} />;
   };
 
   _keyExtractor = item => {

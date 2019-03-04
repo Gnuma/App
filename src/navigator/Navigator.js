@@ -17,6 +17,7 @@ import CameraScreen from "../views/Camera";
 import SelectBookScreen from "../views/SelectBook";
 import VendiInfosScreen from "../views/VendiInfos";
 import ChatHomeScreen from "../views/ChatHome";
+import SingleChatScreen from "../views/SingleChat";
 
 import Header from "../Header/Header";
 
@@ -93,6 +94,10 @@ const ChatNavigator = {
       Home: {
         screen: ChatHomeScreen,
         path: "/chat"
+      },
+      Chat: {
+        screen: SingleChatScreen,
+        path: "/chat/:chatid"
       }
     },
     {
@@ -101,6 +106,16 @@ const ChatNavigator = {
       }
     }
   )
+};
+
+ChatNavigator.navigationOptions = ({ navigation }) => {
+  let { routeName } = navigation.state.routes[navigation.state.index];
+  let navigationOptions = {};
+  if (routeName === "Chat") {
+    navigationOptions.tabBarVisible = false;
+  }
+
+  return navigationOptions;
 };
 
 const AppStack = createBottomTabNavigator({

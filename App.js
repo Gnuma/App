@@ -8,6 +8,10 @@ import NavigationService from "./src/navigator/NavigationService";
 const store = configureStore();
 
 class App extends Component {
+  componentWillUnmount() {
+    console.log("App Has unmounted");
+  }
+
   render() {
     return (
       <Provider store={store}>
