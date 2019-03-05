@@ -1,3 +1,5 @@
+import uuid from "uuid";
+
 export const mockChatLink = {
   buyer: {
     id: 1,
@@ -57,7 +59,7 @@ export const mockMessages = [
     }
   },
   {
-    _id: "H",
+    _id: uuid.v4(),
     createdAt: new Date(Date.UTC(2019, 3, 1, 15, 30)),
     text: "Ciao Sesto",
     user: {

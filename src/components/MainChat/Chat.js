@@ -12,8 +12,13 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import Button from "../Button";
 import ChatComposer from "./ChatComposer";
 import GnumaChat from "./GnumaChat";
+import { mockMessages } from "../../mockData/Chat";
 
 export default class Chat extends Component {
+  state = {
+    messages: mockMessages
+  };
+
   render() {
     return <View style={{ flex: 1, marginTop: 130 }}>{this.getContent()}</View>;
   }
@@ -105,13 +110,17 @@ export default class Chat extends Component {
   };
 
   getContent = () => {
-    const { status, user, isLoading, messages } = this.props;
-    let mockMessages = messages;
+    const { status, user, isLoading } = this.props;
+    const { messages } = this.state;
     if (status === "active") {
       return (
         <GnumaChat
-          messages={mockMessages}
-          onSend={message => mockMessages.unshift(message)}
+          messages={messages}
+          onSend={message =>
+            this.setState(prevState => ({
+              messages: [...prevState.messages, message]
+            }))
+          }
           user={{
             _id: 1,
             name: "Federico"

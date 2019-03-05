@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import Button from "../Button";
 import { Header3, Header4 } from "../Text";
 import GnumaBubble from "./GnumaBubble";
+import uuid from "uuid";
 
 const getOnlyDate = fullDate => {
   return new Date(
@@ -36,6 +37,7 @@ export default class GnumaChat extends Component {
     const { messages: newMessages } = props;
     const { messages: oldMessages } = state;
 
+    console.log(newMessages.length);
     let updatedData = state.formattedData;
     if (newMessages.length > oldMessages.length) {
       let lastDate;
@@ -83,6 +85,7 @@ export default class GnumaChat extends Component {
             );
           }}
           sections={formattedData}
+          keyExtractor={(item, index) => item._id + index}
         />
         <View
           style={{
@@ -112,7 +115,15 @@ export default class GnumaChat extends Component {
   };
 
   _handleSend = () => {
-    this.props.onSend(this.state.input);
+    this.props.onSend({
+      _id: uuid.v4(),
+      createdAt: new Date(),
+      text: this.state.input,
+      user: this.props.user
+    });
+    this.setState({
+      input: ""
+    });
     console.log(this.state.input);
   };
 }
