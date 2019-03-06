@@ -51,5 +51,8 @@ export default StyleSheet.create({
   },
   p5: {
     padding: 5
+  },
+  rightHeaderContainer: {
+    flexDirection: "row"
   }
 });

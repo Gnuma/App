@@ -17,6 +17,7 @@ export class ContactButton extends Component {
             borderRadius: 8,
             marginBottom: 10
           }}
+          onPress={this.props.onContact}
         >
           <Header2 color={"secondary"}>Contatta Ora</Header2>
         </Button>

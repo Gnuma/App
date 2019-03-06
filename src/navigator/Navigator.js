@@ -20,6 +20,7 @@ import ChatHomeScreen from "../views/ChatHome";
 import SingleChatScreen from "../views/SingleChat";
 
 import Header from "../Header/Header";
+import TabBar from "../TabBar/TabBar";
 
 const SearchNavigator = {
   screen: createStackNavigator({
@@ -70,22 +71,26 @@ const VendiNavigator = {
 const ProfileNavigator = {
   screen: createStackNavigator(
     {
-      Login: {
-        screen: LoginScreen,
-        path: "/login"
-      },
       Signup: {
         screen: SignupScreen,
         path: "/signup"
+      },
+      Login: {
+        screen: LoginScreen,
+        path: "/login"
       }
     },
     {
       defaultNavigationOptions: {
-        initialRouteName: "Login",
         header: null
-      }
+      },
+      initialRouteName: "Signup",
+      initialRouteKey: "startingAuth"
     }
-  )
+  ),
+  navigationOptions: {
+    tabBarVisible: false
+  }
 };
 
 const ChatNavigator = {
@@ -118,12 +123,17 @@ ChatNavigator.navigationOptions = ({ navigation }) => {
   return navigationOptions;
 };
 
-const AppStack = createBottomTabNavigator({
-  SEARCH: SearchNavigator,
-  VENDI: VendiNavigator,
-  AUTH: ProfileNavigator,
-  CHAT: ChatNavigator
-});
+const AppStack = createBottomTabNavigator(
+  {
+    SEARCH: SearchNavigator,
+    VENDI: VendiNavigator,
+    AUTH: ProfileNavigator,
+    CHAT: ChatNavigator
+  },
+  {
+    tabBarComponent: TabBar
+  }
+);
 
 const FullApp = createSwitchNavigator(
   {

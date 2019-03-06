@@ -34,3 +34,15 @@ export const isInvalidEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return !re.test(String(email).toLowerCase());
 };
+
+export const fieldCheck = (field, validator) => {
+  const value = field.value;
+  field.errorMessage = "";
+  for (let i = 0; i < validator.functions.length; i++) {
+    if (validator.functions[i](value)) {
+      field.errorMessage = validator.warnings[i];
+      break;
+    }
+  }
+  return field;
+};

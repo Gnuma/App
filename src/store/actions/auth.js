@@ -41,7 +41,13 @@ export const authFail = error => {
   };
 };
 
-export const authLogin = (username, password) => {
+export const authLogin = (
+  username,
+  password,
+  callback,
+  nextRoute = "Home",
+  params
+) => {
   return dispatch => {
     dispatch(authStart());
     if (isOffline) {
@@ -49,7 +55,8 @@ export const authLogin = (username, password) => {
       if (username === "Test" && password === "testuserpwd") {
         const token = "tokenTest";
         dispatch(loginSuccess(token, true));
-        NavigatorService.navigate("Home");
+        callback ? callback() : null;
+        NavigatorService.navigate(nextRoute, params);
       } else {
         dispatch(authFail("Invalid authentication"));
       }

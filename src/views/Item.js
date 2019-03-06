@@ -7,6 +7,7 @@ import { itemData } from "../mockData/Item";
 import MainItem from "../components/MainItem/MainItem";
 import ContactButton from "../components/MainItem/ContactButton";
 import colors from "../styles/colors";
+import NavigatorService from "../navigator/NavigationService";
 
 export class Item extends Component {
   state = {
@@ -44,7 +45,7 @@ export class Item extends Component {
         ) : (
           <View style={{ flex: 1 }}>
             <MainItem data={data} />
-            <ContactButton />
+            <ContactButton onContact={this._handleContact} />
           </View>
         )}
       </View>
@@ -53,6 +54,10 @@ export class Item extends Component {
 
   _handleGoBack = () => {
     this.props.navigation.goBack(null);
+  };
+
+  _handleContact = () => {
+    NavigatorService.protectedNavigation("CHAT");
   };
 }
 

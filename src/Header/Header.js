@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { withNavigation } from "react-navigation";
 import styles from "./styles";
 import * as searchActions from "../store/actions/search";
+import * as authActions from "../store/actions/auth";
 import LeftHeader from "./LeftHeader";
 import CenterHeader from "./CenterHeader";
 import RightHeader from "./RightHeader";
@@ -48,7 +49,11 @@ export class Header extends Component {
           />
         </View>
         <View style={styles.secondary}>
-          <RightHeader setActive={this.openSearchField} />
+          <RightHeader
+            setActive={this.openSearchField}
+            onLogout={this.props.logoutRedux}
+            isAuthenticated={this.props.isAuthenticated}
+          />
         </View>
       </View>
     );
@@ -86,7 +91,8 @@ export class Header extends Component {
 
 const mapStateToProps = state => ({
   searchQuery: state.search.searchQuery,
-  isActive: state.search.isActive
+  isActive: state.search.isActive,
+  isAuthenticated: state.auth.token !== null
 });
 
 const mapDispatchToProps = dispatch => {
@@ -96,7 +102,8 @@ const mapDispatchToProps = dispatch => {
     setActiveRedux: isActive =>
       dispatch(searchActions.searchSetActive(isActive)),
     handleSearchQueryChange: searchQuery =>
-      dispatch(searchActions.handleSearchQueryChange(searchQuery))
+      dispatch(searchActions.handleSearchQueryChange(searchQuery)),
+    logoutRedux: () => dispatch(authActions.authLogout())
   };
 };
 
