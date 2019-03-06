@@ -2,11 +2,12 @@ import React, { Component } from "react";
 import { Text, View } from "react-native";
 import { Header3, Header4 } from "../Text";
 
-export default (GnumaBubble = props => {
-  const { text } = props;
+export default props => {
+  const { text, sender, fromUser  } = props;
+  console.log(fromUser)
   return (
-    <View style={{ backgroundColor: "lightblue", height: 30 }}>
+    <View style={{ backgroundColor: fromUser ? "lightblue" : "red" , height: 30 }}>
       <Header3>{text}</Header3>
     </View>
   );
-});
+};
