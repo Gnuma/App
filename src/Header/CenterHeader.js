@@ -42,7 +42,7 @@ export class CenterHeader extends Component {
             onSubmitEditing={onSubmitEditing}
             blurOnSubmit={true}
             ref={setRef}
-            autoFocus={true}
+            autoFocus={!searchQuery}
             onFocus={onFocus}
           />
 

@@ -53,9 +53,6 @@ const searchSetActive = (state, action) => {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.SEARCH_SET_SEARCHQUERY:
-      return searchSetSearchQuery(state, action);
-
     case actionTypes.SEARCH_START:
       return searchStart(state, action);
 
@@ -70,6 +67,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SEARCH_SET_ACTIVE:
       return searchSetActive(state, action);
+
+    case actionTypes.SEARCH_SET_SEARCHQUERY:
+      return searchSetSearchQuery(state, action);
 
     default:
       return state;
