@@ -37,7 +37,7 @@ export default class GnumaChat extends Component {
     const { messages: newMessages } = props;
     const { messages: oldMessages } = state;
 
-    console.log(newMessages);
+    //console.log(newMessages);
     let updatedData = state.formattedData;
     if (newMessages.length > oldMessages.length) {
       let lastDate;
@@ -73,7 +73,13 @@ export default class GnumaChat extends Component {
           inverted
           style={{ flex: 1 }}
           renderItem={({ item, index, section }) => {
-            return <GnumaBubble text={item.text} sender={item.user} fromUser={this.props.user._id === item.user._id}/>;
+            return (
+              <GnumaBubble
+                text={item.text}
+                sender={item.user}
+                fromUser={this.props.user._id === item.user._id}
+              />
+            );
           }}
           renderSectionHeader={({ section: { title } }) => {
             if (title === "first_index") return null;

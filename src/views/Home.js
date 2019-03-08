@@ -9,6 +9,7 @@ import SearchResults from "../components/SearchResults/SearchResults";
 import * as searchActions from "../store/actions/search";
 import BookShelf from "../components/MainHome/BookShelf";
 import SearchLink from "../components/MainHome/SearchLink";
+import { AndroidBackHandler } from "react-navigation-backhandler";
 
 export class Home extends Component {
   static propTypes = {
@@ -17,6 +18,14 @@ export class Home extends Component {
     suggestions: PropTypes.array,
     searchRedux: PropTypes.func
   };
+
+  render() {
+    return (
+      <AndroidBackHandler onBackPress={this._onBackButtonPressAndroid}>
+        {this.getContent()}
+      </AndroidBackHandler>
+    );
+  }
 
   getContent = () => {
     if (this.props.isSearchActive) {
@@ -46,6 +55,17 @@ export class Home extends Component {
     }
   };
 
+  _onBackButtonPressAndroid = () => {
+    if (this.props.isSearchActive) {
+      this.props.setActiveRedux(false);
+      return true;
+    } else if (this.props.results !== null) {
+      this.props.searchRedux("");
+      return true;
+    }
+    return false;
+  };
+
   _openSearchBar = () => {
     this.props.setActiveRedux(true);
   };
@@ -53,10 +73,6 @@ export class Home extends Component {
   _searchOption = search_query => {
     this.props.searchRedux(search_query);
   };
-
-  render() {
-    return this.getContent();
-  }
 }
 
 const mapStateToProps = state => ({

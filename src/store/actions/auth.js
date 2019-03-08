@@ -1,11 +1,22 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
 import NavigatorService from "../../navigator/NavigationService";
-import { setItem, getItem, removeItem } from "../utility";
+import { setItem, getItem, removeItem, multiGet } from "../utility";
 
 const isOffline = true;
 
 const tokenKey = "@auth:token";
+const officeKey = "@auth:office";
+
+export const authAppInit = (office, isSaving) => {
+  if (isSaving) setItem(officeKey, office);
+  return {
+    type: actionTypes.AUTH_APPINIT,
+    payload: {
+      office
+    }
+  };
+};
 
 export const authStart = () => {
   return {
@@ -83,6 +94,26 @@ export const authLogin = (
 export const autoLogin = () => {
   return dispatch => {
     dispatch(authStart());
+
+    multiGet([tokenKey, officeKey]).then(userInfos => {
+      const token = userInfos[0][1];
+      const office = userInfos[1][1];
+
+      if (office !== null) {
+        dispatch(authAppInit(office, false));
+        if (token !== null) {
+          dispatch(loginSuccess(token, false));
+          NavigatorService.navigate("Home");
+        } else {
+          dispatch(authFail("Token not found"));
+          NavigatorService.navigate("Home");
+        }
+      } else {
+        dispatch(authFail("Office not set"));
+        NavigatorService.navigate("InitProfile");
+      }
+    });
+
     getItem(tokenKey)
       .then(token => {
         if (token !== null) {

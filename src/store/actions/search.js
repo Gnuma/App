@@ -62,7 +62,7 @@ export const searchSetActive = isActive => {
 export const search = (search_query, cap) => {
   return dispatch => {
     dispatch(searchStart(search_query)); //Unificare
-    //Keyboard.dismiss();
+    Keyboard.dismiss();
     if (isOffline) {
       if (search_query) {
         dispatch(

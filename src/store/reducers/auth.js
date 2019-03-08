@@ -4,7 +4,14 @@ import { updateObject } from "../utility";
 const initialState = {
   token: null,
   error: null,
-  loading: false
+  loading: false,
+  office: null
+};
+
+export const authAppInit = (state, action) => {
+  return updateObject(state, {
+    office: action.payload.office
+  });
 };
 
 const authStart = (state, action) => {
@@ -39,6 +46,9 @@ const logoutSuccess = (state, action) => {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case actionTypes.AUTH_APPINIT:
+      return authAppInit(state, action);
+
     case actionTypes.AUTH_START:
       return authStart(state, action);
 

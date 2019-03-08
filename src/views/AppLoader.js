@@ -17,7 +17,7 @@ export class AppLoader extends Component {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Button onPress={() => this.props.navigation.navigate("App")}>
-          <Header1>Gnuma</Header1>
+          <Header1>Quipu</Header1>
         </Button>
       </View>
     );

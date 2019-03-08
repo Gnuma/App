@@ -16,7 +16,7 @@ export const mockMessages = [
   {
     _id: "A",
     createdAt: new Date(Date.UTC(2019, 3, 4, 12, 0)),
-    text: "Ciao Primo",
+    text: "Ciao 6",
     user: {
       _id: 1,
       name: "Federico"
@@ -24,8 +24,8 @@ export const mockMessages = [
   },
   {
     _id: "B",
-    createdAt: new Date(Date.UTC(2019, 3, 4, 12, 30)),
-    text: "Ciao Secondo",
+    createdAt: new Date(Date.UTC(2019, 3, 4, 11, 30)),
+    text: "Ciao 5",
     user: {
       _id: 2,
       name: "Alice"
@@ -33,8 +33,8 @@ export const mockMessages = [
   },
   {
     _id: "C",
-    createdAt: new Date(Date.UTC(2019, 3, 4, 13, 0)),
-    text: "Ciao Terzo",
+    createdAt: new Date(Date.UTC(2019, 3, 4, 11, 0)),
+    text: "Ciao 4",
     user: {
       _id: 2,
       name: "Alice"
@@ -42,8 +42,8 @@ export const mockMessages = [
   },
   {
     _id: "D",
-    createdAt: new Date(Date.UTC(2019, 3, 2, 13, 30)),
-    text: "Ciao Quarto",
+    createdAt: new Date(Date.UTC(2019, 3, 2, 10, 30)),
+    text: "Ciao 3",
     user: {
       _id: 1,
       name: "Federico"
@@ -51,8 +51,8 @@ export const mockMessages = [
   },
   {
     _id: "F",
-    createdAt: new Date(Date.UTC(2019, 3, 2, 14, 30)),
-    text: "Ciao Quinto",
+    createdAt: new Date(Date.UTC(2019, 3, 2, 9, 30)),
+    text: "Ciao 2",
     user: {
       _id: 1,
       name: "Federico"
@@ -60,8 +60,8 @@ export const mockMessages = [
   },
   {
     _id: uuid.v4(),
-    createdAt: new Date(Date.UTC(2019, 3, 1, 15, 30)),
-    text: "Ciao Sesto",
+    createdAt: new Date(Date.UTC(2019, 3, 1, 8, 30)),
+    text: "Ciao 1",
     user: {
       _id: 1,
       name: "Federico"

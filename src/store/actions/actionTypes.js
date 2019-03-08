@@ -1,3 +1,4 @@
+export const AUTH_APPINIT = "AUTH_APPINIT";
 export const AUTH_START = "AUTH_START";
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const AUTH_FAIL = "AUTH_FAIL";

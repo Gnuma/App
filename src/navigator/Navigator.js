@@ -18,6 +18,7 @@ import SelectBookScreen from "../views/SelectBook";
 import VendiInfosScreen from "../views/VendiInfos";
 import ChatHomeScreen from "../views/ChatHome";
 import SingleChatScreen from "../views/SingleChat";
+import InitProfileScreen from "../views/InitProfile";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -123,6 +124,22 @@ ChatNavigator.navigationOptions = ({ navigation }) => {
   return navigationOptions;
 };
 
+const InitProfileNavigator = {
+  screen: createStackNavigator(
+    {
+      IPHome: {
+        screen: InitProfileScreen,
+        path: "/iphome"
+      }
+    },
+    {
+      defaultNavigationOptions: {
+        header: null
+      }
+    }
+  )
+};
+
 const AppStack = createBottomTabNavigator(
   {
     SEARCH: SearchNavigator,
@@ -138,7 +155,8 @@ const AppStack = createBottomTabNavigator(
 const FullApp = createSwitchNavigator(
   {
     AppLoader: AppLoaderScreen,
-    App: AppStack
+    App: AppStack,
+    InitProfile: InitProfileNavigator
   },
   {
     initialRouteName: "AppLoader"
