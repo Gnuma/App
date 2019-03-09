@@ -13,14 +13,17 @@ export class SearchResults extends Component {
         style={{ flex: 1 }}
         keyboardShouldPersistTaps={"handled"}
         data={suggestions}
-        renderItem={({ item }) => (
-          <Button
-            style={{ padding: 10, flexDriection: "row" }}
-            onPress={() => searchRedux(item)}
-          >
-            <Header3>{item}</Header3>
-          </Button>
-        )}
+        renderItem={({ item }) => {
+          console.log(item);
+          return (
+            <Button
+              style={{ padding: 10, flexDriection: "row" }}
+              onPress={() => searchRedux(item.isbn)}
+            >
+              <Header3>{item.title}</Header3>
+            </Button>
+          );
+        }}
         keyExtractor={this._keyExtractor}
         contentContainerStyle={{
           justifyContent: "center",

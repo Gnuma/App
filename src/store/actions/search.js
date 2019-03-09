@@ -2,8 +2,9 @@ import * as actionTypes from "./actionTypes";
 import axios from "axios";
 import { singleResults, multiResults } from "../../mockData/SearchResults";
 import { Keyboard } from "react-native";
+import { ___BOOK_HINTS_ENDPOINT___ } from "../constants";
 
-const isOffline = true;
+const isOffline = false;
 
 export const searchSetSearchQuery = search_query => {
   return {
@@ -96,6 +97,17 @@ export const handleSearchQueryChange = search_query => {
       }
       dispatch(searchSuggest(suggestions));
     } else {
+      axios
+        .post(___BOOK_HINTS_ENDPOINT___, {
+          keyword: search_query
+        })
+        .then(res => {
+          console.log(res);
+          dispatch(searchSuggest(res.data.results));
+        })
+        .catch(err => {
+          dispatch(searchFail(err));
+        });
     }
   };
 };

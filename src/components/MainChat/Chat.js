@@ -118,7 +118,7 @@ export default class Chat extends Component {
           messages={messages}
           onSend={message =>
             this.setState(prevState => ({
-              messages: [...prevState.messages, message]
+              messages: [message, ...prevState.messages]
             }))
           }
           user={{

@@ -9,7 +9,7 @@ export const updateObject = (oldObject, updatedProprieties) => {
 
 export const setItem = async (key, item) => {
   try {
-    const jsonOfItem = await AsyncStorage.setItem(key, JSON.stringify(item));
+    const jsonOfItem = await AsyncStorage.setItem(key, item);
     return jsonOfItem;
   } catch (error) {
     console.log(error);

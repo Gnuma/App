@@ -2,8 +2,9 @@ import * as actionTypes from "./actionTypes";
 import axios from "axios";
 import NavigatorService from "../../navigator/NavigationService";
 import { setItem, getItem, removeItem, multiGet } from "../utility";
+import { ___LOGIN_ENDPOINT___ } from "../constants";
 
-const isOffline = true;
+const isOffline = false;
 
 const tokenKey = "@auth:token";
 const officeKey = "@auth:office";
@@ -74,7 +75,7 @@ export const authLogin = (
     } else {
       //Online
       axios
-        .post("http://192.168.178.104:8000/gnuma/v1/auth/login/", {
+        .post(___LOGIN_ENDPOINT___, {
           username,
           password
         })
@@ -96,6 +97,7 @@ export const autoLogin = () => {
     dispatch(authStart());
 
     multiGet([tokenKey, officeKey]).then(userInfos => {
+      console.log(userInfos);
       const token = userInfos[0][1];
       const office = userInfos[1][1];
 

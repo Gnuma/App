@@ -5,6 +5,8 @@ import Button from "../Button";
 import { Header3, Header4 } from "../Text";
 import GnumaBubble from "./GnumaBubble";
 import uuid from "uuid";
+import Icon from "react-native-vector-icons/FontAwesome";
+import colors from "../../styles/colors";
 
 const getOnlyDate = fullDate => {
   return new Date(
@@ -40,23 +42,44 @@ export default class GnumaChat extends Component {
     //console.log(newMessages);
     let updatedData = state.formattedData;
     if (newMessages.length > oldMessages.length) {
+      let lastUpdatedIndex = newMessages.length - oldMessages.length;
       let lastDate;
+      let lastUserID;
       if (oldMessages.length === 0) {
         lastDate = false;
       } else {
-        lastDate = getOnlyDate(newMessages[oldMessages.length - 1].createdAt);
+        lastDate = getOnlyDate(newMessages[lastUpdatedIndex].createdAt);
+        lastUserID = newMessages[lastUpdatedIndex].user._id;
       }
-      for (let i = oldMessages.length; i < newMessages.length; i++) {
+      for (let i = lastUpdatedIndex - 1; i >= 0; i--) {
         const newDate = getOnlyDate(newMessages[i].createdAt);
-        if (!lastDate || newDate < lastDate) {
-          updatedData[updatedData.length - 1].data.push(newMessages[i]);
-          updatedData.push({ title: newDate, data: [] });
+        //console.log("Date Comparison: ", newDate, lastDate, newDate > lastDate);
+        if (!lastDate || newDate > lastDate) {
+          updatedData[0] = { title: newDate, data: updatedData[0].data };
+          updatedData.unshift({
+            title: "first_index",
+            data: [
+              {
+                ...newMessages[i],
+                fromSameUser: true
+              }
+            ]
+          });
+          //updatedData[0].data.push(newMessages[i]);
           lastDate = newDate;
+          lastUserID = newMessages[i].user._id;
         } else {
-          updatedData[updatedData.length - 2].data.push(newMessages[i]);
+          updatedData[0].data.unshift({
+            ...newMessages[i],
+            fromSameUser: lastUserID == newMessages[i].user._id
+          });
+          console.log(lastUserID, newMessages[i].user._id);
+          lastUserID = newMessages[i].user._id;
         }
       }
     }
+
+    console.log(updatedData);
 
     return {
       ...state,
@@ -78,13 +101,17 @@ export default class GnumaChat extends Component {
                 text={item.text}
                 sender={item.user}
                 fromUser={this.props.user._id === item.user._id}
+                fromSameUser={item.fromSameUser}
               />
             );
           }}
           renderSectionHeader={({ section: { title } }) => {
             if (title === "first_index") return null;
             return (
-              <Header3 style={{ fontWeight: "bold" }}>
+              <Header3
+                color={"grey"}
+                style={{ alignSelf: "center", marginVertical: 14 }}
+              >
                 {title.getFullYear() + " / " + title.getDate()}
               </Header3>
             );
@@ -95,7 +122,6 @@ export default class GnumaChat extends Component {
         <View
           style={{
             flexDirection: "row",
-            borderTopWidth: 1,
             borderTopColor: "black"
           }}
         >
@@ -105,9 +131,29 @@ export default class GnumaChat extends Component {
             value={this.state.input}
             onChangeText={this._handleChangeInput}
           />
-          <Button onPress={this._handleSend}>
-            <Header3 color={"primary"}>Invia</Header3>
-          </Button>
+          <View
+            style={{
+              width: 50
+            }}
+          >
+            <Button
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+              onPress={this._handleSend}
+              disabled={!this.state.input}
+            >
+              <Icon
+                name="paper-plane"
+                style={{
+                  color: this.state.input ? colors.primary : colors.grey
+                }}
+                size={22}
+              />
+            </Button>
+          </View>
         </View>
       </View>
     );
@@ -120,15 +166,14 @@ export default class GnumaChat extends Component {
   };
 
   _handleSend = () => {
-    this.props.onSend({
-      _id: uuid.v4(),
-      createdAt: new Date(),
-      text: this.state.input,
-      user: this.props.user
-    });
-    this.setState({
-      input: ""
-    });
-    console.log(this.state.input);
+    if (this.state.input) {
+      this.props.onSend({
+        _id: uuid.v4(),
+        createdAt: new Date(),
+        text: this.state.input,
+        user: this.props.user
+      });
+      this._handleChangeInput("");
+    }
   };
 }

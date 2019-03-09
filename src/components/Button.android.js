@@ -8,17 +8,25 @@ import {
 
 export class Button extends Component {
   render() {
-    return (
-      <TouchableNativeFeedback
-        onPress={this.props.onPress}
-        background={TouchableNativeFeedback.Ripple()}
-        useForeground={true}
-      >
+    if (this.props.disabled) {
+      return (
         <View pointerEvents="box-only" style={this.props.style}>
           {this.props.children}
         </View>
-      </TouchableNativeFeedback>
-    );
+      );
+    } else {
+      return (
+        <TouchableNativeFeedback
+          onPress={this.props.onPress}
+          background={TouchableNativeFeedback.Ripple()}
+          useForeground={true}
+        >
+          <View pointerEvents="box-only" style={this.props.style}>
+            {this.props.children}
+          </View>
+        </TouchableNativeFeedback>
+      );
+    }
   }
 }
 

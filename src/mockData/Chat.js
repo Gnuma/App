@@ -15,7 +15,7 @@ export const mockChatLink = {
 export const mockMessages = [
   {
     _id: "A",
-    createdAt: new Date(Date.UTC(2019, 3, 4, 12, 0)),
+    createdAt: new Date(2019, 2, 4, 12, 0),
     text: "Ciao 6",
     user: {
       _id: 1,
@@ -24,7 +24,7 @@ export const mockMessages = [
   },
   {
     _id: "B",
-    createdAt: new Date(Date.UTC(2019, 3, 4, 11, 30)),
+    createdAt: new Date(2019, 2, 4, 11, 30),
     text: "Ciao 5",
     user: {
       _id: 2,
@@ -33,7 +33,7 @@ export const mockMessages = [
   },
   {
     _id: "C",
-    createdAt: new Date(Date.UTC(2019, 3, 4, 11, 0)),
+    createdAt: new Date(2019, 2, 4, 11, 0),
     text: "Ciao 4",
     user: {
       _id: 2,
@@ -41,8 +41,35 @@ export const mockMessages = [
     }
   },
   {
+    _id: uuid.v4(),
+    createdAt: new Date(2019, 2, 4, 10, 59),
+    text: "Spero tutto ok",
+    user: {
+      _id: 1,
+      name: "Federico"
+    }
+  },
+  {
+    _id: uuid.v4(),
+    createdAt: new Date(2019, 2, 4, 10, 58),
+    text: "Come va?",
+    user: {
+      _id: 1,
+      name: "Federico"
+    }
+  },
+  {
+    _id: uuid.v4(),
+    createdAt: new Date(2019, 2, 4, 10, 57),
+    text: "Ciao skgkldfkgkldfghkodf",
+    user: {
+      _id: 1,
+      name: "Federico"
+    }
+  },
+  {
     _id: "D",
-    createdAt: new Date(Date.UTC(2019, 3, 2, 10, 30)),
+    createdAt: new Date(2019, 2, 2, 10, 30),
     text: "Ciao 3",
     user: {
       _id: 1,
@@ -51,7 +78,7 @@ export const mockMessages = [
   },
   {
     _id: "F",
-    createdAt: new Date(Date.UTC(2019, 3, 2, 9, 30)),
+    createdAt: new Date(2019, 2, 2, 9, 30),
     text: "Ciao 2",
     user: {
       _id: 1,
@@ -60,7 +87,7 @@ export const mockMessages = [
   },
   {
     _id: uuid.v4(),
-    createdAt: new Date(Date.UTC(2019, 3, 1, 8, 30)),
+    createdAt: new Date(2019, 2, 1, 8, 30),
     text: "Ciao 1",
     user: {
       _id: 1,
