@@ -10,7 +10,8 @@ export const MainItemStyles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    marginHorizontal: 35
+    marginHorizontal: 35,
+    paddingBottom: 80
   },
   bigDivider: {
     marginTop: 25,

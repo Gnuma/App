@@ -34,13 +34,13 @@ export class VendiInfos extends Component {
           authors={authors}
         />
         <MainSell
-          handleSubmit={this.handleSubmit}
           price={price}
           conditions={conditions}
           description={description}
           setPrice={setPriceRedux}
           setDescription={setDescriptionRedux}
           setConditions={setConditionsRedux}
+          handleComplete={this._handleComplete}
         />
       </View>
     );
@@ -50,7 +50,11 @@ export class VendiInfos extends Component {
     this.props.navigation.goBack(null);
   };
 
-  handleSubmit = () => {};
+  _handleComplete = () => {
+    if (this.props.price && this.props.description && this.props.conditions) {
+      this.props.submitRedux();
+    }
+  };
 }
 
 const mapStateToProps = state => ({
@@ -65,7 +69,8 @@ const mapDispatchToProps = dispatch => {
     setDescriptionRedux: description =>
       dispatch(sellActions.setDescription(description)),
     setConditionsRedux: conditions =>
-      dispatch(sellActions.setConditions(conditions))
+      dispatch(sellActions.setConditions(conditions)),
+    submitRedux: () => dispatch(sellActions.submit())
   };
 };
 

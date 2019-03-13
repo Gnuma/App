@@ -13,7 +13,7 @@ export class TabBar extends Component {
 
   render() {
     const { navigation } = this.props;
-
+    const focus = this._getFocused();
     return (
       <View
         style={{
@@ -27,26 +27,54 @@ export class TabBar extends Component {
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           onPress={this._goHome}
         >
-          <Icon name="search" size={27} style={{ marginBottom: 5 }} />
-          <Header4>Esplora</Header4>
+          <Icon
+            name="search"
+            size={20}
+            style={{
+              marginBottom: 5,
+              color: focus === "SEARCH" ? colors.secondary : colors.grey
+            }}
+          />
+          <Header4 color={focus === "SEARCH" ? "secondary" : "grey"}>
+            Esplora
+          </Header4>
         </Button>
         <Button
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           onPress={this._goVendi}
         >
-          <SellIcon style={{ marginBottom: 5 }} />
-          <Header4>Vendi</Header4>
+          <SellIcon
+            style={{ marginBottom: 5 }}
+            color={focus === "VENDI" ? colors.secondary : colors.grey}
+          />
+          <Header4 color={focus === "VENDI" ? "secondary" : "grey"}>
+            Vendi
+          </Header4>
         </Button>
         <Button
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           onPress={this._goChat}
         >
-          <Icon name="paper-plane" size={27} style={{ marginBottom: 5 }} />
-          <Header4>Chat</Header4>
+          <Icon
+            name="paper-plane"
+            size={20}
+            style={{
+              marginBottom: 5,
+              color: focus === "CHAT" ? colors.secondary : colors.grey
+            }}
+          />
+          <Header4 color={focus === "CHAT" ? "secondary" : "grey"}>
+            Chat
+          </Header4>
         </Button>
       </View>
     );
   }
+
+  _getFocused = () => {
+    return this.props.navigation.state.routes[this.props.navigation.state.index]
+      .routeName;
+  };
 
   _goHome = () => {
     this.props.navigation.navigate("SEARCH");

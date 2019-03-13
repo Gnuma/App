@@ -1,18 +1,41 @@
 import React, { Component } from "react";
-import { View, FlatList, Text, SectionList } from "react-native";
+import {
+  View,
+  FlatList,
+  Text,
+  SectionList,
+  ActivityIndicator
+} from "react-native";
 import PropTypes from "prop-types";
 import styles from "./styles";
 import ListMultiItem from "../ListItem/ListMultiItem";
 import ListSingleItem from "../ListItem/ListSingleItem";
 import { Header2, Header4 } from "../../components/Text";
+import colors from "../../styles/colors";
 
 export class MainList extends Component {
   static propTypes = {
-    data: PropTypes.object
+    data: PropTypes.object,
+    isLoading: PropTypes.bool
   };
 
   render() {
-    const { data } = this.props;
+    const { data, isLoading } = this.props;
+
+    if (isLoading) {
+      return (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color={colors.secondary} />
+        </View>
+      );
+    }
+
+    if (!data || data.results.length <= 0) {
+      return <Header2>Nessun Risultato</Header2>;
+    }
+
     const isSingle = data.resultType === "single";
     const results = data.results;
 
@@ -27,9 +50,9 @@ export class MainList extends Component {
                 backgroundColor: "#fff"
               }}
             >
-              <Header2 color={"primary"}>{data.object.title}</Header2>
+              <Header2 color={"primary"}>{results[0].book.title}</Header2>
               <Header4 style={{ paddingBottom: 5, paddingLeft: 10 }}>
-                {data.object.authors}
+                {results[0].book.author}
               </Header4>
             </View>
             <FlatList
@@ -52,7 +75,7 @@ export class MainList extends Component {
   }
 
   _keyExtractor = item => {
-    return item.id;
+    return item.pk.toString();
   };
 
   _renderMultiItem = ({ item }) => {

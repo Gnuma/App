@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import styles from "./styles";
 import { Header1, Header3, Header4, Header5 } from "../../components/Text";
 import ConditionCircle from "../ConditionCircle";
-
 const itemHeight = 130;
 
 export default class Item extends Component {
@@ -14,7 +13,9 @@ export default class Item extends Component {
   };
   render() {
     const { isSingle, data } = this.props;
-    const { name, id, img, authors, price, seller, conditions, office } = data;
+    console.log(data);
+    const { price, seller, condition, book } = data;
+    const office = seller.classM.office;
     return (
       <View
         style={{
@@ -49,12 +50,12 @@ export default class Item extends Component {
         <View style={{ flex: 1, marginLeft: 5 }}>
           <View style={{ flex: 2, flexDirection: "row" }}>
             <View style={{ flex: 3 }}>
-              <Header3 color="black">{seller}</Header3>
+              <Header3 color="black">{seller.user.username}</Header3>
               <Header1 color="primary">EUR {price}</Header1>
             </View>
             <View style={{ margin: 10 }}>
               <ConditionCircle
-                conditions={conditions}
+                conditions={condition}
                 radius={35}
                 style={{ margin: 10 }}
               />
@@ -62,7 +63,7 @@ export default class Item extends Component {
           </View>
           <View style={{ flex: 1 }}>
             <Header4 color="black">{office.name}</Header4>
-            <Header5 style={{ marginLeft: 15 }}>{office.address}</Header5>
+            <Header5 style={{ marginLeft: 15 }}>{office.cap}</Header5>
           </View>
         </View>
       </View>

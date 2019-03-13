@@ -5,18 +5,23 @@ import colors from "../styles/colors";
 import { Header5 } from "./Text";
 
 const conditionsTable = {
-  1: {
+  0: {
     text: "Ottimo",
     percentage: 75,
     color: colors.secondary
   },
-  2: {
+  1: {
     text: "Buono",
     percentage: 50,
     color: colors.lightYellow
   },
-  3: {
+  2: {
     text: "Usurato",
+    percentage: 25,
+    color: colors.red
+  },
+  3: {
+    text: "ERROR",
     percentage: 25,
     color: colors.red
   }

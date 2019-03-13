@@ -24,7 +24,7 @@ export const msgListenToChats = (chatRef, type) => {
   };
 };
 */
-
+//Test
 export const msgChatUpdate = (chatID, chatData, type) => {
   return {
     type: actionTypes.MSG_CHATUPDATE,

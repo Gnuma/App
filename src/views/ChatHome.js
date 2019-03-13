@@ -15,6 +15,7 @@ export class ChatHome extends Component {
           sellerChatsData={sellerChats}
           buyerChatsData={buyerChats}
           inspectChat={this.inspectChat}
+          handleGoBack={this._handleGoBack}
         />
       </View>
     );
@@ -24,6 +25,10 @@ export class ChatHome extends Component {
     this.props.navigation.navigate("Chat", {
       data
     });
+  };
+
+  _handleGoBack = () => {
+    this.props.navigation.goBack(null);
   };
 }
 

@@ -10,20 +10,20 @@ import Item from "./Item";
 const itemHeight = 130;
 export class ListSingleItem extends Component {
   static propTypes = {
-    data: PropTypes.object.isRequired,
+    data: PropTypes.object.isRequired
   };
 
   render() {
     const { data } = this.props;
-    const { name, id, img, authors, price, seller } = data;
+    const { book, id } = data;
 
     return (
       <Button
         onPress={() =>
           this.props.navigation.navigate("Item", {
-            itemID: id,
-            name: name,
-            authors: authors
+            itemID: "ID",
+            name: book.title,
+            authors: book.author
           })
         }
         style={{

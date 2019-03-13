@@ -94,6 +94,7 @@ export class Signup extends Component {
           elevation: 4,
           borderRadius: 6
         }}
+        onPress={this.signup}
       >
         <Header2 color={"primary"} style={{ textAlign: "center" }}>
           Registrati
@@ -219,7 +220,11 @@ export class Signup extends Component {
       const pwd = fields.pwd.value;
       const email = fields.email.value;
       const confirmPwd = fields.confirmPwd.value;
-      this.props.signupRedux(uid, pwd, email, confirmPwd);
+      const _callback = this.props.navigation.getParam(
+        "___CALLBACK___",
+        undefined
+      );
+      this.props.signupRedux(uid, email, pwd, confirmPwd, _callback);
     } else {
       this.setState({
         fields: { ...result }
@@ -241,8 +246,18 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    signupRedux: (uid, email, pwd1, pwd2) =>
-      dispatch(authActions.authSignup(uid, email, pwd1, pwd2))
+    signupRedux: (uid, email, pwd1, pwd2, callback, nextRoute, params) =>
+      dispatch(
+        authActions.authSignup(
+          uid,
+          email,
+          pwd1,
+          pwd2,
+          callback,
+          nextRoute,
+          params
+        )
+      )
   };
 };
 

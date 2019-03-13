@@ -6,12 +6,13 @@ import colors from "../styles/colors";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Header3 } from "./Text";
 
-export default class Picker extends Component {
+export default class TextInputPicker extends Component {
   static propTypes = {
     options: PropTypes.array,
     onSelect: PropTypes.func,
     onTextChange: PropTypes.func,
-    defaultValue: PropTypes.string
+    defaultValue: PropTypes.string,
+    value: PropTypes.string
   };
 
   constructor(props) {
@@ -19,8 +20,7 @@ export default class Picker extends Component {
 
     this.state = {
       isActive: false,
-      selected: undefined,
-      value: ""
+      selected: undefined
     };
   }
 
@@ -35,9 +35,7 @@ export default class Picker extends Component {
     });
 
   _onChange = text => {
-    this.setState({
-      value: text
-    });
+    this.props.onTextChange(text);
   };
 
   _focusInput = () => {
@@ -49,8 +47,8 @@ export default class Picker extends Component {
   };
 
   render() {
-    const { isActive, value } = this.state;
-    const { options, style } = this.props;
+    const { isActive } = this.state;
+    const { options, style, value } = this.props;
     return (
       <View style={[{ padding: 8 }, style]}>
         <View style={{ flexDirection: "row" }}>
@@ -98,7 +96,7 @@ export default class Picker extends Component {
               backgroundColor: "white",
               borderRadius: 6,
               elevation: 3,
-              height: 140,
+              maxheight: 140,
               marginTop: -10
             }}
           >
@@ -125,6 +123,7 @@ export default class Picker extends Component {
   };
 
   _renderOption = ({ item }) => {
+    console.log(this.state.selected, item);
     const isSelected =
       this.state.selected && this.state.selected.id === item.id;
     return (
@@ -133,7 +132,7 @@ export default class Picker extends Component {
         style={{ paddingVertical: 6, paddingLeft: 10 }}
       >
         <Header3 color={isSelected ? "secondary" : "black"}>
-          {item.title}
+          {item.name}
         </Header3>
       </Button>
     );
@@ -142,8 +141,7 @@ export default class Picker extends Component {
   onSelection = item => {
     this.setState({
       selected: item,
-      isActive: false,
-      value: item.title
+      isActive: false
     });
     Keyboard.dismiss();
     this.props.onSelect ? this.props.onSelect(item) : null;

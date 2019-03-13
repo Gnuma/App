@@ -68,7 +68,7 @@ export class Header extends Component {
   };
 
   resetToHome = () => {
-    this.props.searchRedux("");
+    this.props.goHomeRedux();
   };
 
   search = () => {
@@ -103,7 +103,8 @@ const mapDispatchToProps = dispatch => {
       dispatch(searchActions.searchSetActive(isActive)),
     handleSearchQueryChange: searchQuery =>
       dispatch(searchActions.handleSearchQueryChange(searchQuery)),
-    logoutRedux: () => dispatch(authActions.authLogout())
+    logoutRedux: () => dispatch(authActions.authLogout()),
+    goHomeRedux: () => dispatch(searchActions.searchGoHome())
   };
 };
 

@@ -16,7 +16,9 @@ export class Home extends Component {
     results: PropTypes.object,
     isSearchActive: PropTypes.bool,
     suggestions: PropTypes.array,
-    searchRedux: PropTypes.func
+    searchRedux: PropTypes.func,
+    showResults: PropTypes.bool,
+    isLoading: PropTypes.bool
   };
 
   render() {
@@ -35,8 +37,10 @@ export class Home extends Component {
           suggestions={this.props.suggestions}
         />
       );
-    } else if (this.props.results !== null) {
-      return <MainList data={this.props.results} />;
+    } else if (this.props.showResults) {
+      return (
+        <MainList data={this.props.results} isLoading={this.props.isLoading} />
+      );
     } else {
       return (
         <View style={{ flex: 1, justifyContent: "center" }}>
@@ -59,11 +63,11 @@ export class Home extends Component {
     if (this.props.isSearchActive) {
       this.props.setActiveRedux(false);
       return true;
-    } else if (this.props.results !== null) {
-      this.props.searchRedux("");
+    } else if (this.props.showResults) {
+      this.props.goHomeRedux();
       return true;
     }
-    return false;
+    return true;
   };
 
   _openSearchBar = () => {
@@ -78,7 +82,9 @@ export class Home extends Component {
 const mapStateToProps = state => ({
   isSearchActive: state.search.isActive,
   results: state.search.results,
-  suggestions: state.search.suggestions
+  suggestions: state.search.suggestions,
+  showResults: state.search.showResults,
+  isLoading: state.search.loading
 });
 
 const mapDispatchToProps = dispatch => {
@@ -86,7 +92,8 @@ const mapDispatchToProps = dispatch => {
     searchRedux: (search_query, cap) =>
       dispatch(searchActions.search(search_query, cap)),
     setActiveRedux: isActive =>
-      dispatch(searchActions.searchSetActive(isActive))
+      dispatch(searchActions.searchSetActive(isActive)),
+    goHomeRedux: () => dispatch(searchActions.searchGoHome())
   };
 };
 

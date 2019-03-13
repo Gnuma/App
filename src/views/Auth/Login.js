@@ -106,12 +106,10 @@ export class Login extends Component {
     if (result === true) {
       const uid = fields.uid.value;
       const pwd = fields.pwd.value;
-
       const _callback = this.props.navigation.getParam(
         "___CALLBACK___",
         undefined
       );
-
       this.props.loginRedux(uid, pwd, _callback);
     } else {
       this.setState(prevState => ({

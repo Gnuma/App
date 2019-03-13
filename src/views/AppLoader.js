@@ -10,7 +10,6 @@ import { Header1 } from "../components/Text";
 export class AppLoader extends Component {
   componentDidMount() {
     this.props.autoLoginRedux();
-    this.props.msgConnectRedux(1);
   }
 
   render() {
@@ -28,8 +27,7 @@ const mapStateToProps = state => ({});
 
 const mapDispatchToProps = dispatch => {
   return {
-    autoLoginRedux: () => dispatch(authActions.autoLogin()),
-    msgConnectRedux: userID => dispatch(msgActions.connect(userID))
+    autoLoginRedux: () => dispatch(authActions.autoLogin())
   };
 };
 

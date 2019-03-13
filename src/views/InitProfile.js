@@ -5,16 +5,21 @@ import { connect } from "react-redux";
 import * as authActions from "../store/actions/auth";
 import Button from "../components/Button";
 import { Header1, Header3 } from "../components/Text";
-import Picker from "../components/Picker";
+import Picker from "../components/TextInputPicker";
+import axios from "axios";
+import { ___OFFICE_HINTS_ENDPOINT___ } from "../store/constants";
 
 export class InitProfile extends Component {
   state = {
-    office: undefined
+    options: [],
+    office: undefined,
+    officeQueryValue: ""
   };
 
   _onSelectOffice = office => {
     this.setState({
-      office: office
+      office: office,
+      officeQueryValue: office.name
     });
   };
 
@@ -23,6 +28,22 @@ export class InitProfile extends Component {
       this.props.appInitRedux(this.state.office);
       this.props.navigation.navigate("App");
     }
+  };
+
+  _onOfficeQueryChange = text => {
+    this.setState({
+      officeQueryValue: text
+    });
+    axios
+      .post(___OFFICE_HINTS_ENDPOINT___, {
+        keyword: text
+      })
+      .then(res => {
+        this.setState({
+          options: res.data.results
+        });
+      })
+      .catch(err => console.log(err));
   };
 
   render() {
@@ -44,9 +65,11 @@ export class InitProfile extends Component {
         </Header3>
         <Picker
           defaultValue={"Istituto"}
-          options={mockOptions}
+          options={this.state.options}
           style={{ marginVertical: 20 }}
           onSelect={this._onSelectOffice}
+          value={this.state.officeQueryValue}
+          onTextChange={this._onOfficeQueryChange}
         />
         <Button
           style={{

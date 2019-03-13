@@ -6,7 +6,9 @@ const initialState = {
   error: null, //errors
   loading: false, //is loading results
   searchQuery: "", //search query,
-  isActive: false
+  isActive: false,
+  showResults: false,
+  suggestions: []
 };
 
 const searchSetSearchQuery = (state, action) => {
@@ -20,7 +22,9 @@ const searchStart = (state, action) => {
     error: null,
     loading: true,
     searchQuery: action.payload.search_query,
-    isActive: false
+    isActive: false,
+    showResults: true,
+    results: null
   });
 };
 
@@ -51,6 +55,13 @@ const searchSetActive = (state, action) => {
   });
 };
 
+const searchGoHome = (state, action) => {
+  return updateObject(state, {
+    showResults: false,
+    searchQuery: ""
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SEARCH_START:
@@ -70,6 +81,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SEARCH_SET_SEARCHQUERY:
       return searchSetSearchQuery(state, action);
+
+    case actionTypes.SEARCH_GO_HOME:
+      return searchGoHome(state, action);
 
     default:
       return state;

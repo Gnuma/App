@@ -9,7 +9,7 @@ export const updateObject = (oldObject, updatedProprieties) => {
 
 export const setItem = async (key, item) => {
   try {
-    const jsonOfItem = await AsyncStorage.setItem(key, item);
+    const jsonOfItem = await AsyncStorage.setItem(key, JSON.stringify(item));
     return jsonOfItem;
   } catch (error) {
     console.log(error);
@@ -39,8 +39,16 @@ export const removeItem = async key => {
 
 export const multiGet = async keys => {
   try {
-    return await AsyncStorage.multiGet(keys);
+    let items = await AsyncStorage.multiGet(keys);
+    for (let i = 0; i < items.length; i++) {
+      if (items[i][1] !== null) items[i][1] = JSON.parse(items[i][1]);
+    }
+    return items;
   } catch (error) {
     console.log(error);
   }
+};
+
+export const isIsbn = value => {
+  return /^\d+$/.test(value) && value.length >= 9 && value.length <= 13;
 };

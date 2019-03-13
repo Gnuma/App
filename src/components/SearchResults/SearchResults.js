@@ -14,11 +14,10 @@ export class SearchResults extends Component {
         keyboardShouldPersistTaps={"handled"}
         data={suggestions}
         renderItem={({ item }) => {
-          console.log(item);
           return (
             <Button
               style={{ padding: 10, flexDriection: "row" }}
-              onPress={() => searchRedux(item.isbn)}
+              onPress={() => searchRedux(item)}
             >
               <Header3>{item.title}</Header3>
             </Button>
