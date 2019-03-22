@@ -27,7 +27,11 @@ function protectedNavigation(routeName, routeParams, ___CALLBACK___) {
   else {
     _navigator.dispatch(
       NavigationActions.setParams({
-        params: { ...routeParams, ___CALLBACK___ },
+        params: {
+          ___routeName___: routeName,
+          ___routeParams___: routeParams,
+          ___CALLBACK___
+        },
         key: "startingAuth"
       })
     );

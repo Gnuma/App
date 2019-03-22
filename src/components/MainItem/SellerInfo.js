@@ -7,11 +7,12 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../../styles/colors";
 
 export default props => {
+  const { username } = props.data;
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <View>
-          <Header2 color={"black"}>Federico</Header2>
+          <Header2 color={"black"}>{username}</Header2>
         </View>
         <View style={styles.exploreIconContainer}>
           <Button>

@@ -8,35 +8,42 @@ import MainItem from "../components/MainItem/MainItem";
 import ContactButton from "../components/MainItem/ContactButton";
 import colors from "../styles/colors";
 import NavigatorService from "../navigator/NavigationService";
-
+import axios from "axios";
+import { ___GET_AD___ } from "../store/constants";
 export class Item extends Component {
   state = {
-    data: undefined
+    data: undefined,
+    bookName: this.props.navigation.getParam("name", "Undesfineds"),
+    bookAuthors: this.props.navigation.getParam("authors", "Undesfineds")
   };
 
   componentDidMount() {
     const { navigation } = this.props;
-    const id = navigation.getParam("itemId", "Undesfineds");
-    setTimeout(() => {
-      this.setState({
-        data: itemData
+    const id = navigation.getParam("itemID", "Undesfineds");
+
+    axios
+      .get(___GET_AD___ + `${id}/`)
+      .then(res => {
+        this.setState({
+          data: res.data
+        });
+      })
+      .catch(err => {
+        console.log("ERROR", err);
       });
-    }, 500);
   }
 
   render() {
-    const { data } = this.state;
+    const { data, bookName, bookAuthors } = this.state;
     const { navigation } = this.props;
-    const title = navigation.getParam("name", "Undefined");
-    const authors = navigation.getParam("authors", "Undefined");
     const isLoading = data === undefined;
 
     return (
       <View style={{ flex: 1 }}>
         <ItemHeader
           handleGoBack={this._handleGoBack}
-          title={title}
-          authors={authors}
+          title={bookName}
+          authors={bookAuthors}
         />
         {isLoading ? (
           <View style={styles.container}>

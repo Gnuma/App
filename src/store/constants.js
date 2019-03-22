@@ -16,3 +16,4 @@ export const ___INITUSER_ENDPOINT___ = ___BASE_ENDPOINT___ + "init/";
 
 export const ___CREATE_AD___ = ___BASE_ENDPOINT___ + "ads/";
 export const ___BASE_UPLOAD_PICTURE___ = ___BASE_ENDPOINT___ + "ads/upload/";
+export const ___GET_AD___ = ___BASE_ENDPOINT___ + "ads/";

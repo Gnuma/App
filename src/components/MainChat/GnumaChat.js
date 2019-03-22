@@ -73,13 +73,13 @@ export default class GnumaChat extends Component {
             ...newMessages[i],
             fromSameUser: lastUserID == newMessages[i].user._id
           });
-          console.log(lastUserID, newMessages[i].user._id);
+          //console.log(lastUserID, newMessages[i].user._id);
           lastUserID = newMessages[i].user._id;
         }
       }
     }
 
-    console.log(updatedData);
+    //console.log(updatedData);
 
     return {
       ...state,
@@ -167,12 +167,15 @@ export default class GnumaChat extends Component {
 
   _handleSend = () => {
     if (this.state.input) {
+      /*
       this.props.onSend({
         _id: uuid.v4(),
         createdAt: new Date(),
         text: this.state.input,
         user: this.props.user
       });
+      */
+      this.props.onSend(this.state.input);
       this._handleChangeInput("");
     }
   };

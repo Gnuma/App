@@ -110,7 +110,15 @@ export class Login extends Component {
         "___CALLBACK___",
         undefined
       );
-      this.props.loginRedux(uid, pwd, _callback);
+      const routeName = this.props.navigation.getParam(
+        "___routeName___",
+        undefined
+      );
+      const routeParams = this.props.navigation.getParam(
+        "___routeParams___",
+        undefined
+      );
+      this.props.loginRedux(uid, pwd, _callback, routeName, routeParams);
     } else {
       this.setState(prevState => ({
         ...prevState,

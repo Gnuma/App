@@ -19,7 +19,7 @@ export class ListMultiItem extends Component {
       <Button
         onPress={() =>
           this.props.navigation.navigate("Item", {
-            itemID: "ID",
+            itemID: this.props.pk,
             name: name,
             authors: authors
           })

@@ -5,7 +5,9 @@ const initialState = {
   token: null,
   error: null,
   loading: false,
-  office: null
+  office: null,
+  gnumaUser: null,
+  username: null
 };
 
 export const authAppInit = (state, action) => {
@@ -25,7 +27,9 @@ const loginSuccess = (state, action) => {
   return updateObject(state, {
     token: action.payload.token,
     error: null,
-    loading: false
+    loading: false,
+    gnumaUser: action.payload.gnumaUser,
+    username: action.payload.username
   });
 };
 
@@ -40,7 +44,9 @@ const logoutSuccess = (state, action) => {
   return updateObject(state, {
     token: null,
     error: null,
-    loading: false
+    loading: false,
+    gnumaUser: null,
+    username: null
   });
 };
 

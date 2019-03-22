@@ -3,7 +3,7 @@ import axios from "axios";
 import { StackActions } from "react-navigation";
 import NavigatorService from "../../navigator/NavigationService";
 import { setItem, getItem, removeItem, multiGet } from "../utility";
-import { msgConnect } from "./messaging";
+import { connect as msgConnect } from "./messaging";
 import {
   ___LOGIN_ENDPOINT___,
   ___WHOAMI_ENDPOINT___,
@@ -33,13 +33,19 @@ export const authStart = () => {
   };
 };
 
-export const loginSuccess = (token, isSaving) => {
-  if (isSaving) setItem(tokenKey, token);
+export const loginSuccess = (
+  token,
+  username = "NotSet",
+  gnumaUser = "NotSet"
+) => {
+  setItem(tokenKey, token);
   axios.defaults.headers.common["Authorization"] = "Token " + token; // for all requests
   return {
     type: actionTypes.LOGIN_SUCCESS,
     payload: {
-      token: token
+      token,
+      username,
+      gnumaUser
     }
   };
 };
@@ -74,7 +80,7 @@ export const authLogin = (
       //Offline
       if (username === "Test" && password === "testuserpwd") {
         const token = "tokenTest";
-        dispatch(loginSuccess(token, true));
+        dispatch(loginSuccess(token));
         callback ? callback() : null;
         NavigatorService.navigate(nextRoute, params);
       } else {
@@ -89,8 +95,7 @@ export const authLogin = (
         })
         .then(res => {
           const token = res.data.key;
-          console.log(res);
-          dispatch(loginSuccess(token, true));
+          dispatch(loginSuccess(token));
           callback ? callback() : null;
           NavigatorService.navigate(nextRoute, params);
         })
@@ -104,16 +109,12 @@ export const authLogin = (
 export const autoLogin = () => {
   return dispatch => {
     dispatch(authStart());
-    dispatch(msgConnect(1));
     multiGet([tokenKey, officeKey]).then(userInfos => {
       console.log(userInfos);
       const token = userInfos[0][1];
       const office = userInfos[1][1];
 
       if (token !== null) {
-        //Login
-        //dispatch(loginSuccess(token, false));
-
         axios
           .get(___WHOAMI_ENDPOINT___, {
             headers: {
@@ -121,8 +122,11 @@ export const autoLogin = () => {
             }
           })
           .then(res => {
-            console.log("Succes", res);
-            dispatch(loginSuccess(token, false));
+            if (!res.data.gnuma_user) throw "Gnuma User not initialized";
+            dispatch(
+              loginSuccess(token, res.data.username, res.data.gnuma_user)
+            );
+            dispatch(msgConnect(1));
           })
           .catch(err => {
             dispatch(authFail(err));
@@ -156,52 +160,6 @@ export const authLogout = () => {
       .catch(err => {
         dispatch(authFail(err));
       });
-
-    /*
-    //test
-    getItem(tokenKey)
-      .then(token => {
-        if (token === null) {
-          dispatch(authFail("The user wasn't logged in"));
-        } else {
-          dispatch(logoutSuccess());
-        }
-      })
-      .catch(err => {
-        console.warn(err);
-      });
-
-    /*
-    getItem(tokenKey)
-      .then(token => {
-        if (token === null) {
-          dispatch(authFail("The user wasn't logged in"));
-        } else {
-          axios
-            .post("http://127.0.0.1:8000/gnuma/v1/auth/logout/")
-            .then(() => {
-              dispatch(logoutSuccess());
-            })
-            .catch(err => {
-              dispatch(authFail(err));
-            });
-        }
-      })
-      .catch(err => {
-        console.warn(err);
-      });
-      */
-  };
-};
-
-export const authCheckState = () => {
-  return dispatch => {
-    //const token = localStorage.getItem("token");
-    if (token === null) {
-      dispatch(logoutSuccess());
-    } else {
-      dispatch(loginSuccess(token));
-    }
   };
 };
 
@@ -219,11 +177,6 @@ export const authSignup = (
 
     if (isOffline) {
       console.log(username, email, password1, password2);
-      /*
-      const token = "tokenTest";
-      dispatch(loginSuccess(token, true));
-      NavigatorService.navigate("Home");
-      */
     } else {
       axios
         .post(___SIGNUP_ENDPOINT___, {
@@ -241,7 +194,7 @@ export const authSignup = (
               office: "J. Von Neumann"
             })
             .then(res => {
-              dispatch(loginSuccess(token, true));
+              dispatch(loginSuccess(token));
               callback ? callback() : null;
               NavigatorService.navigate(nextRoute, params);
             })

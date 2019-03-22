@@ -11,14 +11,13 @@ export class MainItem extends Component {
     const { data } = this.props;
     const primaryData = {
       price: data.price,
-      conditions: data.conditions,
-      office: data.seller.office
+      conditions: data.condition,
+      office: data.seller.classM.office
     };
-    const sellerData = data.seller;
+    const sellerData = data.seller.user;
     const secondaryData = {
       book: data.book
     };
-
     return (
       <ScrollView style={styles.scrollView}>
         <ImageSlider style={styles.imageSlider} />

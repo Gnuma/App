@@ -16,14 +16,14 @@ import { mockMessages } from "../../mockData/Chat";
 
 export default class Chat extends Component {
   state = {
-    messages: mockMessages
+    messages: this.props.messages
   };
 
   render() {
     return <View style={{ flex: 1, marginTop: 130 }}>{this.getContent()}</View>;
   }
 
-  onSend = (messages = []) => {
+  onSend = (messages = "") => {
     if (messages.length > 0) {
       firebase
         .firestore()
@@ -31,7 +31,7 @@ export default class Chat extends Component {
         .doc(this.props.chatID)
         .collection("messages")
         .add({
-          content: messages[0].text,
+          content: messages,
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
           sender: this.props.userType
         });
@@ -111,16 +111,12 @@ export default class Chat extends Component {
 
   getContent = () => {
     const { status, user, isLoading } = this.props;
-    const { messages } = this.state;
+    const { messages } = this.props;
     if (status === "active") {
       return (
         <GnumaChat
           messages={messages}
-          onSend={message =>
-            this.setState(prevState => ({
-              messages: [message, ...prevState.messages]
-            }))
-          }
+          onSend={this.onSend}
           user={{
             _id: 1,
             name: "Federico"
@@ -243,3 +239,17 @@ export default class Chat extends Component {
           minInputToolbarHeight={60}
         />
 */
+
+/*<GnumaChat
+          messages={messages}
+          onSend={message =>
+            this.setState(prevState => ({
+              messages: [message, ...prevState.messages]
+            }))
+          }
+          user={{
+            _id: 1,
+            name: "Federico"
+          }}
+        />
+        */

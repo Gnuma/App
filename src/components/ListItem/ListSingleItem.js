@@ -15,13 +15,13 @@ export class ListSingleItem extends Component {
 
   render() {
     const { data } = this.props;
-    const { book, id } = data;
+    const { book, pk } = data;
 
     return (
       <Button
         onPress={() =>
           this.props.navigation.navigate("Item", {
-            itemID: "ID",
+            itemID: pk,
             name: book.title,
             authors: book.author
           })

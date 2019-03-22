@@ -2,7 +2,7 @@ import firebase from "react-native-firebase";
 import * as actionTypes from "./actionTypes";
 import { mockChatLink, mockMessages } from "../../mockData/Chat";
 
-const isOffline = true;
+const isOffline = false;
 
 export const msgConnect = (unsubscriber, type) => {
   return {
