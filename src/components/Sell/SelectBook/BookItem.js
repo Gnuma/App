@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Text, View, Image } from "react-native";
-import { Header3, Header4, Header5 } from "../Text";
-import Button from "../Button";
+import { Header3, Header4, Header5 } from "../../Text";
+import Button from "../../Button";
 
 const itemHeight = 130;
 
@@ -30,7 +30,7 @@ export default class BookItem extends Component {
               borderTopLeftRadius: 10,
               borderBottomLeftRadius: 10
             }}
-            source={require("../../media/imgs/thumbnail-test.png")}
+            source={require("../../../media/imgs/thumbnail-test.png")}
           />
           <View style={{ flex: 1, margin: 5 }}>
             <View style={{ flex: 0 }}>

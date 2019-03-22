@@ -4,6 +4,7 @@ import Button from "../Button";
 import colors from "../../styles/colors";
 import CameraPreviews from "./CameraPreviews";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { header as headerStyle, generalStyle } from "./styles";
 
 export class CameraHeader extends Component {
   render() {
@@ -15,17 +16,9 @@ export class CameraHeader extends Component {
       previewsOrder
     } = this.props;
     return (
-      <View
-        style={{
-          flex: 0,
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: 20
-        }}
-      >
-        <Button onPress={handleGoBack} style={{ padding: 10 }}>
-          <Icon name="chevron-left" size={30} style={{ color: "white" }} />
+      <View style={headerStyle.container}>
+        <Button onPress={handleGoBack} style={generalStyle.p10}>
+          <Icon name="chevron-left" size={30} style={generalStyle.w} />
         </Button>
         <CameraPreviews
           previews={previews}

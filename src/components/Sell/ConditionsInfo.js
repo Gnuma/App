@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { Header2, Header3 } from "../Text";
-import Button from "../Button";
 import colors from "../../styles/colors";
+import SolidButton from "../SolidButton";
 
 export default class ConditionsInfo extends Component {
   render() {
@@ -19,39 +19,39 @@ export default class ConditionsInfo extends Component {
             alignItems: "center"
           }}
         >
-          <Button
-            style={[
-              styles.button,
-              { borderColor: conditions === 1 ? colors.secondary : "white" }
-            ]}
+          <SolidButton
+            style={{
+              borderColor: conditions === 1 ? colors.secondary : "white",
+              borderWidth: 2
+            }}
             onPress={this._setOttimo}
           >
             <Header3 style={styles.buttonText} color={"secondary"}>
               Ottimo
             </Header3>
-          </Button>
-          <Button
-            style={[
-              styles.button,
-              { borderColor: conditions === 2 ? colors.lightYellow : "white" }
-            ]}
+          </SolidButton>
+          <SolidButton
+            style={{
+              borderColor: conditions === 2 ? colors.lightYellow : "white",
+              borderWidth: 2
+            }}
             onPress={this._setBuono}
           >
             <Header3 style={styles.buttonText} color={"lightYellow"}>
               Buono
             </Header3>
-          </Button>
-          <Button
-            style={[
-              styles.button,
-              { borderColor: conditions === 3 ? colors.red : "white" }
-            ]}
+          </SolidButton>
+          <SolidButton
+            style={{
+              borderColor: conditions === 3 ? colors.red : "white",
+              borderWidth: 2
+            }}
             onPress={this._setUsato}
           >
             <Header3 style={styles.buttonText} color={"red"}>
               Usato
             </Header3>
-          </Button>
+          </SolidButton>
         </View>
       </View>
     );

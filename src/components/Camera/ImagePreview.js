@@ -1,18 +1,14 @@
 import React, { Component } from "react";
 import {
-  Text,
   View,
   Animated,
-  Image,
   ImageBackground,
-  TouchableWithoutFeedback,
-  PanResponder,
   Easing,
-  Dimensions,
   Platform
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Button from "../Button";
+import { cameraPreview as cameraPreviewStyle, generalStyle } from "./styles";
 
 export default class ImagePreview extends Component {
   constructor(props) {
@@ -69,60 +65,25 @@ export default class ImagePreview extends Component {
     const { item } = this.props;
     if (item)
       return (
-        <Animated.View
-          style={[
-            {
-              borderRadius: 4,
-              marginHorizontal: 6,
-              elevation: 4,
-              borderColor: "white",
-              borderWidth: 2,
-              marginTop: 5
-            },
-            this._style
-          ]}
-        >
+        <Animated.View style={[cameraPreviewStyle.itemContainer, this._style]}>
           <ImageBackground
-            style={{
-              height: 70,
-              width: 52,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
+            style={cameraPreviewStyle.imagePreview}
             source={item}
             resizeMode="stretch"
           >
             <Button
-              style={{ right: 3, top: 2, position: "absolute" }}
+              style={cameraPreviewStyle.deletePreviewBtn}
               onPress={this._local_deleteItem}
             >
-              <Icon
-                name="times-circle"
-                size={20}
-                style={{
-                  color: "white"
-                }}
-              />
+              <Icon name="times-circle" size={20} style={generalStyle.w} />
             </Button>
           </ImageBackground>
         </Animated.View>
       );
     else
       return (
-        <View
-          style={{
-            height: 74,
-            width: 56,
-            borderWidth: 2,
-            borderColor: "white",
-            justifyContent: "center",
-            alignItems: "center",
-            marginHorizontal: 6,
-            borderRadius: 4,
-            marginTop: 5
-          }}
-        >
-          <Icon name="camera" size={20} style={{ color: "white" }} />
+        <View style={cameraPreviewStyle.unknownPreview}>
+          <Icon name="camera" size={20} style={generalStyle.w} />
         </View>
       );
   }

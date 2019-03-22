@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { View, SectionList, TextInput, Text } from "react-native";
 import PropTypes from "prop-types";
-import Button from "../Button";
-import { Header3, Header4 } from "../Text";
-import GnumaBubble from "./GnumaBubble";
+import Button from "../../Button";
+import { Header3, Header4 } from "../../Text";
+import QuipuBubble from "./QuipuBubble";
 import uuid from "uuid";
 import Icon from "react-native-vector-icons/FontAwesome";
-import colors from "../../styles/colors";
+import colors from "../../../styles/colors";
 
 const getOnlyDate = fullDate => {
   return new Date(
@@ -16,7 +16,7 @@ const getOnlyDate = fullDate => {
   );
 };
 
-export default class GnumaChat extends Component {
+export default class QuipuChat extends Component {
   static propTypes = {
     messages: PropTypes.array,
     onSend: PropTypes.func,
@@ -97,7 +97,7 @@ export default class GnumaChat extends Component {
           style={{ flex: 1 }}
           renderItem={({ item, index, section }) => {
             return (
-              <GnumaBubble
+              <QuipuBubble
                 text={item.text}
                 sender={item.user}
                 fromUser={this.props.user._id === item.user._id}

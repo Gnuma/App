@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Text, View } from "react-native";
 import ImagePreview from "./ImagePreview";
 import SortableList from "react-native-sortable-list";
+import { cameraPreview as cameraPreviewStyle } from "./styles";
 
 export class CameraPreviews extends Component {
   constructor(props) {
@@ -17,7 +18,7 @@ export class CameraPreviews extends Component {
     return (
       <SortableList
         horizontal
-        style={{ flex: 1, height: 80, alignItems: "center" }}
+        style={cameraPreviewStyle.container}
         data={previews}
         renderRow={this._renderItem}
         rowActivationTime={0}

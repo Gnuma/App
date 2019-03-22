@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { GiftedChat } from "react-native-gifted-chat";
 import { chats } from "../mockData/Chat";
-import ChatHeader from "../components/MainChat/ChatHeader";
-import Chat from "../components/MainChat/Chat";
+import ChatHeader from "../components/Chat/ChatHeader";
+import Chat from "../components/Chat/Chat";
 
 export class SingleChat extends Component {
   constructor(props) {

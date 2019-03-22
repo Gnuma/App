@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { View, Text, ScrollView } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import ItemHeader from "../components/MainItem/ItemHeader";
-import MainSell from "../components/MainSell/MainSell";
+import ItemHeader from "../components/Item/ItemHeader";
+import MainSell from "../components/Sell/MainSell";
 import * as sellActions from "../store/actions/sell";
 
 export class VendiInfos extends Component {

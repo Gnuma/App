@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { View, TextInput } from "react-native";
-import Button from "../Button";
+import Button from "../../Button";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Header2, Header5 } from "../Text";
-import colors from "../../styles/colors";
+import { Header2, Header5 } from "../../Text";
+import colors from "../../../styles/colors";
 
 export default class SelectBookHeader extends Component {
   render() {

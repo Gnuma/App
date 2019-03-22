@@ -3,12 +3,12 @@ import { View } from "react-native";
 import { withNavigation } from "react-navigation";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import MainList from "../components/MainList/MainList";
+import MainList from "../components/List/MainList";
 import { Header1 } from "../components/Text";
 import SearchResults from "../components/SearchResults/SearchResults";
 import * as searchActions from "../store/actions/search";
-import BookShelf from "../components/MainHome/BookShelf";
-import SearchLink from "../components/MainHome/SearchLink";
+import BookShelf from "../components/Home/BookShelf";
+import SearchLink from "../components/Home/SearchLink";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 
 export class Home extends Component {

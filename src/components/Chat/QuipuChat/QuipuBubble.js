@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Text, View } from "react-native";
-import { Header3, Header4 } from "../Text";
+import { Header3, Header4 } from "../../Text";
 import styles from "./styles";
 
 export default props => {

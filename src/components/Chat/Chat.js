@@ -11,7 +11,7 @@ import { Header3, Header4 } from "../Text";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Button from "../Button";
 import ChatComposer from "./ChatComposer";
-import GnumaChat from "./GnumaChat";
+import QuipuChat from "./QuipuChat/QuipuChat";
 import { mockMessages } from "../../mockData/Chat";
 
 export default class Chat extends Component {
@@ -114,7 +114,7 @@ export default class Chat extends Component {
     const { messages } = this.props;
     if (status === "active") {
       return (
-        <GnumaChat
+        <QuipuChat
           messages={messages}
           onSend={this.onSend}
           user={{
@@ -240,7 +240,7 @@ export default class Chat extends Component {
         />
 */
 
-/*<GnumaChat
+/*<QuipuChat
           messages={messages}
           onSend={message =>
             this.setState(prevState => ({

@@ -10,7 +10,10 @@ export class Button extends Component {
   render() {
     if (this.props.disabled) {
       return (
-        <View pointerEvents="box-only" style={this.props.style}>
+        <View
+          pointerEvents="box-only"
+          style={[styles.button, this.props.style]}
+        >
           {this.props.children}
         </View>
       );
@@ -21,7 +24,10 @@ export class Button extends Component {
           background={TouchableNativeFeedback.Ripple()}
           useForeground={true}
         >
-          <View pointerEvents="box-only" style={this.props.style}>
+          <View
+            pointerEvents="box-only"
+            style={[styles.button, this.props.style]}
+          >
             {this.props.children}
           </View>
         </TouchableNativeFeedback>
@@ -33,3 +39,9 @@ export class Button extends Component {
 Button.defaultProps = { disabled: false };
 
 export default Button;
+
+const styles = StyleSheet.create({
+  button: {
+    overflow: "hidden"
+  }
+});

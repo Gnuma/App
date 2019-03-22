@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { View, Text } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import SBHeader from "../components/MainSelectBook/SelectBookHeader";
+import SBHeader from "../components/Sell/SelectBook/SelectBookHeader";
 import { bookList } from "../mockData/Book";
-import SBList from "../components/MainSelectBook/SelectBookList";
+import SBList from "../components/Sell/SelectBook/SelectBookList";
 import * as sellActions from "../store/actions/sell";
 
 export class SelectBook extends Component {

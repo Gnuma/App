@@ -5,6 +5,7 @@ import { Header2, Header4 } from "../Text";
 import Button from "../Button";
 import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../../styles/colors";
+import SolidButton from "../SolidButton";
 
 export default props => {
   const { username } = props.data;
@@ -21,22 +22,15 @@ export default props => {
         </View>
       </View>
       <View style={styles.buttonListContainer}>
-        <Button style={styles.button}>
+        <SolidButton icon="heart" iconSize={20}>
           <Header4 color={"primary"}>Salva Venditore</Header4>
-          <Icon name="heart" size={20} style={styles.buttonIcon} />
-        </Button>
-        <Button style={styles.button}>
+        </SolidButton>
+        <SolidButton icon="star" iconSize={20}>
           <Header4 color={"primary"}>Salva Inserzione</Header4>
-          <Icon name="star" size={20} style={styles.buttonIcon} />
-        </Button>
-        <Button style={styles.button}>
+        </SolidButton>
+        <SolidButton icon="exclamation-triangle" iconSize={20}>
           <Header4 color={"primary"}>Segnala Inserzione</Header4>
-          <Icon
-            name="exclamation-triangle"
-            size={20}
-            style={styles.buttonIcon}
-          />
-        </Button>
+        </SolidButton>
       </View>
     </View>
   );

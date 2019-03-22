@@ -24,24 +24,9 @@ export class ListMultiItem extends Component {
             authors: authors
           })
         }
-        style={{
-          flex: 1,
-          margin: 10,
-          elevation: 3,
-          borderRadius: 10,
-          backgroundColor: "white"
-        }}
+        style={styles.itemButton}
       >
-        <View
-          style={{
-            flex: 1,
-            flexGrow: 1,
-            paddingLeft: 5,
-            paddingBottom: 5,
-            borderTopEndRadius: 10,
-            backgroundColor: "white"
-          }}
-        >
+        <View style={styles.multiHeader}>
           <Header2 color={"primary"}>{book.title}</Header2>
           <Header5>{book.author}</Header5>
         </View>

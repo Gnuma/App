@@ -5,6 +5,7 @@ import colors from "../../styles/colors";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Header3 } from "../Text";
 import { RNCamera } from "react-native-camera";
+import { bottomBar as bottomBarStyle, generalStyle } from "./styles";
 
 export class CameraBottom extends Component {
   render() {
@@ -15,23 +16,9 @@ export class CameraBottom extends Component {
       handleGoNext
     } = this.props;
     return (
-      <View
-        style={{
-          flex: 0,
-          flexDirection: "row",
-          justifyContent: "center",
-          marginBottom: 35
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "flex-end",
-            flexDirection: "row",
-            alignItems: "center"
-          }}
-        >
-          <Button style={{ padding: 10 }} onPress={changeFlashMode}>
+      <View style={bottomBarStyle.container}>
+        <View style={bottomBarStyle.leftBox}>
+          <Button style={generalStyle.p10} onPress={changeFlashMode}>
             <Icon
               name="bolt"
               size={30}
@@ -44,33 +31,11 @@ export class CameraBottom extends Component {
             />
           </Button>
         </View>
-        <View
-          style={{ flex: 1, justifyContent: "center", flexDirection: "row" }}
-        >
-          <Button
-            style={{
-              width: 60,
-              height: 60,
-              borderRadius: 30,
-              backgroundColor: "white"
-            }}
-            onPress={takePicture}
-          />
+        <View style={bottomBarStyle.middleBox}>
+          <Button style={bottomBarStyle.captureBtn} onPress={takePicture} />
         </View>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            flexDirection: "row",
-            alignItems: "center"
-          }}
-        >
-          <Button
-            style={{
-              padding: 10
-            }}
-            onPress={handleGoNext}
-          >
+        <View style={bottomBarStyle.rightBox}>
+          <Button style={generalStyle.p10} onPress={handleGoNext}>
             <Icon
               name="arrow-circle-right"
               size={40}
