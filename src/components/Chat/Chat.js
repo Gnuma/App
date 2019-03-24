@@ -113,16 +113,7 @@ export default class Chat extends Component {
     const { status, user, isLoading } = this.props;
     const { messages } = this.props;
     if (status === "active") {
-      return (
-        <QuipuChat
-          messages={messages}
-          onSend={this.onSend}
-          user={{
-            _id: 1,
-            name: "Federico"
-          }}
-        />
-      );
+      return <QuipuChat messages={messages} onSend={this.onSend} user={user} />;
     } else if (this.props.userType === "buyer") {
       return (
         <View style={{ flex: 1, marginHorizontal: 15 }}>

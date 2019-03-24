@@ -5,18 +5,12 @@ const initialState = {
   sellerChats: {},
   buyerChats: {},
   messages: {},
-  user: 1,
-  db: null
+  user: null
 };
 
 const msgConnect = (state, action) => {
-  const { type, unsubscriber } = action.payload;
-  console.log(unsubscriber);
   return updateObject(state, {
-    [type]: {
-      ...state[type],
-      unsubscriber: unsubscriber
-    }
+    user: action.payload.userID
   });
 };
 

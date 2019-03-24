@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View } from "react-native";
+import { View, Keyboard } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { withNavigation } from "react-navigation";
@@ -11,10 +11,6 @@ import CenterHeader from "./CenterHeader";
 import RightHeader from "./RightHeader";
 
 export class Header extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   static propTypes = {
     searchRedux: PropTypes.func,
     setActiveRedux: PropTypes.func,
@@ -32,29 +28,26 @@ export class Header extends Component {
       ].routeName === "Item";
     return (
       <View style={styles.header}>
-        <View style={styles.primary}>
-          <LeftHeader
-            isActive={isActive}
-            isItem={isItem}
-            handleGoBack={this.setInactive}
-          />
-          <CenterHeader
-            isActive={isActive}
-            searchQuery={searchQuery}
-            onChangeText={this.handleChangeText}
-            onSubmitEditing={this.search}
-            resetToHome={this.resetToHome}
-            onFocus={this.setActive}
-            setRef={this.setSearchRef}
-          />
-        </View>
-        <View style={styles.secondary}>
-          <RightHeader
-            setActive={this.openSearchField}
-            onLogout={this.props.logoutRedux}
-            isAuthenticated={this.props.isAuthenticated}
-          />
-        </View>
+        <LeftHeader
+          isActive={isActive}
+          isItem={isItem}
+          handleGoBack={this.setInactive}
+        />
+        <CenterHeader
+          isActive={isActive}
+          searchQuery={searchQuery}
+          onChangeText={this.handleChangeText}
+          onSubmitEditing={this.search}
+          resetToHome={this.resetToHome}
+          onFocus={this.setActive}
+          setRef={this.setSearchRef}
+        />
+        <RightHeader
+          setActive={this.openSearchField}
+          onLogout={this.props.logoutRedux}
+          isAuthenticated={this.props.isAuthenticated}
+          visible={!isActive && !searchQuery}
+        />
       </View>
     );
   }
@@ -81,6 +74,7 @@ export class Header extends Component {
   };
 
   setInactive = () => {
+    Keyboard.dismiss();
     this.props.setActiveRedux(false);
   };
 

@@ -1,10 +1,12 @@
 import React, { Component } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import ItemHeader from "../components/Item/ItemHeader";
 import MainSell from "../components/Sell/MainSell";
 import * as sellActions from "../store/actions/sell";
+import { Header2 } from "../components/Text";
+import colors from "../styles/colors";
 
 export class VendiInfos extends Component {
   state = {
@@ -23,7 +25,8 @@ export class VendiInfos extends Component {
       description,
       setPriceRedux,
       setDescriptionRedux,
-      setConditionsRedux
+      setConditionsRedux,
+      loading
     } = this.props;
 
     return (
@@ -33,15 +36,23 @@ export class VendiInfos extends Component {
           title={title}
           authors={authors}
         />
-        <MainSell
-          price={price}
-          conditions={conditions}
-          description={description}
-          setPrice={setPriceRedux}
-          setDescription={setDescriptionRedux}
-          setConditions={setConditionsRedux}
-          handleComplete={this._handleComplete}
-        />
+        {!loading ? (
+          <MainSell
+            price={price}
+            conditions={conditions}
+            description={description}
+            setPrice={setPriceRedux}
+            setDescription={setDescriptionRedux}
+            setConditions={setConditionsRedux}
+            handleComplete={this._handleComplete}
+          />
+        ) : (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <ActivityIndicator size="large" color={colors.secondary} />
+          </View>
+        )}
       </View>
     );
   }
@@ -60,7 +71,8 @@ export class VendiInfos extends Component {
 const mapStateToProps = state => ({
   price: state.sell.price,
   description: state.sell.description,
-  conditions: state.sell.conditions
+  conditions: state.sell.conditions,
+  loading: state.sell.loading
 });
 
 const mapDispatchToProps = dispatch => {

@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import Button from "../components/Button";
 import Logo from "./Logo";
 import { Header3 } from "../components/Text";
+import colors from "../styles/colors";
 
 export class CenterHeader extends Component {
   static propTypes = {
@@ -29,12 +30,7 @@ export class CenterHeader extends Component {
     } = this.props;
     if (isActive || searchQuery) {
       return (
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row"
-          }}
-        >
+        <View style={styles.searchBoxContainer}>
           <TextInput
             onChangeText={onChangeText}
             value={searchQuery}
@@ -45,10 +41,21 @@ export class CenterHeader extends Component {
             autoFocus={!searchQuery}
             onFocus={onFocus}
           />
-
-          <Button onPress={resetToHome}>
-            <Icon name="times" size={24} style={[styles.icon, styles.p5]} />
-          </Button>
+          {searchQuery && isActive ? (
+            <Button onPress={resetToHome}>
+              <Icon
+                name="times"
+                size={24}
+                style={[styles.resetIcon, styles.p5]}
+              />
+            </Button>
+          ) : (
+            <Icon
+              name="search"
+              size={24}
+              style={[styles.searchIcon, styles.p5]}
+            />
+          )}
         </View>
       );
     } else {

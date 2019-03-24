@@ -4,6 +4,7 @@ import { updateObject } from "../utility";
 const initialState = {
   token: null,
   error: null,
+  id: null,
   loading: false,
   office: null,
   gnumaUser: null,
@@ -29,7 +30,8 @@ const loginSuccess = (state, action) => {
     error: null,
     loading: false,
     gnumaUser: action.payload.gnumaUser,
-    username: action.payload.username
+    username: action.payload.username,
+    id: action.payload.id
   });
 };
 

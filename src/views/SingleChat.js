@@ -36,8 +36,8 @@ export class SingleChat extends Component {
 
   get user() {
     return {
-      name: "Federico",
-      _id: 1
+      name: this.props.userUsername,
+      _id: this.props.userID
     };
   }
 
@@ -70,6 +70,8 @@ export class SingleChat extends Component {
 const mapStateToProps = (state, props) => {
   const navProps = props.navigation.getParam("data", "null");
   return {
+    userID: state.auth.id,
+    userUsername: state.auth.username,
     messages: state.messaging.messages[navProps.id],
     status:
       state.messaging[

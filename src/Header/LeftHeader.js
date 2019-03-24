@@ -15,7 +15,11 @@ export class LeftHeader extends Component {
     if (isActive || isItem) {
       return (
         <Button onPress={handleGoBack}>
-          <Icon name="chevron-left" size={24} style={styles.icon} />
+          <Icon
+            name="chevron-left"
+            size={24}
+            style={[styles.icon, styles.p5]}
+          />
         </Button>
       );
     } else {

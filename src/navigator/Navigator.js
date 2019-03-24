@@ -97,11 +97,11 @@ const ProfileNavigator = {
 const ChatNavigator = {
   screen: createStackNavigator(
     {
-      Home: {
+      ChatHome: {
         screen: ChatHomeScreen,
         path: "/chat"
       },
-      Chat: {
+      ChatSingle: {
         screen: SingleChatScreen,
         path: "/chat/:chatid"
       }

@@ -1,15 +1,13 @@
 import firebase from "react-native-firebase";
 import * as actionTypes from "./actionTypes";
 import { mockChatLink, mockMessages } from "../../mockData/Chat";
-
 const isOffline = false;
 
-export const msgConnect = (unsubscriber, type) => {
+export const msgConnect = userID => {
   return {
     type: actionTypes.MSG_CONNECT,
     payload: {
-      unsubscriber,
-      type
+      userID
     }
   };
 };
@@ -66,9 +64,10 @@ export const msgSend = (content, chatID) => {};
 
 const _subscribeChats = (ref, type, dispatch) => {
   ref.onSnapshot(chatsSnapshot => {
-    chatsSnapshot.forEach(chat =>
-      dispatch(msgChatUpdate(chat.id, chat.data(), type))
-    );
+    chatsSnapshot.forEach(chat => {
+      console.log("Subscribing to chat");
+      dispatch(msgChatUpdate(chat.id, chat.data(), type));
+    });
   });
 };
 
@@ -93,12 +92,34 @@ const _subscribeMessages = (ref, dispatch) => {
   });
 };
 
+export const contact = (itemID, toID, toUsername) => {
+  return (dispatch, getState) => {
+    const { id, username } = getState().auth;
+    const db = firebase.firestore().collection("chats");
+    db.doc().set({
+      buyer: {
+        id,
+        name: username
+      },
+      seller: {
+        id: toID,
+        name: toUsername
+      },
+      status: "pending",
+      item: itemID
+    });
+  };
+};
+
 export const connect = userID => {
   return dispatch => {
     if (isOffline) {
       dispatch(msgChatUpdate("AAA", mockChatLink, "buyerChats"));
       dispatch(msgMessagesUpdate("AAA", mockMessages));
     } else {
+      console.log("Connecting with fb with " + userID);
+      dispatch(msgConnect(userID));
+
       const db = firebase.firestore().collection("chats");
 
       const buyerChatsRef = db.where("buyer.id", "==", userID);

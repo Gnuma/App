@@ -1,14 +1,15 @@
 import React, { Component } from "react";
-import { Text, View } from "react-native";
-import { Image } from "react-native";
+import { View } from "react-native";
 import styles from "./styles";
+import { Header1 } from "../components/Text";
 
 export default class Logo extends Component {
   render() {
     return (
       <View style={styles.logoView}>
-        <Image source={require("../media/imgs/logo.png")} style={styles.logo} />
-        <Text style={styles.logoText}>Gnuma</Text>
+        <Header1 color="white" style={styles.logo}>
+          Quipu
+        </Header1>
       </View>
     );
   }

@@ -136,6 +136,8 @@ android {
 }
 
 dependencies {
+    implementation project(':rn-fetch-blob')
+    implementation project(':react-native-vector-icons')
     implementation project(':react-native-svg')
     implementation project(':react-native-firebase')
     implementation "com.google.android.gms:play-services-base:15.0.1"

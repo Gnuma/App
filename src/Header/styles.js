@@ -8,51 +8,45 @@ export default StyleSheet.create({
     justifyContent: "center"
   },
   logo: {
-    margin: 4
-  },
-  logoText: {
-    fontSize: 20,
-    color: "white"
-  },
-  searchLogo: {
-    color: "white",
-    paddingRight: 6
+    fontWeight: "200",
+    letterSpacing: 5
   },
 
   header: {
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 60,
-    backgroundColor: colors.secondary
-  },
-  primary: {
-    flex: 6,
-    flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    marginLeft: 10
-  },
-  secondary: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center"
+    height: 60,
+    backgroundColor: colors.secondary,
+    paddingVertical: 3,
+    paddingHorizontal: 5
   },
   icon: {
     color: "white"
-  },
-  searchInput: {
-    marginLeft: 10,
-    fontSize: 18,
-    padding: 2,
-    backgroundColor: "white",
-    flex: 1
   },
   p5: {
     padding: 5
   },
   rightHeaderContainer: {
-    flexDirection: "row"
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    flexGrow: 1
+  },
+  searchBoxContainer: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: colors.white
+  },
+  searchInput: {
+    fontSize: 18,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    flex: 1
+  },
+  resetIcon: {
+    color: colors.black
+  },
+  searchIcon: {
+    color: colors.grey
   }
 });

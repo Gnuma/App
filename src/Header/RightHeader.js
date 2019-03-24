@@ -14,31 +14,28 @@ export class RightHeader extends Component {
     isAuthenticated: PropTypes.bool
   };
   render() {
-    const { setActive } = this.props;
-    return (
-      <View style={styles.rightHeaderContainer}>
-        <Button onPress={setActive} style={{ marginRight: 10 }}>
-          <Icon name="search" size={24} style={styles.icon} />
-        </Button>
-        {this.props.isAuthenticated ? (
-          <Button onPress={this.props.onLogout} style={{ marginRight: 10 }}>
-            <Icon name="gear" size={24} style={styles.icon} />
-          </Button>
-        ) : (
+    const { setActive, visible, isAuthenticated } = this.props;
+    if (visible) {
+      return (
+        <View style={styles.rightHeaderContainer}>
           <Button
-            onPress={() =>
-              NavigationService.protectedNavigation("CHAT", null, () =>
-                console.log("WORKING")
-              )
-            }
+            onPress={isAuthenticated ? this.props.onLogout : this._goAuth}
             style={{ marginRight: 10 }}
           >
             <Icon name="gear" size={24} style={styles.icon} />
           </Button>
-        )}
-      </View>
-    );
+        </View>
+      );
+    } else {
+      return null;
+    }
   }
+
+  _goAuth = () => {
+    NavigationService.protectedNavigation("Home", null, () =>
+      console.log("WORKING")
+    );
+  };
 }
 
 export default RightHeader;

@@ -3,9 +3,31 @@ import NavigatorService from "../../navigator/NavigationService";
 import { setItem, getItem, removeItem } from "../utility";
 import axios from "axios";
 import uuid from "uuid";
-import { ___BASE_UPLOAD_PICTURE___ } from "../constants";
+import { ___BASE_UPLOAD_PICTURE___, ___CREATE_AD___ } from "../constants";
+import RNFetchBlob from "rn-fetch-blob";
 
 const isOffline = true;
+
+export const sellStart = () => {
+  return {
+    type: actionTypes.SELL_START
+  };
+};
+
+export const sellSuccess = () => {
+  return {
+    type: actionTypes.SELL_SUCCESS
+  };
+};
+
+export const sellFail = error => {
+  return {
+    type: actionTypes.SELL_FAIL,
+    payload: {
+      error
+    }
+  };
+};
 
 export const takePreview = data => {
   return {
@@ -72,6 +94,7 @@ export const setDescription = description => {
 
 export const submit = () => {
   return (dispatch, getState) => {
+    dispatch(sellStart());
     const {
       previews,
       previewsOrder,
@@ -80,26 +103,67 @@ export const submit = () => {
       conditions,
       description
     } = getState().sell;
+    const { token } = getState().auth;
     let activePreviews = [];
     for (let i = 0; i < previewsOrder.length; i++) {
       if (previews[previewsOrder[i]] !== null) {
-        axios
-          .post(
-            ___BASE_UPLOAD_PICTURE___ + uuid.v4() + "/",
-            previews[previewsOrder[i]].base64,
-            {
-              headers: { "Content-Type": "image/jpeg" }
-            }
-          )
-          .then(res => {
-            console.log(res);
-          })
-          .catch(err => {
-            console.log(err.response);
-          });
+        activePreviews.push(previews[previewsOrder[i]].base64);
       }
     }
-
-    console.log(activePreviews, book, price, conditions, description);
+    if (activePreviews.length > 0) {
+      let uploadStatus = activePreviews.length;
+      for (let i = 0; i < activePreviews.length; i++) {
+        RNFetchBlob.fetch(
+          "POST",
+          ___BASE_UPLOAD_PICTURE___ + "IMG" + ".jpg/",
+          {
+            Authorization: "Token " + token,
+            "Content-Type": "image/jpeg"
+          },
+          activePreviews[i]
+        )
+          .then(res => {
+            console.log(res);
+            const status = res.respInfo.status;
+            console.log(status, uploadStatus);
+            if (status === 201) {
+              uploadStatus--;
+              if (uploadStatus === 0) {
+                createAD(dispatch, book, price, conditions, description);
+              }
+            } else {
+              console.warn("Something went wrongato", status);
+              dispatch(sellFail("Error in image Upload"));
+            }
+          })
+          .catch(err => {
+            console.warn("Something went wrongato", err.response);
+            dispatch(sellFail("Error in image Upload"));
+          });
+      }
+    } else {
+      dispatch(sellFail("No images selected"));
+    }
   };
+};
+
+const createAD = (dispatch, book, price, conditions, description) => {
+  console.log("Creating Ad for " + book);
+  axios
+    .post(___CREATE_AD___, {
+      isbn: book,
+      price,
+      condition: conditions,
+      description
+    })
+    .then(res => {
+      console.log(res);
+      dispatch(sellSuccess());
+      NavigatorService.navigate("Home");
+    })
+    .catch(err => {
+      console.warn("Something went wrongato", err.response);
+      dispatch(sellFail("Error in ad creation"));
+      NavigatorService.navigate("Home");
+    });
 };

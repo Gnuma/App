@@ -14,7 +14,9 @@ const initialState = {
   book: null,
   price: "",
   conditions: null,
-  description: ""
+  description: "",
+  loading: false,
+  error: null
 };
 
 const takePreview = (state, action) => {
@@ -69,8 +71,49 @@ const setDescription = (state, action) => {
   });
 };
 
+const sellStart = (state, action) => {
+  return updateObject(state, {
+    loading: true
+  });
+};
+
+const sellSuccess = (state, action) => {
+  return updateObject(state, {
+    previews: {
+      0: null,
+      1: null,
+      2: null,
+      3: null,
+      4: null
+    },
+    previewsOrder: [0, 1, 2, 3, 4],
+    book: null,
+    price: "",
+    conditions: null,
+    description: "",
+    loading: false,
+    error: null
+  });
+};
+
+const sellFail = (state, action) => {
+  return updateObject(state, {
+    loading: false,
+    error: action.payload.error
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case actionTypes.SELL_START:
+      return sellStart(state, action);
+
+    case actionTypes.SELL_SUCCESS:
+      return sellSuccess(state, action);
+
+    case actionTypes.SELL_FAIL:
+      return sellFail(state, action);
+
     case actionTypes.SELL_TAKEPREVIEW:
       return takePreview(state, action);
 

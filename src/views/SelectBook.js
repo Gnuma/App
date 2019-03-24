@@ -6,10 +6,12 @@ import SBHeader from "../components/Sell/SelectBook/SelectBookHeader";
 import { bookList } from "../mockData/Book";
 import SBList from "../components/Sell/SelectBook/SelectBookList";
 import * as sellActions from "../store/actions/sell";
-
+import axios from "axios";
+import { ___BOOK_HINTS_ENDPOINT___ } from "../store/constants";
 export class SelectBook extends Component {
   state = {
-    searchQuery: ""
+    searchQuery: "",
+    results: []
   };
 
   render() {
@@ -21,22 +23,29 @@ export class SelectBook extends Component {
           resetSearchBar={this.resetSearchBar}
           handleGoBack={this.handleGoBack}
         />
-        <SBList results={bookList} handleSelection={this.handleSelection} />
+        <SBList
+          results={this.state.results}
+          handleSelection={this.handleSelection}
+        />
       </View>
     );
   }
 
-  handleChange = ({ text }) => {
+  handleChange = text => {
     this.setState({
       searchQuery: text
     });
+    if (text) {
+      axios
+        .post(___BOOK_HINTS_ENDPOINT___, { keyword: text })
+        .then(res => {
+          this.setState({ results: res.data.results });
+        })
+        .catch(err => console.log(err.response));
+    }
   };
 
-  resetSearchBar = () => {
-    this.setState({
-      searchQuery: ""
-    });
-  };
+  resetSearchBar = () => this.handleChange("");
 
   handleSelection = isbn => {
     this.props.selectBookRedux(isbn);

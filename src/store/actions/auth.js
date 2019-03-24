@@ -36,7 +36,8 @@ export const authStart = () => {
 export const loginSuccess = (
   token,
   username = "NotSet",
-  gnumaUser = "NotSet"
+  gnumaUser = "NotSet",
+  id = "NotSet"
 ) => {
   setItem(tokenKey, token);
   axios.defaults.headers.common["Authorization"] = "Token " + token; // for all requests
@@ -45,7 +46,8 @@ export const loginSuccess = (
     payload: {
       token,
       username,
-      gnumaUser
+      gnumaUser,
+      id
     }
   };
 };
@@ -95,7 +97,9 @@ export const authLogin = (
         })
         .then(res => {
           const token = res.data.key;
+          console.log(res);
           dispatch(loginSuccess(token));
+          //dispatch(msgConnect(1));
           callback ? callback() : null;
           NavigatorService.navigate(nextRoute, params);
         })
@@ -110,7 +114,7 @@ export const autoLogin = () => {
   return dispatch => {
     dispatch(authStart());
     multiGet([tokenKey, officeKey]).then(userInfos => {
-      console.log(userInfos);
+      //console.log(userInfos);
       const token = userInfos[0][1];
       const office = userInfos[1][1];
 
@@ -124,9 +128,14 @@ export const autoLogin = () => {
           .then(res => {
             if (!res.data.gnuma_user) throw "Gnuma User not initialized";
             dispatch(
-              loginSuccess(token, res.data.username, res.data.gnuma_user)
+              loginSuccess(
+                token,
+                res.data.username,
+                res.data.gnuma_user,
+                res.data.pk
+              )
             );
-            dispatch(msgConnect(1));
+            dispatch(msgConnect(res.data.pk));
           })
           .catch(err => {
             dispatch(authFail(err));

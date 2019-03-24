@@ -22,7 +22,7 @@ export class ChatHome extends Component {
   }
 
   inspectChat = data => {
-    this.props.navigation.navigate("Chat", {
+    this.props.navigation.navigate("ChatSingle", {
       data
     });
   };

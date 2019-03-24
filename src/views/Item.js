@@ -10,6 +10,8 @@ import colors from "../styles/colors";
 import NavigatorService from "../navigator/NavigationService";
 import axios from "axios";
 import { ___GET_AD___ } from "../store/constants";
+import * as msgActions from "../store/actions/messaging";
+
 export class Item extends Component {
   state = {
     data: undefined,
@@ -64,13 +66,26 @@ export class Item extends Component {
   };
 
   _handleContact = () => {
-    NavigatorService.protectedNavigation("CHAT");
+    NavigatorService.protectedNavigation(
+      "CHAT",
+      null,
+      this.props.contactRedux(
+        this.state.data.pk,
+        1,
+        this.state.data.seller.user.username
+      )
+    );
   };
 }
 
 const mapStateToProps = state => ({});
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = dispatch => {
+  return {
+    contactRedux: (itemID, toID, toUsername) =>
+      dispatch(msgActions.contact(itemID, toID, toUsername))
+  };
+};
 
 export default connect(
   mapStateToProps,
