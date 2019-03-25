@@ -27,9 +27,22 @@ const conditionsTable = {
   }
 };
 
+const getConditions = id => {
+  switch (id) {
+    case 0:
+      return conditionsTable[0];
+    case 1:
+      return conditionsTable[1];
+    case 2:
+      return conditionsTable[2];
+    default:
+      return conditionsTable[3];
+  }
+};
+
 export default function ConditionCircle(props) {
   const { conditions, style, radius, fontSize } = props;
-  const { text, percentage, color } = conditionsTable[conditions];
+  const { text, percentage, color } = getConditions(conditions);
   const calculatedFontSize = fontSize ? fontSize : radius * fontRatio;
   return (
     <ProgressCircle

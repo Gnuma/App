@@ -58,13 +58,13 @@ export default class ConditionsInfo extends Component {
   }
 
   _setOttimo = () => {
-    this.props.handleChange(1);
+    this.props.handleChange(0);
   };
   _setBuono = () => {
-    this.props.handleChange(2);
+    this.props.handleChange(1);
   };
   _setUsato = () => {
-    this.props.handleChange(3);
+    this.props.handleChange(2);
   };
 }
 
