@@ -1,12 +1,34 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import colors from "../../styles/colors";
+import { ___BOOK_IMG_RATIO___ } from "../../utils/constants";
+
+const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
+  "window"
+);
+
+function wp(percentage) {
+  const value = (percentage * viewportWidth) / 100;
+  return Math.round(value);
+}
+
+//const width = viewportWidth - 35 * 2;
+
+export const slideWidth = wp(85);
+export const slideHeight = Math.min(
+  slideWidth * ___BOOK_IMG_RATIO___,
+  Math.round(viewportHeight / 1.8)
+);
+export const itemHorizontalMargin = wp(2);
+
+export const sliderWidth = viewportWidth;
+export const itemWidth = slideWidth + itemHorizontalMargin * 2;
 
 export const MainItemStyles = StyleSheet.create({
   scrollView: {
     flex: 1
   },
   imageSlider: {
-    marginTop: 10
+    marginVertical: 10
   },
   content: {
     flex: 1,

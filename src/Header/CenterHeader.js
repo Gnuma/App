@@ -40,21 +40,17 @@ export class CenterHeader extends Component {
             ref={setRef}
             autoFocus={!searchQuery}
             onFocus={onFocus}
+            placeholder={"Cerca un libro"}
           />
           {searchQuery && isActive ? (
-            <Button onPress={resetToHome}>
-              <Icon
-                name="times"
-                size={24}
-                style={[styles.resetIcon, styles.p5]}
-              />
+            <Button
+              onPress={resetToHome}
+              style={[styles.p5, { marginRight: 3 }]}
+            >
+              <Icon name="times" size={24} style={styles.resetIcon} />
             </Button>
           ) : (
-            <Icon
-              name="search"
-              size={24}
-              style={[styles.searchIcon, styles.p5]}
-            />
+            <Icon name="search" size={24} style={styles.searchIcon} />
           )}
         </View>
       );

@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import styles from "./styles";
 import { Header1, Header3, Header4, Header5 } from "../../components/Text";
 import ConditionCircle from "../ConditionCircle";
+import { CachedImage } from "react-native-cached-image";
+import { ___BASE_ENDPOINT___ } from "../../store/constants";
 
 export default class Item extends Component {
   static propTypes = {
@@ -13,8 +15,14 @@ export default class Item extends Component {
   render() {
     const { isSingle, data } = this.props;
     //console.log(data);
-    const { price, seller, condition, book } = data;
+    const { price, seller, condition, book, image_ad } = data;
     const office = seller.classM.office;
+    let mainImage;
+    try {
+      mainImage = image_ad[0];
+    } catch (error) {
+      alert(error);
+    }
     return (
       <View
         style={[
@@ -25,14 +33,16 @@ export default class Item extends Component {
           }
         ]}
       >
-        <Image
+        <CachedImage
           style={[
             styles.image,
             {
               borderTopLeftRadius: isSingle ? 10 : 0
             }
           ]}
-          source={require("../../media/imgs/thumbnail-test.png")}
+          source={{
+            uri: mainImage
+          }}
         />
         <View style={styles.itemContent}>
           <View style={styles.itemTopContent}>

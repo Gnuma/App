@@ -4,13 +4,14 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { chats } from "../mockData/Chat";
 import HomeHeader from "../components/Chat/HomeHeader";
+import BasicHeader from "../components/BasicHeader";
 import ChatsList from "../components/Chat/ChatsList";
 export class ChatHome extends Component {
   render() {
     const { sellerChats, buyerChats } = this.props;
     return (
       <View style={{ flex: 1 }}>
-        <HomeHeader />
+        <BasicHeader title="Chat" />
         <ChatsList
           sellerChatsData={sellerChats}
           buyerChatsData={buyerChats}

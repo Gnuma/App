@@ -1,45 +1,69 @@
 import React, { Component } from "react";
-import { View, Image, Dimensions, StyleSheet } from "react-native";
+import { View, Image, Dimensions, StyleSheet, Platform } from "react-native";
 import PropTypes from "prop-types";
-import Carousel from "react-native-snap-carousel";
+import Carousel, { ParallaxImage } from "react-native-snap-carousel";
+import {
+  sliderWidth,
+  itemWidth,
+  slideHeight,
+  itemHorizontalMargin
+} from "./styles";
+import colors from "../../styles/colors";
 
-const imgRation = 0.92855;
-const imgMargin = 50;
+const IS_IOS = Platform.OS === "ios";
 
 export class ImageSlider extends Component {
-  state = {
-    width: Dimensions.get("window").width,
-    height: (Dimensions.get("window").width - imgMargin) / imgRation
-  };
+  data = [
+    require("../../media/imgs/matematicaVerde.jpeg"),
+    require("../../media/imgs/CorsaroNero.jpeg"),
+    require("../../media/imgs/sezioneAurea.jpeg"),
+    require("../../media/imgs/GuerraMondiale.jpeg"),
+    require("../../media/imgs/mockHomeBook.png")
+  ];
 
-  data = [{}, {}, {}, {}, {}];
-
-  _renderItem = ({ item, index }) => {
+  _renderItem = ({ item, index }, parallaxProps) => {
     return (
-      <View style={styles.itemContainer}>
-        <View style={styles.imageContainer}>
-          <Image
-            style={{
-              width: this.state.width - imgMargin,
-              height: this.state.height
-            }}
-            source={require("../../media/imgs/thumbnail-test.png")}
-          />
-        </View>
+      <View
+        style={{
+          width: itemWidth,
+          height: slideHeight,
+          paddingHorizontal: itemHorizontalMargin
+        }}
+      >
+        <ParallaxImage
+          source={{ uri: item }}
+          containerStyle={{
+            flex: 1,
+            marginBottom: IS_IOS ? 0 : -1, // Prevent a random Android rendering issue
+            backgroundColor: colors.white,
+            borderRadius: 8
+          }}
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            resizeMode: "cover",
+            borderRadius: 8
+          }}
+          parallaxFactor={0.1}
+          showSpinner={true}
+          spinnerColor={"rgba(255, 255, 255, 0.4)"}
+          {...parallaxProps}
+        />
       </View>
     );
   };
 
   render() {
-    const { width, height } = this.state;
+    const { data } = this.props;
     return (
       <View style={[this.props.style]}>
         <Carousel
-          data={this.data}
+          ref={c => (this.slider = c)}
+          data={data}
           renderItem={this._renderItem}
-          itemWidth={width - imgMargin}
-          sliderWidth={width}
-          sliderHeight={height + 10}
+          sliderWidth={sliderWidth}
+          itemWidth={itemWidth}
+          //sliderHeight={height + 10}
+          hasParallaxImages={true}
           inactiveSlideScale={1}
           inactiveSlideOpacity={1}
         />
@@ -56,9 +80,24 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     margin: 10,
     elevation: 4
-  },
-  imageContainer: {
-    overflow: "hidden",
-    borderRadius: 8
   }
 });
+
+/*
+
+  _renderItem = ({ item, index }) => {
+    return (
+      <View style={styles.itemContainer}>
+        <View style={styles.imageContainer}>
+          <Image
+            style={{
+              width: this.state.width - imgMargin,
+              height: this.state.height
+            }}
+            source={require("../../media/imgs/matematicaVerde.jpeg")}
+          />
+        </View>
+      </View>
+    );
+  };
+*/

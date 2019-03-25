@@ -2,6 +2,7 @@ import { StyleSheet } from "react-native";
 import colors from "../../styles/colors";
 
 const itemHeight = 130;
+const imageWidth = 122;
 
 export default StyleSheet.create({
   itemContainer: {
@@ -23,7 +24,7 @@ export default StyleSheet.create({
   },
   image: {
     height: itemHeight,
-    width: 122,
+    width: imageWidth,
     borderBottomLeftRadius: 10
   },
   itemContent: {

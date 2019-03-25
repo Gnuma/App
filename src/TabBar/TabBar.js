@@ -7,6 +7,7 @@ import SellIcon from "../media/vectors/sell-icon";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Header4 } from "../components/Text";
 import colors from "../styles/colors";
+import NavigationService from "../navigator/NavigationService";
 
 export class TabBar extends Component {
   static propTypes = {};
@@ -83,7 +84,7 @@ export class TabBar extends Component {
     this.props.navigation.navigate("VENDI");
   };
   _goChat = () => {
-    this.props.navigation.navigate("CHAT");
+    NavigationService.protectedNavigation("CHAT");
   };
 }
 

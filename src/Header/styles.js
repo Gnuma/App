@@ -19,7 +19,7 @@ export default StyleSheet.create({
     height: 60,
     backgroundColor: colors.secondary,
     paddingVertical: 3,
-    paddingHorizontal: 5
+    paddingHorizontal: 15
   },
   icon: {
     color: "white"
@@ -35,18 +35,27 @@ export default StyleSheet.create({
   searchBoxContainer: {
     flex: 1,
     flexDirection: "row",
-    backgroundColor: colors.white
+    alignItems: "center",
+    backgroundColor: colors.white,
+    borderRadius: 6,
+    overflow: "hidden"
   },
   searchInput: {
     fontSize: 18,
-    paddingVertical: 2,
-    paddingHorizontal: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     flex: 1
   },
   resetIcon: {
-    color: colors.black
+    color: colors.primary
   },
   searchIcon: {
-    color: colors.grey
+    color: colors.primary,
+    paddingRight: 8
+  },
+  goBack: {
+    padding: 10,
+    marginLeft: -10,
+    color: colors.white
   }
 });

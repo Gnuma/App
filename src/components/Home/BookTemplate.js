@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { View, Platform, StyleSheet, Dimensions } from "react-native";
 import { ParallaxImage } from "react-native-snap-carousel";
 import { slideHeight, itemWidth, itemHorizontalMargin } from "./styles";
-import { Header1 } from "../Text";
+import { Header1, Header2 } from "../Text";
 import colors from "../../styles/colors";
 import Button from "../Button";
 
@@ -38,14 +38,15 @@ export default class BookTemplate extends Component {
 
   render() {
     const {
-      data: { title, startingPrice }
+      data: { title, startingPrice: price }
     } = this.props;
     return (
       <View
         style={{
           width: itemWidth,
           height: slideHeight,
-          paddingHorizontal: itemHorizontalMargin
+          paddingHorizontal: itemHorizontalMargin,
+          paddingTop: 5
         }}
       >
         <Button
@@ -60,9 +61,19 @@ export default class BookTemplate extends Component {
           {this.image}
         </Button>
         <View style={{ justifyContent: "center", paddingTop: 10 }}>
-          <Header1 color={"primary"} numberOfLines={1}>
+          <Header1
+            color={"primary"}
+            numberOfLines={1}
+            style={{
+              fontSize: Math.max(
+                10,
+                Math.min(27, (itemWidth / title.length) * 2)
+              )
+            }}
+          >
             {title}
           </Header1>
+          <Header2>da €{price},00</Header2>
         </View>
       </View>
     );

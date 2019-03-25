@@ -20,7 +20,7 @@ export class MainItem extends Component {
     };
     return (
       <ScrollView style={styles.scrollView}>
-        <ImageSlider style={styles.imageSlider} />
+        <ImageSlider style={styles.imageSlider} data={data.image_ad} />
         <View style={styles.content}>
           <PrimaryInfo data={primaryData} />
           <SellerInfo data={sellerData} />

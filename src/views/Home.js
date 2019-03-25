@@ -10,6 +10,7 @@ import * as searchActions from "../store/actions/search";
 import BookShelf from "../components/Home/BookShelf";
 import SearchLink from "../components/Home/SearchLink";
 import { AndroidBackHandler } from "react-navigation-backhandler";
+import { singleResults } from "../mockData/SearchResults";
 
 export class Home extends Component {
   static propTypes = {
@@ -40,6 +41,7 @@ export class Home extends Component {
     } else if (this.props.showResults) {
       return (
         <MainList data={this.props.results} isLoading={this.props.isLoading} />
+        //<MainList data={singleResults} isLoading={this.props.isLoading} />
       );
     } else {
       return (

@@ -67,17 +67,17 @@ const data = [
     img: "../../media/imgs/mockHomeBook.png"
   },
   {
-    title: "Letteratura della natura",
+    title: "Il Blu e il Rosso",
     startingPrice: 15,
     img: "../../media/imgs/mockHomeBook.png"
   },
   {
-    title: "Storia della gloria",
+    title: "Un passo in dietro nella storia",
     startingPrice: 12,
     img: "../../media/imgs/mockHomeBook.png"
   },
   {
-    title: "Educazione civica non ti imita",
+    title: "Cloud",
     startingPrice: 16,
     img: "../../media/imgs/mockHomeBook.png"
   }

@@ -11,7 +11,7 @@ function wp(percentage) {
 }
 
 export const slideWidth = wp(60);
-export const slideHeight = slideWidth * ___BOOK_IMG_RATIO___;
+export const slideHeight = slideWidth * ___BOOK_IMG_RATIO___ + 40;
 export const itemHorizontalMargin = wp(2);
 
 export const sliderWidth = viewportWidth;

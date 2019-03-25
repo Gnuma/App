@@ -112,6 +112,7 @@ export const submit = () => {
     }
     if (activePreviews.length > 0) {
       let uploadStatus = activePreviews.length;
+      let pks = [];
       for (let i = 0; i < activePreviews.length; i++) {
         RNFetchBlob.fetch(
           "POST",
@@ -128,8 +129,10 @@ export const submit = () => {
             console.log(status, uploadStatus);
             if (status === 201) {
               uploadStatus--;
+              pks.push(JSON.parse(res.data).pk);
               if (uploadStatus === 0) {
-                createAD(dispatch, book, price, conditions, description);
+                createAD(dispatch, book, price, conditions, description, pks);
+                //createAD(dispatch, book, price, conditions, description);
               }
             } else {
               console.warn("Something went wrongato", status);
@@ -147,14 +150,15 @@ export const submit = () => {
   };
 };
 
-const createAD = (dispatch, book, price, conditions, description) => {
-  console.log("Creating Ad for " + book);
+const createAD = (dispatch, book, price, conditions, description, pks) => {
+  if (pks.length === 0) pks = undefined;
   axios
     .post(___CREATE_AD___, {
       isbn: book,
       price,
       condition: conditions,
-      description
+      description,
+      pks
     })
     .then(res => {
       console.log(res);
