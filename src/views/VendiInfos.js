@@ -62,7 +62,7 @@ export class VendiInfos extends Component {
   };
 
   _handleComplete = () => {
-    if (this.props.price && this.props.description && this.props.conditions) {
+    if (this.props.price && this.props.description && this.props.conditions !== undefined) {
       this.props.submitRedux();
     }
   };

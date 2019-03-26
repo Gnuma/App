@@ -21,7 +21,7 @@ export default class ConditionsInfo extends Component {
         >
           <SolidButton
             style={{
-              borderColor: conditions === 1 ? colors.secondary : "white",
+              borderColor: conditions === 0 ? colors.secondary : "white",
               borderWidth: 2
             }}
             onPress={this._setOttimo}
@@ -32,7 +32,7 @@ export default class ConditionsInfo extends Component {
           </SolidButton>
           <SolidButton
             style={{
-              borderColor: conditions === 2 ? colors.lightYellow : "white",
+              borderColor: conditions === 1 ? colors.lightYellow : "white",
               borderWidth: 2
             }}
             onPress={this._setBuono}
@@ -43,7 +43,7 @@ export default class ConditionsInfo extends Component {
           </SolidButton>
           <SolidButton
             style={{
-              borderColor: conditions === 3 ? colors.red : "white",
+              borderColor: conditions === 2 ? colors.red : "white",
               borderWidth: 2
             }}
             onPress={this._setUsato}

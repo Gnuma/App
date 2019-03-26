@@ -112,6 +112,7 @@ export default class Chat extends Component {
   getContent = () => {
     const { status, user, isLoading } = this.props;
     const { messages } = this.props;
+    console.log(status);
     if (status === "active") {
       return <QuipuChat messages={messages} onSend={this.onSend} user={user} />;
     } else if (this.props.userType === "buyer") {
