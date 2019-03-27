@@ -7,6 +7,7 @@ import QuipuBubble from "./QuipuBubble";
 import uuid from "uuid";
 import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../../../styles/colors";
+import styles from "./styles";
 
 const getOnlyDate = fullDate => {
   return new Date(
@@ -88,72 +89,64 @@ export default class QuipuChat extends Component {
     };
   }
 
+  _renderTimeDivider = ({ section: { title } }) => {
+    if (title === "first_index") return null;
+    return (
+      <Header3
+        color={"grey"}
+        style={{ alignSelf: "center", marginVertical: 14 }}
+      >
+        {title.getFullYear() + " / " + title.getDate()}
+      </Header3>
+    );
+  };
+
+  _renderBubble = ({ item, index, section }) => {
+    return (
+      <QuipuBubble
+        text={item.text}
+        sender={item.user}
+        fromUser={this.props.user._id === item.user._id}
+        fromSameUser={item.fromSameUser}
+      />
+    );
+  };
+
+  _keyExtractor = (item, index) => item._id + index;
+
   render() {
     const { formattedData, user } = this.state;
     return (
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex_1}>
         <SectionList
           inverted
-          style={{ flex: 1 }}
-          renderItem={({ item, index, section }) => {
-            return (
-              <QuipuBubble
-                text={item.text}
-                sender={item.user}
-                fromUser={this.props.user._id === item.user._id}
-                fromSameUser={item.fromSameUser}
-              />
-            );
-          }}
-          renderSectionHeader={({ section: { title } }) => {
-            if (title === "first_index") return null;
-            return (
-              <Header3
-                color={"grey"}
-                style={{ alignSelf: "center", marginVertical: 14 }}
-              >
-                {title.getFullYear() + " / " + title.getDate()}
-              </Header3>
-            );
-          }}
+          style={styles.flex_1}
+          renderItem={this._renderBubble}
+          renderSectionHeader={this._renderTimeDivider}
           sections={formattedData}
-          keyExtractor={(item, index) => item._id + index}
+          keyExtractor={this._keyExtractor}
         />
-        <View
-          style={{
-            flexDirection: "row",
-            borderTopColor: "black"
-          }}
-        >
+        <View style={styles.composerContain}>
           <TextInput
-            style={{ flex: 1 }}
+            style={styles.composerInput}
             placeholder={"Scrivi un messaggio"}
             value={this.state.input}
             onChangeText={this._handleChangeInput}
           />
-          <View
-            style={{
-              width: 50
-            }}
+
+          <Button
+            style={styles.composerIcon}
+            onPress={this._handleSend}
+            disabled={!this.state.input}
           >
-            <Button
+            <Icon
+              name="paper-plane"
               style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center"
+                color: this.state.input ? colors.primary : colors.grey
               }}
-              onPress={this._handleSend}
-              disabled={!this.state.input}
-            >
-              <Icon
-                name="paper-plane"
-                style={{
-                  color: this.state.input ? colors.primary : colors.grey
-                }}
-                size={22}
-              />
-            </Button>
-          </View>
+              size={22}
+            />
+          </Button>
         </View>
       </View>
     );

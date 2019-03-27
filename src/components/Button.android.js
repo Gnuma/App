@@ -21,7 +21,7 @@ export class Button extends Component {
       return (
         <TouchableNativeFeedback
           onPress={this.props.onPress}
-          background={TouchableNativeFeedback.Ripple()}
+          //background={TouchableNativeFeedback.Ripple()}
           useForeground={true}
         >
           <View

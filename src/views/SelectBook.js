@@ -8,6 +8,8 @@ import SBList from "../components/Sell/SelectBook/SelectBookList";
 import * as sellActions from "../store/actions/sell";
 import axios from "axios";
 import { ___BOOK_HINTS_ENDPOINT___ } from "../store/constants";
+import _ from "lodash";
+
 export class SelectBook extends Component {
   state = {
     searchQuery: "",
@@ -15,6 +17,9 @@ export class SelectBook extends Component {
   };
 
   render() {
+    const hasNoResults =
+      _.isEmpty(this.state.results) && this.state.searchQuery;
+
     return (
       <View style={{ flex: 1 }}>
         <SBHeader
@@ -26,6 +31,8 @@ export class SelectBook extends Component {
         <SBList
           results={this.state.results}
           handleSelection={this.handleSelection}
+          hasNoResults={hasNoResults}
+          goCreateBook={this._goCreateBook}
         />
       </View>
     );
@@ -41,8 +48,17 @@ export class SelectBook extends Component {
         .then(res => {
           this.setState({ results: res.data.results });
         })
-        .catch(err => console.log(err.response));
+        .catch(err => {
+          //console.log(err.response);
+          this.setState({
+            results: []
+          });
+        });
     }
+  };
+
+  _goCreateBook = () => {
+    this.props.navigation.navigate("CreateBook");
   };
 
   resetSearchBar = () => this.handleChange("");

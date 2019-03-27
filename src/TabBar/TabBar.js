@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Platform, Keyboard } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Button from "../components/Button";
@@ -12,7 +12,31 @@ import NavigationService from "../navigator/NavigationService";
 export class TabBar extends Component {
   static propTypes = {};
 
+  state = {
+    visible: true
+  };
+
+  componentDidMount() {
+    if (Platform.OS === "android") {
+      this.keyboardEventListeners = [
+        Keyboard.addListener("keyboardDidShow", this.visible(false)),
+        Keyboard.addListener("keyboardDidHide", this.visible(true))
+      ];
+    }
+  }
+
+  componentWillUnmount() {
+    this.keyboardEventListeners &&
+      this.keyboardEventListeners.forEach(eventListener =>
+        eventListener.remove()
+      );
+  }
+
+  visible = visible => () => this.setState({ visible });
+
   render() {
+    if (!this.state.visible) return null;
+
     const { navigation } = this.props;
     const focus = this._getFocused();
     return (

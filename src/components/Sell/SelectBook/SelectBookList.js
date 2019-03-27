@@ -1,10 +1,32 @@
 import React, { Component } from "react";
 import { Text, View, FlatList } from "react-native";
 import BookItem from "./BookItem";
+import { Header2, Header3 } from "../../Text";
+import Button from "../../Button";
 
 export default class SelectBookList extends Component {
   render() {
-    const { results } = this.props;
+    const { results, hasNoResults, goCreateBook } = this.props;
+    if (hasNoResults) {
+      return (
+        <Button
+          style={{
+            flexDirection: "row",
+            borderRadius: 10,
+            backgroundColor: "white",
+            elevation: 4,
+            marginVertical: 6,
+            marginHorizontal: 15
+          }}
+          onPress={goCreateBook}
+        >
+          <Header3 color={"primary"} style={{ margin: 10 }}>
+            Nessun risultato per il tuo libro <Header2>Aggiungilo</Header2>
+          </Header3>
+        </Button>
+      );
+    }
+
     return (
       <FlatList
         style={{ flex: 1 }}

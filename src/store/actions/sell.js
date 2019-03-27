@@ -3,7 +3,7 @@ import NavigatorService from "../../navigator/NavigationService";
 import { setItem, getItem, removeItem } from "../utility";
 import axios from "axios";
 import RNFetchBlob from "rn-fetch-blob";
-import FormData from 'form-data'
+import FormData from "form-data";
 import uuid from "uuid";
 import { ___BASE_UPLOAD_PICTURE___, ___CREATE_AD___ } from "../constants";
 import { ___BOOK_IMG_RATIO___ } from "../../utils/constants";
@@ -67,6 +67,16 @@ export const selectBook = book => {
   };
 };
 
+export const createBook = (title, isbn) => {
+  return {
+    type: actionTypes.SELL_CREATEBOOK,
+    payload: {
+      title,
+      isbn
+    }
+  };
+};
+
 export const setPrice = price => {
   return {
     type: actionTypes.SELL_SET_PRICE,
@@ -103,59 +113,71 @@ export const submit = () => {
       book,
       price,
       conditions,
-      description
+      description,
+      isbn,
+      title
     } = getState().sell;
     const { token } = getState().auth;
     let data = new FormData();
-    let counter=0;
+    let counter = 0;
     for (let i = 0; i < previewsOrder.length; i++) {
       if (previews[previewsOrder[i]] !== null) {
         data.append(counter.toString(), previews[previewsOrder[i]].base64);
         counter++;
       }
     }
-    data.append("isbn", book);
+
+    if (book) {
+      data.append("isbn", book);
+    } else {
+      data.append("isbn", isbn);
+      data.append("title", title);
+    }
     data.append("price", price);
     data.append("condition", conditions);
     data.append("description", description);
 
-    if (counter>0){
-      axios.post(___CREATE_AD___, data,{
-        headers: {
-        'accept': 'application/json',
-        'Accept-Language': 'en-US,en;q=0.8',
-        'Content-Type': `multipart/form-data`,
-      }}).then((res) => {
-        console.log(res);
-        dispatch(sellSuccess());
-        NavigatorService.navigate("Home");
-      }).catch((err) => {
-        console.warn("Something went wrongato", "Error in creation");
-        dispatch(sellFail(err));
-        NavigatorService.navigate("Home");
-      });
+    if (counter > 0) {
+      axios
+        .post(___CREATE_AD___, data, {
+          headers: {
+            accept: "application/json",
+            "Accept-Language": "en-US,en;q=0.8",
+            "Content-Type": `multipart/form-data`
+          }
+        })
+        .then(res => {
+          console.log(res);
+          dispatch(sellSuccess());
+          NavigatorService.navigate("Home");
+        })
+        .catch(err => {
+          console.warn("Something went wrongato", "Error in creation");
+          dispatch(sellFail(err));
+          //NavigatorService.navigate("Home");
+        });
     } else {
       dispatch(sellFail("No images selected"));
     }
-
   };
 };
 
-const uploadIMG = (imgs) => {
-  axios.post(___BASE_UPLOAD_PICTURE___, imgs, {
-    headers: {
-      'accept': 'application/json',
-      'Accept-Language': 'en-US,en;q=0.8',
-      'Content-Type': `multipart/form-data`,
-    }
-  })
-    .then((response) => {
+const uploadIMG = imgs => {
+  axios
+    .post(___BASE_UPLOAD_PICTURE___, imgs, {
+      headers: {
+        accept: "application/json",
+        "Accept-Language": "en-US,en;q=0.8",
+        "Content-Type": `multipart/form-data`
+      }
+    })
+    .then(response => {
       //handle success
-    }).catch((error) => {
+    })
+    .catch(error => {
       //handle error
     });
-  
-}
+};
 
 const createAD = (dispatch, book, price, conditions, description, pks) => {
   if (pks.length === 0) pks = undefined;

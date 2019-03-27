@@ -19,6 +19,7 @@ import VendiInfosScreen from "../views/VendiInfos";
 import ChatHomeScreen from "../views/ChatHome";
 import SingleChatScreen from "../views/SingleChat";
 import InitProfileScreen from "../views/InitProfile";
+import CreateBookScreen from "../views/CreateBook";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -56,6 +57,10 @@ const VendiNavigator = {
       VendiInfos: {
         screen: VendiInfosScreen,
         path: "/vendi/vendiinfos"
+      },
+      CreateBook: {
+        screen: CreateBookScreen,
+        path: "/vendi/createbook"
       }
     },
     {

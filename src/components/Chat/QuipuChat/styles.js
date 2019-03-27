@@ -28,5 +28,22 @@ export default StyleSheet.create({
   toBubble: {
     backgroundColor: colors.white,
     alignSelf: "flex-start"
+  },
+  flex_1: {
+    flex: 1
+  },
+  composerContain: {
+    flexDirection: "row",
+    borderTopColor: "black",
+    backgroundColor: colors.white,
+    elevation: 4
+  },
+  composerInput: {
+    flex: 1
+  },
+  composerIcon: {
+    width: 50,
+    justifyContent: "center",
+    alignItems: "center"
   }
 });

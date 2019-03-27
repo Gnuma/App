@@ -11,7 +11,11 @@ const initialState = {
     4: null
   },
   previewsOrder: [0, 1, 2, 3, 4],
+
   book: null,
+  isbn: "",
+  title: "",
+
   price: "",
   conditions: null,
   description: "",
@@ -49,7 +53,17 @@ const setPreviewsOrder = (state, action) => {
 
 const selectBook = (state, action) => {
   return updateObject(state, {
-    book: action.payload.book
+    book: action.payload.book,
+    isbn: "",
+    title: ""
+  });
+};
+
+const createBook = (state, action) => {
+  return updateObject(state, {
+    isbn: action.payload.isbn,
+    title: action.payload.title,
+    book: null
   });
 };
 
@@ -125,6 +139,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SELL_SELECTBOOK:
       return selectBook(state, action);
+
+    case actionTypes.SELL_CREATEBOOK:
+      return createBook(state, action);
 
     case actionTypes.SELL_SET_PRICE:
       return setPrice(state, action);

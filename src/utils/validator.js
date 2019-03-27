@@ -46,3 +46,13 @@ export const fieldCheck = (field, validator) => {
   }
   return field;
 };
+
+export const isNotISBN = value => {
+  try {
+    if (parseInt(value) == value && value.length >= 10 && value.length <= 13)
+      return false;
+  } catch (error) {
+    return true;
+  }
+  return true;
+};
