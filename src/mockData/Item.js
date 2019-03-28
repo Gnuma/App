@@ -5,6 +5,7 @@ export const itemData = {
   condition: 1,
   seller: {
     user: {
+      pk: 1,
       username: "Federico",
       fbPoints: 8
     },
@@ -41,7 +42,7 @@ export const itemData = {
       },
       content:
         "Ciao Gnuma il libro è ancora disponibile? che vuole dire giusto qualche ammaccatura?",
-      created_at: new Date(2019, 3, 28, 12, 0),
+      created_at: "28/03/2019",
       answers: [
         {
           pk: 2,
@@ -52,7 +53,7 @@ export const itemData = {
           },
           content:
             "Ciao Federico, si il libro è disponibile sempre a 15€, le ammaccature sono qualche pagina  piegata verso la fine del libro, comunque è in ottime condizioni.",
-          created_at: new Date(2019, 3, 28, 13, 0)
+          created_at: "28/03/2019"
         },
         {
           pk: 3,
@@ -62,7 +63,7 @@ export const itemData = {
             id: 1
           },
           content: "Grazie mille non mi interessa più",
-          created_at: new Date(2019, 3, 28, 14, 0)
+          created_at: "28/03/2019"
         }
       ]
     },
@@ -74,7 +75,7 @@ export const itemData = {
         id: 3
       },
       content: "Ciao, vendi anche a Isa Roma 2? perchè io vengo da li",
-      created_at: new Date(2019, 3, 28, 13, 0),
+      created_at: "28/03/2019",
       answers: []
     }
   ]

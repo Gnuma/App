@@ -2,14 +2,13 @@ import React, { Component } from "react";
 import { View, TextInput } from "react-native";
 import Button from "../Button";
 import Icon from "react-native-vector-icons/FontAwesome";
-
 export default class CommentComposer extends Component {
   _local_onSend = () => {
     if (this.props.value) this.props.onSend();
   };
 
   render() {
-    const { onTextChange, value } = this.props;
+    const { onTextChange, value, autoFocus, onBlur } = this.props;
     return (
       <View>
         <View style={{ padding: 8, flexDirection: "row" }}>
@@ -30,6 +29,8 @@ export default class CommentComposer extends Component {
             value={value}
             multiline={true}
             maxLength={280}
+            autoFocus={autoFocus}
+            onBlur={onBlur}
           />
           <Button
             style={{

@@ -8,6 +8,10 @@ import Divider from "../Divider";
 import QuipuComment from "../Comments/QuipuComment";
 
 export class MainItem extends Component {
+  componentDidMount() {
+    console.log(this.comments._onAnswer(4));
+  }
+
   render() {
     const { data } = this.props;
     const primaryData = {
@@ -19,8 +23,13 @@ export class MainItem extends Component {
     const secondaryData = {
       book: data.book
     };
+
     return (
-      <ScrollView style={styles.scrollView}>
+      <ScrollView
+        style={styles.scrollView}
+        keyboardShouldPersistTaps={"handled"}
+        ref={component => (this.scrollView = component)}
+      >
         <ImageSlider style={styles.imageSlider} data={data.image_ad} />
         <View style={styles.content}>
           <PrimaryInfo data={primaryData} />
@@ -30,11 +39,21 @@ export class MainItem extends Component {
           <Divider style={styles.smallDivider} />
           <SecondaryInfo data={secondaryData} />
           <Divider style={styles.smallDivider} />
-          <QuipuComment data={data.comments} />
+          <QuipuComment
+            data={data.comments}
+            sellerPK={data.seller.user.pk}
+            scrollTo={this._scrollTo}
+            ref={comments => (this.comments = comments)}
+          />
         </View>
       </ScrollView>
     );
   }
+
+  _scrollTo = y => {
+    console.log(y);
+    this.scrollView.scrollTo({ x: 0, y, animated: true });
+  };
 }
 
 export default MainItem;
