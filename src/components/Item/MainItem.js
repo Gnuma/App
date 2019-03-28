@@ -5,6 +5,7 @@ import { PrimaryInfo, DescriptionInfo, SecondaryInfo } from "./ItemInfos";
 import SellerInfo from "./SellerInfo";
 import ImageSlider from "./ImageSlider";
 import Divider from "../Divider";
+import QuipuComment from "../Comments/QuipuComment";
 
 export class MainItem extends Component {
   render() {
@@ -29,6 +30,7 @@ export class MainItem extends Component {
           <Divider style={styles.smallDivider} />
           <SecondaryInfo data={secondaryData} />
           <Divider style={styles.smallDivider} />
+          <QuipuComment data={data.comments} />
         </View>
       </ScrollView>
     );

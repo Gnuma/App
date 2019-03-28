@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { View, StyleSheet, ActivityIndicator, Keyboard } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import ItemHeader from "../components/Item/ItemHeader";
@@ -16,13 +16,15 @@ export class Item extends Component {
   state = {
     data: undefined,
     bookName: this.props.navigation.getParam("name", "Undesfineds"),
-    bookAuthors: this.props.navigation.getParam("authors", "Undesfineds")
+    bookAuthors: this.props.navigation.getParam("authors", "Undesfineds"),
+    keyboardOpen: false
   };
 
   componentDidMount() {
     const { navigation } = this.props;
     const id = navigation.getParam("itemID", "Undesfineds");
 
+    /*
     axios
       .get(___GET_AD___ + `${id}/`)
       .then(res => {
@@ -33,7 +35,25 @@ export class Item extends Component {
       .catch(err => {
         console.log("ERROR", err);
       });
+      */
+    this.setState({
+      data: itemData
+    });
+
+    this.keyboardEventListeners = [
+      Keyboard.addListener("keyboardDidShow", this.setKeyboardOpen(true)),
+      Keyboard.addListener("keyboardDidHide", this.setKeyboardOpen(false))
+    ];
   }
+
+  componentWillUnmount() {
+    this.keyboardEventListeners &&
+      this.keyboardEventListeners.forEach(eventListener =>
+        eventListener.remove()
+      );
+  }
+
+  setKeyboardOpen = value => () => this.setState({ keyboardOpen: value });
 
   render() {
     const { data, bookName, bookAuthors } = this.state;
@@ -54,7 +74,9 @@ export class Item extends Component {
         ) : (
           <View style={{ flex: 1 }}>
             <MainItem data={data} />
-            <ContactButton onContact={this._handleContact} />
+            {!this.state.keyboardOpen ? (
+              <ContactButton onContact={this._handleContact} />
+            ) : null}
           </View>
         )}
       </View>
