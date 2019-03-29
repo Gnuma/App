@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { View, TextInput } from "react-native";
 import Button from "../Button";
 import Icon from "react-native-vector-icons/FontAwesome";
+import colors from "../../styles/colors";
 export default class CommentComposer extends Component {
   _local_onSend = () => {
     if (this.props.value) this.props.onSend();
@@ -45,7 +46,11 @@ export default class CommentComposer extends Component {
             onPress={this._local_onSend}
             disabled={!value.length > 0}
           >
-            <Icon name={"paper-plane"} size={22} />
+            <Icon
+              name={"paper-plane"}
+              size={22}
+              style={{ color: value ? colors.primary : null }}
+            />
           </Button>
         </View>
       </View>

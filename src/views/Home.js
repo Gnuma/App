@@ -1,16 +1,17 @@
 import React, { Component } from "react";
-import { View } from "react-native";
+import { View, ScrollView } from "react-native";
 import { withNavigation } from "react-navigation";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import MainList from "../components/List/MainList";
-import { Header1 } from "../components/Text";
+import { Header1, Header3 } from "../components/Text";
 import SearchResults from "../components/SearchResults/SearchResults";
 import * as searchActions from "../store/actions/search";
 import BookShelf from "../components/Home/BookShelf";
 import SearchLink from "../components/Home/SearchLink";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 import { singleResults } from "../mockData/SearchResults";
+import Button from "../components/Button";
 
 export class Home extends Component {
   static propTypes = {
@@ -45,7 +46,9 @@ export class Home extends Component {
       );
     } else {
       return (
-        <View style={{ flex: 1, justifyContent: "center" }}>
+        <ScrollView
+          contentContainerStyle={{ flex: 1, justifyContent: "center" }}
+        >
           <View
             style={{
               justifyContent: "center",
@@ -56,7 +59,16 @@ export class Home extends Component {
             <SearchLink onPress={this._openSearchBar} />
           </View>
           <BookShelf onPress={this._searchOption} />
-        </View>
+          <View>
+            <Button
+              onPress={() =>
+                this.props.navigation.navigate("Item", { goToComment: 1 })
+              }
+            >
+              <Header3>Go to comment in item</Header3>
+            </Button>
+          </View>
+        </ScrollView>
       );
     }
   };

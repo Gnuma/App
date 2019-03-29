@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, InteractionManager } from "react-native";
 import { MainItemStyles as styles } from "./styles";
 import { PrimaryInfo, DescriptionInfo, SecondaryInfo } from "./ItemInfos";
 import SellerInfo from "./SellerInfo";
@@ -9,7 +9,11 @@ import QuipuComment from "../Comments/QuipuComment";
 
 export class MainItem extends Component {
   componentDidMount() {
-    console.log(this.comments._onAnswer(4));
+    if (this.props.goToComment && this.props.goToComment()) {
+      InteractionManager.runAfterInteractions(() => {
+        this.comments._onAnswer(this.props.goToComment());
+      });
+    }
   }
 
   render() {
@@ -44,6 +48,10 @@ export class MainItem extends Component {
             sellerPK={data.seller.user.pk}
             scrollTo={this._scrollTo}
             ref={comments => (this.comments = comments)}
+            user={{
+              username: "Bob",
+              id: 10
+            }}
           />
         </View>
       </ScrollView>
@@ -51,7 +59,7 @@ export class MainItem extends Component {
   }
 
   _scrollTo = y => {
-    console.log(y);
+    //console.log(y);
     this.scrollView.scrollTo({ x: 0, y, animated: true });
   };
 }

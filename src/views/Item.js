@@ -21,6 +21,11 @@ export class Item extends Component {
   };
 
   componentDidMount() {
+    this.keyboardEventListeners = [
+      Keyboard.addListener("keyboardDidShow", this.setKeyboardOpen(true)),
+      Keyboard.addListener("keyboardDidHide", this.setKeyboardOpen(false))
+    ];
+
     const { navigation } = this.props;
     const id = navigation.getParam("itemID", "Undesfineds");
 
@@ -39,11 +44,6 @@ export class Item extends Component {
     this.setState({
       data: itemData
     });
-
-    this.keyboardEventListeners = [
-      Keyboard.addListener("keyboardDidShow", this.setKeyboardOpen(true)),
-      Keyboard.addListener("keyboardDidHide", this.setKeyboardOpen(false))
-    ];
   }
 
   componentWillUnmount() {
@@ -73,7 +73,7 @@ export class Item extends Component {
           </View>
         ) : (
           <View style={{ flex: 1 }}>
-            <MainItem data={data} />
+            <MainItem data={data} goToComment={this._goToComment} />
             {!this.state.keyboardOpen ? (
               <ContactButton onContact={this._handleContact} />
             ) : null}
@@ -97,6 +97,10 @@ export class Item extends Component {
         this.state.data.seller.user.username
       )
     );
+  };
+
+  _goToComment = () => {
+    return this.props.navigation.getParam("goToComment", null);
   };
 }
 

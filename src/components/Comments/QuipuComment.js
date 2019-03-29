@@ -6,6 +6,7 @@ import { Header2 } from "../Text";
 import update from "immutability-helper";
 import Comment from "./Comment";
 import Divider from "../Divider";
+import colors from "../../styles/colors";
 
 class QuipuComment extends Component {
   static propTypes = {
@@ -16,8 +17,15 @@ class QuipuComment extends Component {
 
   constructor(props) {
     super(props);
+
     this.commentsPosition = {};
     this.commentsCreated = 0;
+
+    let formattedData = {};
+    for (let i = 0; i < props.data.length; i++) {
+      formattedData[props.data[i].pk] = props.data[i];
+    }
+
     this.state = {
       value: "",
       answeringComment: null,
@@ -41,10 +49,27 @@ class QuipuComment extends Component {
   }
 
   _renderMainComment = (mainComment, index) => {
+    const isFocused = this.state.answeringComment === mainComment.pk;
     return (
       <View
         key={mainComment.pk}
-        onLayout={event => this._onCommentLayout(mainComment.pk, event)}
+        onLayout={event =>
+          this._onCommentLayout(
+            mainComment.pk,
+            event,
+            isFocused && this.state.moveTo
+          )
+        }
+        style={
+          isFocused
+            ? {
+                borderColor: colors.secondary,
+                borderWidth: 2,
+                padding: 4,
+                borderRadius: 6
+              }
+            : null
+        }
       >
         <Comment
           {...mainComment}
@@ -52,7 +77,7 @@ class QuipuComment extends Component {
           sellerPK={this.props.sellerPK}
           onAnswer={this._onAnswer}
         />
-        {this.state.answeringComment === mainComment.pk ? (
+        {isFocused ? (
           <CommentComposer
             value={this.state.answeringValue}
             onTextChange={this._handleAnswereComposing}
@@ -69,10 +94,14 @@ class QuipuComment extends Component {
   };
 
   _onAnswer = pk => {
-    this.props.scrollTo(this.commentsPosition[pk] + 120);
-    this.setState({
-      answeringComment: pk
-    });
+    if (this.commentsPosition[pk]) {
+      this.setState({
+        answeringComment: pk,
+        moveTo: true
+      });
+    } else {
+      console.warn("Comment not found");
+    }
   };
 
   _handleAnswereComposing = text => {
@@ -81,9 +110,13 @@ class QuipuComment extends Component {
     });
   };
 
-  _onCommentLayout = (pk, event) => {
+  _onCommentLayout = (pk, event, moveTo) => {
     const layout = event.nativeEvent.layout;
     this.commentsPosition[pk] = layout.y + layout.height;
+    if (moveTo)
+      this.setState({ moveTo: false }, () =>
+        this.props.scrollTo(this.commentsPosition[pk] + 120)
+      );
   };
 
   _handleComposing = text => {
@@ -93,25 +126,35 @@ class QuipuComment extends Component {
   };
 
   _onSendAnswer = () => {
-    this.setState({
-      answeringValue: "",
-      answeringComment: null
-    });
+    const { user } = this.props;
+    if (user) {
+      this.setState(prevState => ({
+        answeringValue: "",
+        answeringComment: null
+      }));
+    } else {
+      console.warn("Not logged in");
+    }
   };
 
   _onSend = () => {
-    this.setState(
-      prevState => ({
-        value: "",
-        data: update(prevState.data, {
-          $unshift: [this.newComment(prevState.value)]
-        })
-      }),
-      () => {
-        this.commentsCreated++;
-        Keyboard.dismiss();
-      }
-    );
+    const { user } = this.props;
+    if (user) {
+      this.setState(
+        prevState => ({
+          value: "",
+          data: update(prevState.data, {
+            $unshift: [this.newComment(prevState.value)]
+          })
+        }),
+        () => {
+          this.commentsCreated++;
+          Keyboard.dismiss();
+        }
+      );
+    } else {
+      console.warn("Not logged in");
+    }
   };
 
   newComment = content => {
@@ -121,8 +164,8 @@ class QuipuComment extends Component {
     return {
       pk: "PK" + this.commentsCreated,
       user: {
-        username: "Federico",
-        id: this.props.sellerPK
+        username: this.props.user.username,
+        id: this.props.user.pk
       },
       content,
       created_at,
@@ -130,9 +173,5 @@ class QuipuComment extends Component {
     };
   };
 }
-
-const mapStateToProps = state => ({});
-
-const mapDispatchToProps = {};
 
 export default QuipuComment;

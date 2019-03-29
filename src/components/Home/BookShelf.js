@@ -24,7 +24,7 @@ export default class BookShelf extends Component {
   render() {
     const { activeSlide } = this.state;
     return (
-      <View style={{ flex: 1 }}>
+      <View>
         <Carousel
           ref={c => (this.bookShelf = c)}
           data={data}

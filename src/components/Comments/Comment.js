@@ -16,7 +16,7 @@ export default class Comment extends Component {
 
   render() {
     const { isFather, answers } = this.props;
-    console.log(this.props);
+    //console.log(this.props);
     return (
       <View>
         {this._renderHeader()}
