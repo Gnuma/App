@@ -21,11 +21,6 @@ class QuipuComment extends Component {
     this.commentsPosition = {};
     this.commentsCreated = 0;
 
-    let formattedData = {};
-    for (let i = 0; i < props.data.length; i++) {
-      formattedData[props.data[i].pk] = props.data[i];
-    }
-
     this.state = {
       value: "",
       answeringComment: null,
@@ -94,6 +89,7 @@ class QuipuComment extends Component {
   };
 
   _onAnswer = pk => {
+    //console.log(this.commentsPosition);
     if (this.commentsPosition[pk]) {
       this.setState({
         answeringComment: pk,
@@ -128,9 +124,26 @@ class QuipuComment extends Component {
   _onSendAnswer = () => {
     const { user } = this.props;
     if (user) {
+      for (var i = 0; i < this.state.data.length; i++) {
+        if (this.state.answeringComment == this.state.data[i].pk) {
+          break;
+        }
+      }
       this.setState(prevState => ({
         answeringValue: "",
-        answeringComment: null
+        answeringComment: null,
+        data: update(
+          prevState.data,
+          {
+            [i]: {
+              answers: { $push: [this.newComment(prevState.answeringValue)] }
+            }
+          },
+          () => {
+            this.commentsCreated++;
+            Keyboard.dismiss();
+          }
+        )
       }));
     } else {
       console.warn("Not logged in");
@@ -162,7 +175,7 @@ class QuipuComment extends Component {
     const created_at =
       now.getDate() + "/" + now.getMonth() + 1 + "/" + now.getFullYear();
     return {
-      pk: "PK" + this.commentsCreated,
+      pk: -this.commentsCreated,
       user: {
         username: this.props.user.username,
         id: this.props.user.pk
