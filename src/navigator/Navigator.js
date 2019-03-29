@@ -20,6 +20,7 @@ import ChatHomeScreen from "../views/ChatHome";
 import SingleChatScreen from "../views/SingleChat";
 import InitProfileScreen from "../views/InitProfile";
 import CreateBookScreen from "../views/CreateBook";
+import ModalTestScreen from "../views/Auth/ModalTest";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -74,31 +75,6 @@ const VendiNavigator = {
   }
 };
 
-const ProfileNavigator = {
-  screen: createStackNavigator(
-    {
-      Signup: {
-        screen: SignupScreen,
-        path: "/signup"
-      },
-      Login: {
-        screen: LoginScreen,
-        path: "/login"
-      }
-    },
-    {
-      defaultNavigationOptions: {
-        header: null
-      },
-      initialRouteName: "Signup",
-      initialRouteKey: "startingAuth"
-    }
-  ),
-  navigationOptions: {
-    tabBarVisible: false
-  }
-};
-
 const ChatNavigator = {
   screen: createStackNavigator(
     {
@@ -145,11 +121,35 @@ const InitProfileNavigator = {
   )
 };
 
+const AuthNavigator = {
+  screen: createStackNavigator(
+    {
+      Signup: {
+        screen: SignupScreen,
+        path: "/signup"
+      },
+      Login: {
+        screen: LoginScreen,
+        path: "/login"
+      }
+    },
+    {
+      defaultNavigationOptions: {
+        header: null
+      },
+      initialRouteName: "Signup",
+      initialRouteKey: "startingAuth"
+    }
+  ),
+  navigationOptions: {
+    tabBarVisible: false
+  }
+};
+
 const AppStack = createBottomTabNavigator(
   {
     SEARCH: SearchNavigator,
     VENDI: VendiNavigator,
-    AUTH: ProfileNavigator,
     CHAT: ChatNavigator
   },
   {
@@ -157,10 +157,21 @@ const AppStack = createBottomTabNavigator(
   }
 );
 
-const FullApp = createSwitchNavigator(
+const MainStack = createStackNavigator(
+  {
+    App: AppStack,
+    AUTH: AuthNavigator
+  },
+  {
+    mode: "modal",
+    headerMode: "none"
+  }
+);
+
+const RootStack = createSwitchNavigator(
   {
     AppLoader: AppLoaderScreen,
-    App: AppStack,
+    Main: MainStack,
     InitProfile: InitProfileNavigator
   },
   {
@@ -168,4 +179,4 @@ const FullApp = createSwitchNavigator(
   }
 );
 
-export default createAppContainer(FullApp);
+export default createAppContainer(RootStack);

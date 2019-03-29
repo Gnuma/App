@@ -12,6 +12,7 @@ import SearchLink from "../components/Home/SearchLink";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 import { singleResults } from "../mockData/SearchResults";
 import Button from "../components/Button";
+import protectedAction from "../utils/protectedAction";
 
 export class Home extends Component {
   static propTypes = {
@@ -66,6 +67,14 @@ export class Home extends Component {
               }
             >
               <Header3>Go to comment in item</Header3>
+            </Button>
+            <Button onPress={() => this.props.navigation.navigate("AUTH")}>
+              <Header3>Go to Modal Auth</Header3>
+            </Button>
+            <Button
+              onPress={() => protectedAction().then(res => console.log(res))}
+            >
+              <Header3>Test protected actions</Header3>
             </Button>
           </View>
         </ScrollView>

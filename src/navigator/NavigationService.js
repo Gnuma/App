@@ -21,6 +21,9 @@ function goBack(key) {
   else _navigator.dispatch(NavigationActions.back(key));
 }
 
+/**
+ * @deprecated Since new AUTH
+ */
 function protectedNavigation(routeName, routeParams, ___CALLBACK___) {
   const isAuthenticated = store.getState().auth.token;
   if (isAuthenticated) navigate(routeName, routeParams);

@@ -10,6 +10,11 @@ import FormInput from "../../components/Form/TextInput";
 import Layout from "./AuthLayout";
 
 export class Login extends Component {
+  constructor(props) {
+    super(props);
+    this._resolve = this.props.navigation.getParam("resolve", () => {});
+  }
+
   static propTypes = {
     isAuthenticated: PropTypes.bool,
     isLoading: PropTypes.bool,
@@ -106,19 +111,8 @@ export class Login extends Component {
     if (result === true) {
       const uid = fields.uid.value;
       const pwd = fields.pwd.value;
-      const _callback = this.props.navigation.getParam(
-        "___CALLBACK___",
-        undefined
-      );
-      const routeName = this.props.navigation.getParam(
-        "___routeName___",
-        undefined
-      );
-      const routeParams = this.props.navigation.getParam(
-        "___routeParams___",
-        undefined
-      );
-      this.props.loginRedux(uid, pwd, _callback, routeName, routeParams);
+
+      this.props.loginRedux(uid, pwd, this._resolve);
     } else {
       this.setState(prevState => ({
         ...prevState,
@@ -135,8 +129,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    loginRedux: (uid, pwd, callback, nextRoute, params) =>
-      dispatch(authActions.authLogin(uid, pwd, callback, nextRoute, params))
+    loginRedux: (uid, pwd, resolve) =>
+      dispatch(authActions.authLogin(uid, pwd, resolve))
   };
 };
 

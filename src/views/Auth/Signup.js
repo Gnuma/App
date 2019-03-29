@@ -25,6 +25,9 @@ export class Signup extends Component {
   constructor(props) {
     super(props);
 
+    this._resolve = this.props.navigation.getParam("resolve", () => {});
+    this._reject = this.props.navigation.getParam("reject", () => {});
+
     this.state = {
       fields: {
         uid: {
@@ -164,6 +167,7 @@ export class Signup extends Component {
         renderTopSection={this._renderTopSection}
         renderBottomSection={this._renderBottomSection}
         canQuitAuth
+        reject={this._reject}
       />
     );
   }
@@ -220,27 +224,8 @@ export class Signup extends Component {
       const pwd = fields.pwd.value;
       const email = fields.email.value;
       const confirmPwd = fields.confirmPwd.value;
-      const _callback = this.props.navigation.getParam(
-        "___CALLBACK___",
-        undefined
-      );
-      const routeName = this.props.navigation.getParam(
-        "___routeName___",
-        undefined
-      );
-      const routeParams = this.props.navigation.getParam(
-        "___routeParams___",
-        undefined
-      );
-      this.props.signupRedux(
-        uid,
-        email,
-        pwd,
-        confirmPwd,
-        _callback,
-        routeName,
-        routeParams
-      );
+
+      this.props.signupRedux(uid, email, pwd, confirmPwd, this._resolve);
     } else {
       this.setState({
         fields: { ...result }
@@ -262,18 +247,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    signupRedux: (uid, email, pwd1, pwd2, callback, nextRoute, params) =>
-      dispatch(
-        authActions.authSignup(
-          uid,
-          email,
-          pwd1,
-          pwd2,
-          callback,
-          nextRoute,
-          params
-        )
-      )
+    signupRedux: (uid, email, pwd1, pwd2, resolve) =>
+      dispatch(authActions.authSignup(uid, email, pwd1, pwd2, resolve))
   };
 };
 

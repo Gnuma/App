@@ -37,6 +37,7 @@ export default class AuthLayout extends Component {
   }
 
   _goBack() {
+    this.props.reject();
     NavigationService.goBack(null);
   }
 }
