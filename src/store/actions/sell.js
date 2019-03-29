@@ -118,15 +118,35 @@ export const submit = () => {
       title
     } = getState().sell;
     const { token } = getState().auth;
-    let data = new FormData();
+    //let data = new FormData();
+    let data = [];
     let counter = 0;
     for (let i = 0; i < previewsOrder.length; i++) {
       if (previews[previewsOrder[i]] !== null) {
-        data.append(counter.toString(), previews[previewsOrder[i]].base64);
+        /*data.append(counter.toString(), {
+          name: "image.jpg",
+          type: "image/jpg",
+          uri: previews[previewsOrder[i]].uri
+        });
+        */
+        /*
+        data.push({
+          name: "0",
+          filename: "0.png",
+          data: previews[previewsOrder[i]].base64
+        });
+        */
+        data.push({
+          name: counter.toString(),
+          data: RNFetchBlob.wrap(previews[previewsOrder[i]].uri),
+          type: "image/jpg",
+          filename: "img.jpg"
+        });
         counter++;
       }
     }
 
+    /*
     if (book) {
       data.append("isbn", book);
     } else {
@@ -136,22 +156,52 @@ export const submit = () => {
     data.append("price", price);
     data.append("condition", conditions);
     data.append("description", description);
+    */
+
+    if (book) {
+      data.push({ name: "isbn", data: book.toString() });
+    } else {
+      data.push({ name: "isbn", data: isbn.toString() });
+      data.push({ name: "title", data: title });
+    }
+
+    data.push({ name: "price", data: price.toString() });
+    data.push({ name: "condition", data: conditions.toString() });
+    data.push({ name: "description", data: description });
 
     if (counter > 0) {
+      /*
       axios
-        .post(___CREATE_AD___, data, {
-          headers: {
-            accept: "application/json",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Content-Type": `multipart/form-data`
-          }
-        })
+        .post(___CREATE_AD___, data)
         .then(res => {
           console.log(res);
           dispatch(sellSuccess());
           NavigatorService.navigate("Home");
         })
         .catch(err => {
+          console.warn("Something went wrongato", "Error in creation");
+          dispatch(sellFail(err));
+          //NavigatorService.navigate("Home");
+        });
+*/
+
+      console.log("SENDING ", data);
+      RNFetchBlob.fetch(
+        "POST",
+        ___CREATE_AD___,
+        {
+          Authorization: "Token " + token,
+          "Content-Type": "multipart/form-data"
+        },
+        data
+      )
+        .then(res => {
+          console.log(res);
+          dispatch(sellSuccess());
+          NavigatorService.navigate("Home");
+        })
+        .catch(err => {
+          console.log(err);
           console.warn("Something went wrongato", "Error in creation");
           dispatch(sellFail(err));
           //NavigatorService.navigate("Home");
