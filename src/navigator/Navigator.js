@@ -11,8 +11,9 @@ import HomeScreen from "../views/Home";
 import ItemScreen from "../views/Item";
 import VendiScreen from "../views/Vendi";
 import AppLoaderScreen from "../views/AppLoader";
-import LoginScreen from "../views/Auth/Login";
-import SignupScreen from "../views/Auth/Signup";
+//import LoginScreen from "../views/Auth/Login";
+//import SignupScreen from "../views/Auth/Signup";
+import Auth from "../views/Auth/Auth";
 import CameraScreen from "../views/Camera";
 import SelectBookScreen from "../views/SelectBook";
 import VendiInfosScreen from "../views/VendiInfos";
@@ -20,7 +21,6 @@ import ChatHomeScreen from "../views/ChatHome";
 import SingleChatScreen from "../views/SingleChat";
 import InitProfileScreen from "../views/InitProfile";
 import CreateBookScreen from "../views/CreateBook";
-import ModalTestScreen from "../views/Auth/ModalTest";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -121,6 +121,7 @@ const InitProfileNavigator = {
   )
 };
 
+/*
 const AuthNavigator = {
   screen: createStackNavigator(
     {
@@ -145,6 +146,7 @@ const AuthNavigator = {
     tabBarVisible: false
   }
 };
+*/
 
 const AppStack = createBottomTabNavigator(
   {
@@ -160,7 +162,7 @@ const AppStack = createBottomTabNavigator(
 const MainStack = createStackNavigator(
   {
     App: AppStack,
-    AUTH: AuthNavigator
+    AUTH: Auth
   },
   {
     mode: "modal",
