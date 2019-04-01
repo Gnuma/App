@@ -21,6 +21,16 @@ export class Item extends Component {
   };
 
   componentDidMount() {
+    console.log("Mounted");
+    /*
+    this.didFocusSubscription = this.props.navigation.addListener(
+      "didFocus",
+      payload => {
+        console.debug("didFocus", payload);
+      }
+    );
+    */
+
     this.keyboardEventListeners = [
       Keyboard.addListener("keyboardDidShow", this.setKeyboardOpen(true)),
       Keyboard.addListener("keyboardDidHide", this.setKeyboardOpen(false))
@@ -41,6 +51,7 @@ export class Item extends Component {
         console.log("ERROR", err);
       });
       */
+
     this.setState({
       data: itemData
     });
@@ -51,6 +62,9 @@ export class Item extends Component {
       this.keyboardEventListeners.forEach(eventListener =>
         eventListener.remove()
       );
+
+    //this.didFocusSubscription && this.didFocusSubscription.remove();
+    console.log("Unmounting");
   }
 
   setKeyboardOpen = value => () => this.setState({ keyboardOpen: value });

@@ -11,7 +11,8 @@ export default class Comment extends Component {
     user: PropTypes.object,
     content: PropTypes.string,
     isFather: PropTypes.bool,
-    sellerPK: PropTypes.number
+    sellerPK: PropTypes.number,
+    isPending: PropTypes.bool
   };
 
   render() {
@@ -40,7 +41,7 @@ export default class Comment extends Component {
   }
 
   _renderHeader = () => {
-    const { user, created_at, isFather, sellerPK, pk } = this.props;
+    const { user, created_at, isFather, sellerPK, pk, isPending } = this.props;
     return (
       <View
         style={{
@@ -57,8 +58,8 @@ export default class Comment extends Component {
           {user.username}
         </Header3>
         <Divider style={{ width: 20, height: 1, marginHorizontal: 4 }} />
-        <Header5>{created_at}</Header5>
-        {isFather ? (
+        <Header5>{isPending ? "Inviando..." : created_at}</Header5>
+        {isFather && !isPending ? (
           <Button
             style={{
               marginHorizontal: 2,

@@ -6,7 +6,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 export default ({ children, style, icon, iconSize, iconStyle, ...rest }) => {
   return (
     <Button style={[styles.container, style]} {...rest}>
-      {children}
+      <View style={styles.children}>{children}</View>
       {icon ? (
         <Icon name={icon} size={iconSize} style={[styles.icon, iconStyle]} />
       ) : null}
@@ -20,13 +20,14 @@ const styles = StyleSheet.create({
     elevation: 2,
     flexDirection: "row",
     padding: 10,
-    justifyContent: "center",
     borderRadius: 8,
     marginVertical: 4
   },
   icon: {
-    position: "absolute",
-    right: 10,
-    alignSelf: "center"
+    alignSelf: "center",
+    paddingLeft: 10
+  },
+  children: {
+    flex: 1
   }
 });

@@ -7,6 +7,7 @@ import update from "immutability-helper";
 import Comment from "./Comment";
 import Divider from "../Divider";
 import colors from "../../styles/colors";
+import uuid from "uuid";
 
 class QuipuComment extends Component {
   static propTypes = {
@@ -20,6 +21,8 @@ class QuipuComment extends Component {
 
     this.commentsPosition = {};
     this.commentsCreated = 0;
+
+    this.mainCommentQueue = 0;
 
     this.state = {
       value: "",
@@ -129,38 +132,31 @@ class QuipuComment extends Component {
           break;
         }
       }
-      this.setState(prevState => ({
-        answeringValue: "",
-        answeringComment: null,
-        data: update(
-          prevState.data,
-          {
-            [i]: {
-              answers: { $push: [this.newComment(prevState.answeringValue)] }
-            }
-          },
-          () => {
-            this.commentsCreated++;
-            Keyboard.dismiss();
-          }
-        )
-      }));
-    } else {
-      console.warn("Not logged in");
-    }
-  };
-
-  _onSend = () => {
-    const { user } = this.props;
-    if (user) {
+      const content = this.state.answeringValue;
       this.setState(
         prevState => ({
-          value: "",
+          answeringValue: "",
+          answeringComment: null,
           data: update(prevState.data, {
-            $unshift: [this.newComment(prevState.value)]
+            [i]: {
+              answers: {
+                $push: [this.composeComment(prevState.answeringValue)]
+              }
+            }
           })
         }),
         () => {
+          const fatherPK = i;
+          const childPK = this.state.data[i].answers.length - 1;
+          console.log(fatherPK, childPK);
+          setTimeout(() => {
+            this.sendingConfirmation(fatherPK, childPK, {
+              pk: uuid.v4(),
+              created_at: "Now",
+              content
+            });
+          }, 5000);
+
           this.commentsCreated++;
           Keyboard.dismiss();
         }
@@ -170,10 +166,41 @@ class QuipuComment extends Component {
     }
   };
 
-  newComment = content => {
-    const now = new Date();
-    const created_at =
-      now.getDate() + "/" + now.getMonth() + 1 + "/" + now.getFullYear();
+  _onSend = () => {
+    const { user } = this.props;
+    const content = this.state.value;
+    if (user) {
+      this.mainCommentQueue++;
+      console.log(this.mainCommentQueue);
+      this.setState(
+        prevState => ({
+          value: "",
+          data: update(prevState.data, {
+            $unshift: [this.composeComment(prevState.value)]
+          })
+        }),
+        () => {
+          //send validation
+          setTimeout(
+            () =>
+              this.sendingConfirmation(0, null, {
+                pk: uuid.v4(),
+                created_at: "Now",
+                content
+              }),
+            5000
+          );
+
+          this.commentsCreated++;
+          Keyboard.dismiss();
+        }
+      );
+    } else {
+      console.warn("Not logged in");
+    }
+  };
+
+  composeComment = content => {
     return {
       pk: -this.commentsCreated,
       user: {
@@ -181,9 +208,43 @@ class QuipuComment extends Component {
         id: this.props.user.pk
       },
       content,
-      created_at,
-      answers: []
+      created_at: undefined,
+      answers: [],
+      isPending: true
     };
+  };
+
+  sendingConfirmation = (fatherPK, childPK, comment) => {
+    //console.log(fatherPK, childPK, comment);
+    this.mainCommentQueue = Math.max(0, this.mainCommentQueue - 1);
+    if (childPK !== null) {
+      this.setState(prevState => ({
+        data: update(prevState.data, {
+          [fatherPK + this.mainCommentQueue]: {
+            answers: {
+              [childPK]: {
+                $merge: {
+                  ...comment,
+                  isPending: false
+                }
+              }
+            }
+          }
+        })
+      }));
+    } else {
+      //console.log("Setting Father comment", comment, fatherPK);
+      this.setState(prevState => ({
+        data: update(prevState.data, {
+          [fatherPK + this.mainCommentQueue]: {
+            $merge: {
+              ...comment,
+              isPending: false
+            }
+          }
+        })
+      }));
+    }
   };
 }
 

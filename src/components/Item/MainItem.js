@@ -9,6 +9,7 @@ import QuipuComment from "../Comments/QuipuComment";
 
 export class MainItem extends Component {
   componentDidMount() {
+    console.log(this.props.goToComment());
     if (this.props.goToComment && this.props.goToComment()) {
       InteractionManager.runAfterInteractions(() => {
         this.comments._onAnswer(this.props.goToComment());
@@ -43,16 +44,18 @@ export class MainItem extends Component {
           <Divider style={styles.smallDivider} />
           <SecondaryInfo data={secondaryData} />
           <Divider style={styles.smallDivider} />
-          <QuipuComment
-            data={data.comments}
-            sellerPK={data.seller.user.pk}
-            scrollTo={this._scrollTo}
-            ref={comments => (this.comments = comments)}
-            user={{
-              username: "Bob",
-              id: 10
-            }}
-          />
+          {data.comments ? (
+            <QuipuComment
+              data={data.comments}
+              sellerPK={data.seller.user.pk}
+              scrollTo={this._scrollTo}
+              ref={comments => (this.comments = comments)}
+              user={{
+                username: "Bob",
+                id: 10
+              }}
+            />
+          ) : null}
         </View>
       </ScrollView>
     );
