@@ -11,6 +11,7 @@ import NavigatorService from "../navigator/NavigationService";
 import axios from "axios";
 import { ___GET_AD___ } from "../store/constants";
 import * as msgActions from "../store/actions/messaging";
+import { notificationsViewItem } from "../store/actions/notifications";
 
 export class Item extends Component {
   state = {
@@ -55,6 +56,9 @@ export class Item extends Component {
     this.setState({
       data: itemData
     });
+
+    //To be put in then
+    this.props.notificationViewItemRedux(id);
   }
 
   componentWillUnmount() {
@@ -123,7 +127,8 @@ const mapStateToProps = state => ({});
 const mapDispatchToProps = dispatch => {
   return {
     contactRedux: (itemID, toID, toUsername) =>
-      dispatch(msgActions.contact(itemID, toID, toUsername))
+      dispatch(msgActions.contact(itemID, toID, toUsername)),
+    notificationViewItemRedux: itemPK => dispatch(notificationsViewItem(itemPK))
   };
 };
 

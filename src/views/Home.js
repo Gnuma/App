@@ -11,6 +11,7 @@ import SearchLink from "../components/Home/SearchLink";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 import { singleResults } from "../mockData/SearchResults";
 import NotificationCenter from "../components/Home/NotificationCenter";
+import _ from "lodash";
 
 export class Home extends Component {
   static propTypes = {
@@ -55,7 +56,7 @@ export class Home extends Component {
           >
             <SearchLink onPress={this._openSearchBar} />
           </View>
-          {this.props.notifications ? (
+          {this.props.notifications && !_.isEmpty(this.props.notifications) ? (
             <NotificationCenter
               data={this.props.notifications}
               commentHandler={this._onCommentNotificationPress}

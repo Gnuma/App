@@ -1,8 +1,9 @@
 import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
+import update from "immutability-helper";
 
 const initialState = {
-  notifications: null,
+  notifications: {},
   idSubscription: null
 };
 
@@ -22,7 +23,13 @@ const notificationsUnsubscribe = (state, action) => {
   clearInterval(state.idSubscription);
   return updateObject(state, {
     idSubscription: null,
-    notifications: null
+    notifications: {}
+  });
+};
+
+const notificationViewItem = (state, action) => {
+  return update(state, {
+    notifications: { $unset: [action.payload.itemPK] }
   });
 };
 
@@ -36,6 +43,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.NOTIFICATIONS_UNSUBSCRIBE:
       return notificationsUnsubscribe(state, action);
+
+    case actionTypes.NOTIFICATIONS_VIEW_ITEM:
+      return notificationViewItem(state, action);
 
     default:
       return state;

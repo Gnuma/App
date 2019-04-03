@@ -5,35 +5,12 @@ import { Header2, Header3 } from "../Text";
 import memoize from "memoize-one";
 import SolidButton from "../SolidButton";
 export default class NotificationCenter extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   filter = memoize(data => this.formatNotifications(data));
 
   formatNotifications = data => {
-    console.log(data);
-    let formatedData = {};
-    for (let i = 0; i < data.length; i++) {
-      const itemPK = data[i].itemPK;
-      const fatherPK =
-        data[i].fatherPK !== undefined ? data[i].fatherPK : data[i].pk;
-
-      if (!formatedData[itemPK])
-        formatedData[itemPK] = {
-          itemPK,
-          fatherPK,
-          commentPK: data[i].pk,
-          book: data[i].book
-        };
-      else if (
-        !formatedData[itemPK].commentPK ||
-        formatedData[itemPK].fatherPK !== fatherPK
-      )
-        formatedData[itemPK].commentPK = null;
-    }
-
-    return formatedData;
+    return Object.keys(data).map(function(key) {
+      return data[key];
+    });
   };
 
   _keyExtractor = item => {
@@ -45,7 +22,6 @@ export default class NotificationCenter extends Component {
     const text = singleComment
       ? "Nuova domanda su " + item.book
       : "Nuove domande su " + item.book;
-    console.log(item);
     return (
       <SolidButton
         style={{
@@ -68,10 +44,9 @@ export default class NotificationCenter extends Component {
   };
 
   render() {
-    const filteredData = this.filter(this.props.data);
-    const arrayData = Object.keys(filteredData).map(function(key) {
-      return filteredData[key];
-    });
+    const data = this.props.data;
+    const arrayData = this.filter(data);
+
     return (
       <View
         style={{

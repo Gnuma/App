@@ -102,7 +102,7 @@ export const authLogin = (
           const token = res.data.key;
           console.log(res);
           dispatch(loginSuccess(token));
-          //dispatch(notificationsSubscribe());
+          dispatch(notificationsSubscribe());
           //dispatch(msgConnect(1));
           callback ? callback() : null;
           NavigatorService.navigate(nextRoute, params);

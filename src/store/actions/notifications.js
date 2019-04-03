@@ -1,6 +1,7 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
 import { newCommentsSingle, newCommentsMulti } from "../../mockData/comments";
+import { localNotification } from "../../service/pushNotification";
 
 export const notificationsUpdate = notifications => {
   return {
@@ -22,8 +23,7 @@ export const notificationsSetSubscription = idSubscription => {
 
 export const notificationsSubscribe = () => {
   return dispatch => {
-    console.log("Getting Called");
-    const idSubscription = setInterval(() => dispatch(update()), 5000);
+    const idSubscription = setInterval(() => dispatch(update()), 10000);
     dispatch(notificationsSetSubscription(idSubscription));
   };
 };
@@ -34,14 +34,47 @@ export const notificationsUnsubscribe = () => {
   };
 };
 
+export const notificationsViewItem = itemPK => {
+  return {
+    type: actionTypes.NOTIFICATIONS_VIEW_ITEM,
+    payload: {
+      itemPK
+    }
+  };
+};
+
 let debugCounter = 0;
 
 export const update = () => {
   return dispatch => {
     //axios
-
-    if (debugCounter === 0) dispatch(notificationsUpdate(newCommentsMulti));
-    else dispatch(notificationsUpdate(newCommentsSingle));
+    let data;
+    if (debugCounter === 0) data = newCommentsMulti;
+    else data = newCommentsSingle;
     debugCounter++;
+    dispatch(notificationsUpdate(formatComments(data)));
+    //localNotification();
   };
+};
+
+formatComments = data => {
+  let formattedData = {};
+  for (let i = 0; i < data.length; i++) {
+    const itemPK = data[i].itemPK;
+    const fatherPK =
+      data[i].fatherPK !== undefined ? data[i].fatherPK : data[i].pk;
+    if (!formattedData[itemPK])
+      formattedData[itemPK] = {
+        itemPK,
+        fatherPK,
+        commentPK: data[i].pk,
+        book: data[i].book
+      };
+    else if (
+      !formattedData[itemPK].commentPK ||
+      formattedData[itemPK].fatherPK !== fatherPK
+    )
+      formattedData[itemPK].commentPK = null;
+  }
+  return formattedData;
 };
