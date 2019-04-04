@@ -40,7 +40,6 @@ export class Item extends Component {
     const { navigation } = this.props;
     const id = navigation.getParam("itemID", "Undesfineds");
 
-    /*
     axios
       .get(___GET_AD___ + `${id}/`)
       .then(res => {
@@ -51,11 +50,10 @@ export class Item extends Component {
       .catch(err => {
         console.log("ERROR", err);
       });
-      */
 
-    this.setState({
-      data: itemData
-    });
+    //this.setState({
+    //  data: itemData
+    //});
 
     //To be put in then
     this.props.notificationViewItemRedux(id);

@@ -41,8 +41,8 @@ export class Home extends Component {
       );
     } else if (this.props.showResults) {
       return (
-        //<MainList data={this.props.results} isLoading={this.props.isLoading} />
-        <MainList data={singleResults} isLoading={this.props.isLoading} />
+        <MainList data={this.props.results} isLoading={this.props.isLoading} />
+        //<MainList data={singleResults} isLoading={this.props.isLoading} />
       );
     } else {
       return (

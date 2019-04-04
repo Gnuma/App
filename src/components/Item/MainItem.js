@@ -44,7 +44,7 @@ export class MainItem extends Component {
           <Divider style={styles.smallDivider} />
           <SecondaryInfo data={secondaryData} />
           <Divider style={styles.smallDivider} />
-          {data.comments ? (
+          {/*data.comments*/ true ? (
             <QuipuComment
               data={data.comments}
               sellerPK={data.seller.user.pk}
@@ -54,6 +54,7 @@ export class MainItem extends Component {
                 username: "Bob",
                 id: 10
               }}
+              itemPK={data.pk}
             />
           ) : null}
         </View>

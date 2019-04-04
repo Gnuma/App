@@ -8,6 +8,8 @@ import Comment from "./Comment";
 import Divider from "../Divider";
 import colors from "../../styles/colors";
 import uuid from "uuid";
+import axios from "axios";
+import { ___CREATE_COMMENT___ } from "../../store/constants";
 
 class QuipuComment extends Component {
   static propTypes = {
@@ -28,7 +30,7 @@ class QuipuComment extends Component {
       value: "",
       answeringComment: null,
       answeringValue: "",
-      data: props.data
+      data: props.data ? props.data : []
     };
   }
 
@@ -41,6 +43,7 @@ class QuipuComment extends Component {
           onTextChange={this._handleComposing}
           onSend={this._onSend}
         />
+
         <View>{this.state.data.map(this._renderMainComment)}</View>
       </View>
     );
@@ -132,6 +135,7 @@ class QuipuComment extends Component {
           break;
         }
       }
+      const remotefatherPK = this.state.data[i].pk;
       const content = this.state.answeringValue;
       this.setState(
         prevState => ({
@@ -148,14 +152,22 @@ class QuipuComment extends Component {
         () => {
           const fatherPK = i;
           const childPK = this.state.data[i].answers.length - 1;
-          console.log(fatherPK, childPK);
-          setTimeout(() => {
-            this.sendingConfirmation(fatherPK, childPK, {
-              pk: uuid.v4(),
-              created_at: "Now",
-              content
-            });
-          }, 5000);
+          //console.log(fatherPK, childPK);
+          axios
+            .post(___CREATE_COMMENT___, {
+              type: "answer",
+              item: remotefatherPK,
+              content: content
+            })
+            .then(res => {
+              console.log(res);
+              this.sendingConfirmation(fatherPK, childPK, {
+                pk: res.data.pk,
+                created_at: res.data.timestamp
+                //content
+              });
+            })
+            .catch(err => console.log(err.response));
 
           this.commentsCreated++;
           Keyboard.dismiss();
@@ -171,7 +183,7 @@ class QuipuComment extends Component {
     const content = this.state.value;
     if (user) {
       this.mainCommentQueue++;
-      console.log(this.mainCommentQueue);
+      //console.log(this.mainCommentQueue);
       this.setState(
         prevState => ({
           value: "",
@@ -181,15 +193,25 @@ class QuipuComment extends Component {
         }),
         () => {
           //send validation
-          setTimeout(
-            () =>
+
+          axios
+            .post(___CREATE_COMMENT___, {
+              type: "comment",
+              item: this.props.itemPK,
+              content: content
+            })
+            .then(res => {
+              console.log(res);
               this.sendingConfirmation(0, null, {
-                pk: uuid.v4(),
-                created_at: "Now",
-                content
-              }),
-            5000
-          );
+                pk: res.data.pk,
+                created_at: res.data.timestamp
+                //content
+              });
+            })
+            .catch(err => {
+              console.warn(err);
+              console.log(err.response);
+            });
 
           this.commentsCreated++;
           Keyboard.dismiss();

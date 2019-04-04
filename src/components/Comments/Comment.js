@@ -41,7 +41,17 @@ export default class Comment extends Component {
   }
 
   _renderHeader = () => {
-    const { user, created_at, isFather, sellerPK, pk, isPending } = this.props;
+    const { user, isFather, sellerPK, pk, isPending } = this.props;
+    let created_at = new Date(this.props.created_at);
+    if (created_at.getTime() > 0)
+      created_at =
+        created_at.getDate() +
+        "/" +
+        (created_at.getMonth() + 1) +
+        "/" +
+        created_at.getFullYear();
+    else created_at = this.props.created_at;
+
     return (
       <View
         style={{
