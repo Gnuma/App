@@ -90,7 +90,7 @@ export class Home extends Component {
       this.props.goHomeRedux();
       return true;
     }
-    return true;
+    return false;
   };
 
   _openSearchBar = () => {

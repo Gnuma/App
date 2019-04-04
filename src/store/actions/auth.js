@@ -168,7 +168,7 @@ export const authLogout = () => {
 export const authSignup = (username, email, password1, password2, resolve) => {
   return dispatch => {
     dispatch(authStart());
-
+    console.log("INIZIO");
     if (isOffline) {
       console.log(username, email, password1, password2);
     } else {
@@ -194,10 +194,12 @@ export const authSignup = (username, email, password1, password2, resolve) => {
             })
             .catch(err => {
               dispatch(authFail(err));
+              console.log("DENTRO");
             });
         })
         .catch(err => {
           dispatch(authFail(err));
+          console.log("FUORI");
         });
     }
   };
