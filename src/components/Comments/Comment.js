@@ -104,7 +104,7 @@ export default class Comment extends Component {
     const { content, isFather } = this.props;
     return (
       <View style={{ marginLeft: isFather ? 12 : 0 }}>
-        <Header3>{content}</Header3>
+        <Header3 color={"black"}>{content}</Header3>
       </View>
     );
   };

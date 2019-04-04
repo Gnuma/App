@@ -36,7 +36,7 @@ export class MainItem extends Component {
         ref={component => (this.scrollView = component)}
       >
         <ImageSlider style={styles.imageSlider} data={data.image_ad} />
-        <View style={styles.content}>
+        <View style={styles.content} onLayout={this._setContainerOffset}>
           <PrimaryInfo data={primaryData} />
           <SellerInfo data={sellerData} />
           <Divider style={styles.bigDivider} />
@@ -65,8 +65,16 @@ export class MainItem extends Component {
   _scrollTo = y => {
     //console.log(y);
     console.log(y);
+    y += this.containerOffset;
     this.scrollView.scrollTo({ x: 0, y, animated: true });
   };
+
+  _setContainerOffset = event => {
+    const layout = event.nativeEvent.layout;
+    this.containerOffset = layout.y;
+  };
+
+  containerOffset = 0;
 }
 
 export default MainItem;
