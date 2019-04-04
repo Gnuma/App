@@ -25,7 +25,8 @@ export const itemWidth = slideWidth + itemHorizontalMargin * 2;
 
 export const MainItemStyles = StyleSheet.create({
   scrollView: {
-    flex: 1
+    flex: 1,
+    paddingBottom: 35
   },
   imageSlider: {
     marginVertical: 10

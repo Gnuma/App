@@ -1,183 +1,163 @@
 import React, { Component } from "react";
-import { View } from "react-native";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import * as authActions from "../../store/actions/auth";
-import { Header1, Header3, Header2 } from "../../components/Text";
-import Button from "../../components/Button";
-import { submit, fieldCheck, isEmpty } from "../../utils/validator.js";
-import FormInput from "../../components/Form/TextInput";
-import Layout from "./AuthLayout";
+import { View, ToastAndroid } from "react-native";
+import { Header1, Header3 } from "../../components/Text";
+import SolidButton from "../../components/SolidButton";
+import OutlinedInput from "../../components/Form/OutlinedInput";
+import { submit, isEmpty, fieldCheck } from "../../utils/validator.js";
 
-export class Login extends Component {
-  static propTypes = {
-    isAuthenticated: PropTypes.bool,
-    isLoading: PropTypes.bool,
-    loginRedux: PropTypes.func
-  };
-
+export default class Login extends Component {
   state = {
     fields: {
-      uid: {
-        value: "",
-        errorMessage: ""
-      },
-      pwd: {
-        value: "",
-        errorMessage: ""
+      0: {
+        uid: {
+          value: "",
+          errorMessage: ""
+        },
+        pwd: {
+          value: "",
+          errorMessage: ""
+        }
       }
     }
   };
 
-  _renderTopSection = () => (
+  continue = () => {
+    const { status } = this.props;
+    const stateFields = this.state.fields[status];
+    const stateValidators = validators[status];
+
+    const result = submit(stateFields, stateValidators);
+    if (result === true) {
+      if (status !== 0) {
+        this.props.goNext();
+      } else {
+        const { fields } = this.state;
+        const uid = fields[0].uid.value;
+        const pwd = fields[0].pwd.value;
+
+        this.props.login(uid, pwd, this.props.resolve);
+      }
+    } else {
+      this.setState(prevState => ({
+        fields: { ...prevState.fields, [status]: { ...result } }
+      }));
+
+      let errorList = "";
+      for (var key in result) {
+        if (result.hasOwnProperty(key)) {
+          if (result[key].errorMessage) {
+            if (errorList) errorList += "\n";
+            errorList += result[key].errorMessage;
+          }
+        }
+      }
+      ToastAndroid.showWithGravity(
+        errorList,
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER
+      );
+    }
+  };
+
+  handleChange = (key, value) => {
+    this.updateField(key, { value, errorMessage: "" });
+  };
+
+  checkField = (key, goNext) => {
+    const newState = fieldCheck(
+      this.state.fields[this.props.status][key],
+      validators[this.props.status][key]
+    );
+    this.updateField(key, newState, goNext);
+  };
+
+  updateField = (key, newState, goNext = false) => {
+    const status = this.props.status;
+    this.setState(
+      prevState => ({
+        ...prevState,
+        fields: {
+          ...prevState.fields,
+          [status]: {
+            ...prevState.fields[status],
+            [key]: newState
+          }
+        }
+      }),
+      () => {
+        if (goNext) this.continue();
+      }
+    );
+  };
+
+  _renderLogin = () => (
     <View
-      style={{ flex: 2, justifyContent: "space-evenly", alignItems: "center" }}
+      style={{ flex: 1, justifyContent: "flex-start", alignItems: "center" }}
     >
-      <FormInput
-        placeholder="Username"
-        textContentType="username"
-        value={this.state.fields.uid.value}
-        errorMessage={this.state.fields.uid.errorMessage}
-        onChangeText={this._uid_onChange}
-        onSubmitEditing={this._uid_check}
+      <OutlinedInput
+        placeholder="Username o Email"
+        value={this.state.fields[0].uid.value}
+        onTextChange={text => this.handleChange("uid", text)}
+        onSubmitEditing={() => this.checkField("uid")}
+        autoFocus
       />
-      <FormInput
+      <OutlinedInput
         placeholder="Password"
         textContentType="password"
-        value={this.state.fields.pwd.value}
-        errorMessage={this.state.fields.pwd.errorMessage}
-        onChangeText={this._pwd_onChange}
-        onSubmitEditing={this._pwd_check}
+        value={this.state.fields[0].pwd.value}
+        onTextChange={text => this.handleChange("pwd", text)}
+        onSubmitEditing={() => this.checkField("pwd", true)}
         secureTextEntry={true}
       />
-      <Button
-        style={{
-          paddingVertical: 4,
-          backgroundColor: "white",
-          width: 200,
-          elevation: 4,
-          borderRadius: 6
-        }}
-        onPress={this.login}
-      >
-        <Header2 color={"primary"} style={{ textAlign: "center" }}>
-          Accedi
-        </Header2>
-      </Button>
     </View>
   );
 
-  _renderBottomSection = () => {
-    return <View style={{ flex: 1.2 }} />;
+  _getContent = () => {
+    switch (this.props.status) {
+      case 0:
+        return this._renderLogin();
+      default:
+        return null;
+    }
   };
 
   render() {
-    if (this.props.isLoading) return <Header1>Loading</Header1>;
+    const { status } = this.props;
     return (
-      <Layout
-        renderTopSection={this._renderTopSection}
-        renderBottomSection={this._renderBottomSection}
-      />
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <Header1 color="primary" style={{ marginBottom: 15 }}>
+            Accedi
+          </Header1>
+          {this._getContent()}
+          <View style={{ flex: 1, justifyContent: "flex-end" }}>
+            <SolidButton onPress={this.continue} style={{ width: 180 }}>
+              <Header3 color={"primary"} style={{ textAlign: "center" }}>
+                {status === 0 ? "Accedi" : "Continua"}
+              </Header3>
+            </SolidButton>
+          </View>
+        </View>
+      </View>
     );
   }
-
-  _uid_onChange = value => this.updateField("uid", { value, errorMessage: "" });
-
-  _uid_check = () =>
-    this.updateField("uid", fieldCheck(this.state.fields.uid, validators.uid));
-
-  _pwd_onChange = value => this.updateField("pwd", { value, errorMessage: "" });
-
-  _pwd_check = () =>
-    this.updateField("pwd", fieldCheck(this.state.fields.pwd, validators.pwd));
-
-  updateField = (key, newState) =>
-    this.setState(prevState => ({
-      ...prevState,
-      fields: {
-        ...prevState.fields,
-        [key]: newState
-      }
-    }));
-
-  login = () => {
-    const fields = this.state.fields;
-    const result = submit(fields, validators);
-    if (result === true) {
-      const uid = fields.uid.value;
-      const pwd = fields.pwd.value;
-      const _callback = this.props.navigation.getParam(
-        "___CALLBACK___",
-        undefined
-      );
-      const routeName = this.props.navigation.getParam(
-        "___routeName___",
-        undefined
-      );
-      const routeParams = this.props.navigation.getParam(
-        "___routeParams___",
-        undefined
-      );
-      this.props.loginRedux(uid, pwd, _callback, routeName, routeParams);
-    } else {
-      this.setState(prevState => ({
-        ...prevState,
-        fields: { ...result }
-      }));
-    }
-  };
 }
 
-const mapStateToProps = state => ({
-  isAuthenticated: state.auth.token !== null,
-  isLoading: state.auth.loading
-});
-
-const mapDispatchToProps = dispatch => {
-  return {
-    loginRedux: (uid, pwd, callback, nextRoute, params) =>
-      dispatch(authActions.authLogin(uid, pwd, callback, nextRoute, params))
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Login);
-
 const validators = {
-  uid: {
-    functions: [isEmpty],
-    warnings: ["Inserisci l'email o username"]
-  },
-  pwd: {
-    functions: [isEmpty],
-    warnings: ["Inserisci la password"]
+  0: {
+    uid: {
+      functions: [isEmpty],
+      warnings: ["Inserisci il nome."]
+    },
+    pwd: {
+      functions: [isEmpty],
+      warnings: ["Inserisci la password."]
+    }
   }
 };
-
-/*
- <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Header1>Accedi a GNUMA</Header1>
-        <TextInput
-          placeholder="Username"
-          textContentType="username"
-          onChangeText={value => this.handleChange("uid", value)}
-        />
-        <TextInput
-          placeholder="Password"
-          textContentType="password"
-          secureTextEntry={true}
-          onChangeText={value => this.handleChange("pwd", value)}
-        />
-        <Button
-          style={{ backgroundColor: "red", marginBottom: 40 }}
-          onPress={this.login}
-        >
-          <Header1>Accedi</Header1>
-        </Button>
-        <Button onPress={() => this.props.navigation.navigate("Signup")}>
-          <Header1>oppure Registrati</Header1>
-        </Button>
-      </View>
-      */

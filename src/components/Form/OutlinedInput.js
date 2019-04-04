@@ -26,7 +26,7 @@ export default class OutlinedInput extends Component {
   };
 
   render() {
-    const { style, value, placeholder, icon, inputType } = this.props;
+    const { style, value, placeholder, icon, inputType, ...rest } = this.props;
     return (
       <View style={[{ padding: 8, flexDirection: "row" }, style]}>
         <TextInput
@@ -45,6 +45,7 @@ export default class OutlinedInput extends Component {
           value={value}
           ref={this._setInputRef}
           keyboardType={inputType}
+          {...rest}
         />
         <Button
           style={{
