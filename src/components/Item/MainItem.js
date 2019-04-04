@@ -64,6 +64,7 @@ export class MainItem extends Component {
 
   _scrollTo = y => {
     //console.log(y);
+    console.log(y);
     this.scrollView.scrollTo({ x: 0, y, animated: true });
   };
 }
