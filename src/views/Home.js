@@ -10,6 +10,8 @@ import BookShelf from "../components/Home/BookShelf";
 import SearchLink from "../components/Home/SearchLink";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 import { singleResults } from "../mockData/SearchResults";
+import Button from "../components/Button";
+import protectedAction from "../utils/protectedAction";
 import NotificationCenter from "../components/Home/NotificationCenter";
 import _ from "lodash";
 
@@ -84,7 +86,7 @@ export class Home extends Component {
       this.props.goHomeRedux();
       return true;
     }
-    return true;
+    return false;
   };
 
   _openSearchBar = () => {

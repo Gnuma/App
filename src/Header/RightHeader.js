@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import Button from "../components/Button";
 
 import NavigationService from "../navigator/NavigationService";
+import protectedAction from "../utils/protectedAction";
 
 export class RightHeader extends Component {
   static propTypes = {
@@ -32,9 +33,12 @@ export class RightHeader extends Component {
   }
 
   _goAuth = () => {
-    NavigationService.protectedNavigation("Home", null, () =>
-      console.log("WORKING")
-    );
+    //NavigationService.protectedNavigation("Home", null, () =>
+    //  console.log("WORKING")
+    //);
+    protectedAction()
+      .then(() => console.log("Super Logged In"))
+      .catch(() => console.log("User went out"));
   };
 }
 

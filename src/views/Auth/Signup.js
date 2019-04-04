@@ -1,40 +1,37 @@
 import React, { Component } from "react";
-import { View } from "react-native";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import * as authActions from "../../store/actions/auth";
-import { Header1, Header3, Header2 } from "../../components/Text";
-import Button from "../../components/Button";
-import FormInput from "../../components/Form/TextInput";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { View, ToastAndroid } from "react-native";
+import OutlinedInput from "../../components/Form/OutlinedInput";
 import {
   submit,
   isEmpty,
   fieldCheck,
   isInvalidEmail
 } from "../../utils/validator.js";
-import Layout from "./AuthLayout";
-
-export class Signup extends Component {
-  static propTypes = {
-    isAuthenticated: PropTypes.bool,
-    isLoading: PropTypes.bool,
-    signupRedux: PropTypes.func
-  };
-
+import Button from "../../components/Button";
+import { Header3, Header2, Header1 } from "../../components/Text";
+import SolidButton from "../../components/SolidButton";
+export default class Signup extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      fields: {
+    validators[2].confirmPwd.functions.push(this.isDifferentPwd);
+  }
+
+  state = {
+    fields: {
+      0: {
         uid: {
           value: "",
           errorMessage: ""
-        },
+        }
+      },
+      1: {
         email: {
           value: "",
           errorMessage: ""
-        },
+        }
+      },
+      2: {
         pwd: {
           value: "",
           errorMessage: ""
@@ -44,295 +41,193 @@ export class Signup extends Component {
           errorMessage: ""
         }
       }
-    };
-
-    validators.confirmPwd.functions.push(this.isDifferentPwd);
-  }
-
-  _renderTopSection = () => (
-    <View
-      style={{ flex: 2, justifyContent: "space-evenly", alignItems: "center" }}
-    >
-      <FormInput
-        placeholder="Username"
-        textContentType="username"
-        value={this.state.fields.uid.value}
-        errorMessage={this.state.fields.uid.errorMessage}
-        onChangeText={this._uid_onChange}
-        onSubmitEditing={this._uid_check}
-      />
-      <FormInput
-        placeholder="Email"
-        textContentType="emailAddress"
-        value={this.state.fields.email.value}
-        errorMessage={this.state.fields.email.errorMessage}
-        onChangeText={this._email_onChange}
-        onSubmitEditing={this._email_check}
-      />
-      <FormInput
-        placeholder="Password"
-        textContentType="password"
-        value={this.state.fields.pwd.value}
-        errorMessage={this.state.fields.pwd.errorMessage}
-        onChangeText={this._pwd_onChange}
-        onSubmitEditing={this._pwd_check}
-        secureTextEntry={true}
-      />
-      <FormInput
-        placeholder="Conferma Password"
-        value={this.state.fields.confirmPwd.value}
-        errorMessage={this.state.fields.confirmPwd.errorMessage}
-        onChangeText={this._confirmPwd_onChange}
-        onSubmitEditing={this._confirmPwd_check}
-        secureTextEntry={true}
-      />
-      <Button
-        style={{
-          paddingVertical: 4,
-          backgroundColor: "white",
-          width: 200,
-          elevation: 4,
-          borderRadius: 6
-        }}
-        onPress={this.signup}
-      >
-        <Header2 color={"primary"} style={{ textAlign: "center" }}>
-          Registrati
-        </Header2>
-      </Button>
-    </View>
-  );
-
-  _renderBottomSection = () => {
-    return (
-      <View
-        style={{ flex: 1.2, alignItems: "center", justifyContent: "center" }}
-      >
-        <Header3>Oppure</Header3>
-        <View
-          style={{
-            flexDirection: "row",
-            width: 230,
-            marginVertical: 10,
-            justifyContent: "space-evenly"
-          }}
-        >
-          <Button
-            style={{
-              width: 50,
-              height: 50,
-              backgroundColor: "#4285F4",
-              elevation: 2,
-              justifyContent: "center",
-              borderRadius: 4
-            }}
-          >
-            <Icon
-              name="google"
-              size={32}
-              style={{ alignSelf: "center", color: "white" }}
-            />
-          </Button>
-          <Button
-            style={{
-              width: 50,
-              height: 50,
-              backgroundColor: "#3B5998",
-              elevation: 2,
-              justifyContent: "center",
-              borderRadius: 4
-            }}
-          >
-            <Icon
-              name="facebook"
-              size={32}
-              style={{ alignSelf: "center", color: "white" }}
-            />
-          </Button>
-        </View>
-        <Button onPress={this._goLogin}>
-          <Header3 color={"primary"}>Hai già un account?</Header3>
-        </Button>
-      </View>
-    );
-  };
-
-  render() {
-    if (this.props.isLoading) return <Header1>Loading</Header1>;
-    return (
-      <Layout
-        renderTopSection={this._renderTopSection}
-        renderBottomSection={this._renderBottomSection}
-        canQuitAuth
-      />
-    );
-  }
-
-  _goLogin = () => {
-    const params = this.props.navigation.state.params
-      ? this.props.navigation.state.params
-      : undefined;
-    this.props.navigation.navigate("Login", params);
-  };
-
-  _uid_onChange = value => this.updateField("uid", { value, errorMessage: "" });
-
-  _uid_check = () =>
-    this.updateField("uid", fieldCheck(this.state.fields.uid, validators.uid));
-
-  _email_onChange = value =>
-    this.updateField("email", { value, errorMessage: "" });
-
-  _email_check = () =>
-    this.updateField(
-      "email",
-      fieldCheck(this.state.fields.email, validators.email)
-    );
-
-  _pwd_onChange = value => this.updateField("pwd", { value, errorMessage: "" });
-
-  _pwd_check = () =>
-    this.updateField("pwd", fieldCheck(this.state.fields.pwd, validators.pwd));
-
-  _confirmPwd_onChange = value =>
-    this.updateField("confirmPwd", { value, errorMessage: "" });
-
-  _confirmPwd_check = () =>
-    this.updateField(
-      "confirmPwd",
-      fieldCheck(this.state.fields.confirmPwd, validators.confirmPwd)
-    );
-
-  updateField = (key, newState) =>
-    this.setState(prevState => ({
-      ...prevState,
-      fields: {
-        ...prevState.fields,
-        [key]: newState
-      }
-    }));
-
-  signup = () => {
-    const fields = this.state.fields;
-    const result = submit(fields, validators);
-    if (result === true) {
-      const uid = fields.uid.value;
-      const pwd = fields.pwd.value;
-      const email = fields.email.value;
-      const confirmPwd = fields.confirmPwd.value;
-      const _callback = this.props.navigation.getParam(
-        "___CALLBACK___",
-        undefined
-      );
-      const routeName = this.props.navigation.getParam(
-        "___routeName___",
-        undefined
-      );
-      const routeParams = this.props.navigation.getParam(
-        "___routeParams___",
-        undefined
-      );
-      this.props.signupRedux(
-        uid,
-        email,
-        pwd,
-        confirmPwd,
-        _callback,
-        routeName,
-        routeParams
-      );
-    } else {
-      this.setState({
-        fields: { ...result }
-      });
     }
   };
 
+  continue = () => {
+    const { status } = this.props;
+    const stateFields = this.state.fields[status];
+    const stateValidators = validators[status];
+
+    const result = submit(stateFields, stateValidators);
+    if (result === true) {
+      if (status !== 2) {
+        this.props.goNext();
+      } else {
+        const { fields } = this.state;
+        const uid = fields[0].uid.value;
+        const email = fields[1].email.value;
+        const pwd = fields[2].pwd.value;
+        const confirmPwd = fields[2].confirmPwd.value;
+
+        this.props.signup(uid, email, pwd, confirmPwd, this.props.resolve);
+      }
+    } else {
+      this.setState(prevState => ({
+        fields: { ...prevState.fields, [status]: { ...result } }
+      }));
+
+      let errorList = "";
+      for (var key in result) {
+        if (result.hasOwnProperty(key)) {
+          if (result[key].errorMessage) {
+            if (errorList) errorList += "\n";
+            errorList += result[key].errorMessage;
+          }
+        }
+      }
+      ToastAndroid.showWithGravity(
+        errorList,
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER
+      );
+    }
+  };
+
+  handleChange = (key, value) => {
+    this.updateField(key, { value, errorMessage: "" });
+  };
+
+  checkField = (key, goNext) => {
+    const newState = fieldCheck(
+      this.state.fields[this.props.status][key],
+      validators[this.props.status][key]
+    );
+    this.updateField(key, newState, goNext);
+  };
+
+  updateField = (key, newState, goNext = false) => {
+    const status = this.props.status;
+    this.setState(
+      prevState => ({
+        ...prevState,
+        fields: {
+          ...prevState.fields,
+          [status]: {
+            ...prevState.fields[status],
+            [key]: newState
+          }
+        }
+      }),
+      () => {
+        if (goNext) this.continue();
+      }
+    );
+  };
+
+  _renderUsername = () => (
+    <OutlinedInput
+      placeholder="Username"
+      textContentType="username"
+      value={this.state.fields[0].uid.value}
+      onTextChange={text => this.handleChange("uid", text)}
+      onSubmitEditing={() => this.checkField("uid", true)}
+    />
+  );
+  _renderEmail = () => (
+    <OutlinedInput
+      placeholder="Email"
+      textContentType="emailAddress"
+      value={this.state.fields[1].email.value}
+      onTextChange={text => this.handleChange("email", text)}
+      onSubmitEditing={() => this.checkField("email", true)}
+      autoFocus
+    />
+  );
+  _renderPwd = () => (
+    <View
+      style={{ flex: 1, justifyContent: "flex-start", alignItems: "center" }}
+    >
+      <OutlinedInput
+        placeholder="Password"
+        textContentType="password"
+        value={this.state.fields[2].pwd.value}
+        onTextChange={text => this.handleChange("pwd", text)}
+        onSubmitEditing={() => this.checkField("pwd")}
+        secureTextEntry={true}
+        autoFocus
+      />
+      <OutlinedInput
+        placeholder="Conferma Password"
+        value={this.state.fields[2].confirmPwd.value}
+        onTextChange={text => this.handleChange("confirmPwd", text)}
+        onSubmitEditing={() => this.checkField("confirmPwd", true)}
+        secureTextEntry={true}
+      />
+    </View>
+  );
+
+  _getContent = () => {
+    switch (this.props.status) {
+      case 0:
+        return this._renderUsername();
+      case 1:
+        return this._renderEmail();
+      case 2:
+        return this._renderPwd();
+      default:
+        return null;
+    }
+  };
+
+  render() {
+    const { status } = this.props;
+    return (
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <Header1 color="primary" style={{ marginBottom: 15 }}>
+            Registrati
+          </Header1>
+          {this._getContent()}
+          <View style={{ flex: 1, justifyContent: "flex-end" }}>
+            <SolidButton onPress={this.continue} style={{ width: 180 }}>
+              <Header3 color={"primary"}>
+                {status === 2 ? "Registrati" : "Continua"}
+              </Header3>
+            </SolidButton>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   isDifferentPwd = confirmPwd => {
     const pwd =
-      this.state.fields.pwd !== undefined ? this.state.fields.pwd.value : "";
+      this.state.fields[2].pwd !== undefined
+        ? this.state.fields[2].pwd.value
+        : "";
+    console.log(pwd, confirmPwd);
     return pwd !== confirmPwd;
   };
 }
 
-const mapStateToProps = state => ({
-  isAuthenticated: state.auth.token !== null,
-  isLoading: state.auth.loading
-});
-
-const mapDispatchToProps = dispatch => {
-  return {
-    signupRedux: (uid, email, pwd1, pwd2, callback, nextRoute, params) =>
-      dispatch(
-        authActions.authSignup(
-          uid,
-          email,
-          pwd1,
-          pwd2,
-          callback,
-          nextRoute,
-          params
-        )
-      )
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Signup);
-
 const validators = {
-  uid: {
-    functions: [isEmpty],
-    warnings: ["Inserisci il nome."]
+  0: {
+    uid: {
+      functions: [isEmpty],
+      warnings: ["Inserisci il nome."]
+    }
   },
-  email: {
-    functions: [isEmpty, isInvalidEmail],
-    warnings: ["Inserisci l'email.", "L'email non è valida."]
+  1: {
+    email: {
+      functions: [isEmpty, isInvalidEmail],
+      warnings: ["Inserisci l'email.", "L'email non è valida."]
+    }
   },
-  pwd: {
-    functions: [isEmpty],
-    warnings: ["Inserisci la password."]
-  },
-  confirmPwd: {
-    functions: [isEmpty],
-    warnings: ["Reinserisci la password.", "Le due password non coincidono."]
+  2: {
+    pwd: {
+      functions: [isEmpty],
+      warnings: ["Inserisci la password."]
+    },
+    confirmPwd: {
+      functions: [isEmpty],
+      warnings: ["Reinserisci la password.", "Le due password non coincidono."]
+    }
   }
 };
-
-/*
-<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Header1>Registrati a GNUMA</Header1>
-        <TextInput
-          placeholder="Username"
-          textContentType="username"
-          onChangeText={value => this.handleChange("uid", value)}
-        />
-        <TextInput
-          placeholder="Email"
-          textContentType="emailAddress"
-          onChangeText={value => this.handleChange("email", value)}
-        />
-        <TextInput
-          placeholder="Password"
-          textContentType="password"
-          secureTextEntry={true}
-          onChangeText={value => this.handleChange("pwd", value)}
-        />
-        <TextInput
-          placeholder="Conferma Password"
-          secureTextEntry={true}
-          onChangeText={value => this.handleChange("confirmPwd", value)}
-        />
-        <Button
-          style={{ backgroundColor: "red", marginBottom: 40 }}
-          onPress={this.signup}
-        >
-          <Header1>Registrati</Header1>
-        </Button>
-        <Button onPress={() => this.props.navigation.navigate("Login")}>
-          <Header1>oppure Accedi</Header1>
-        </Button>
-      </View>
-      */

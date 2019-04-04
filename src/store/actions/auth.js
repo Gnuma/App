@@ -72,13 +72,7 @@ export const authFail = error => {
   };
 };
 
-export const authLogin = (
-  username,
-  password,
-  callback,
-  nextRoute = "Home",
-  params
-) => {
+export const authLogin = (username, password, resolve) => {
   return dispatch => {
     dispatch(authStart());
     if (isOffline) {
@@ -86,8 +80,8 @@ export const authLogin = (
       if (username === "Test" && password === "testuserpwd") {
         const token = "tokenTest";
         dispatch(loginSuccess(token));
-        callback ? callback() : null;
-        NavigatorService.navigate(nextRoute, params);
+        resolve ? resolve(token) : null;
+        NavigatorService.goBack(null);
       } else {
         dispatch(authFail("Invalid authentication"));
       }
@@ -103,9 +97,9 @@ export const authLogin = (
           console.log(res);
           dispatch(loginSuccess(token));
           dispatch(notificationsSubscribe());
-          //dispatch(msgConnect(1));
-          callback ? callback() : null;
-          NavigatorService.navigate(nextRoute, params);
+          resolve ? resolve(token) : null;
+          NavigatorService.navigate("App");
+
         })
         .catch(err => {
           dispatch(authFail(err));
@@ -164,8 +158,8 @@ export const autoLogin = () => {
 
 export const authLogout = () => {
   return dispatch => {
-    dispatch(authStart());
-
+    //dispatch(authStart());
+    dispatch(logoutSuccess());
     axios
       .post(___LOGOUT_ENDPOINT___)
       .then(() => {
@@ -173,23 +167,15 @@ export const authLogout = () => {
         dispatch(logoutSuccess());
       })
       .catch(err => {
-        dispatch(authFail(err));
+        //dispatch(authFail(err));
       });
   };
 };
 
-export const authSignup = (
-  username,
-  email,
-  password1,
-  password2,
-  callback,
-  nextRoute = "Home",
-  params
-) => {
+export const authSignup = (username, email, password1, password2, resolve) => {
   return dispatch => {
     dispatch(authStart());
-
+    console.log("INIZIO");
     if (isOffline) {
       console.log(username, email, password1, password2);
     } else {
@@ -211,15 +197,18 @@ export const authSignup = (
             .then(res => {
               dispatch(loginSuccess(token));
               dispatch(notificationsSubscribe());
-              callback ? callback() : null;
-              NavigatorService.navigate(nextRoute, params);
+              resolve ? resolve(token) : null;
+              NavigatorService.goBack(null);
+
             })
             .catch(err => {
               dispatch(authFail(err));
+              console.log("DENTRO");
             });
         })
         .catch(err => {
           dispatch(authFail(err));
+          console.log("FUORI");
         });
     }
   };
