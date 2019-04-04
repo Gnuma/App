@@ -138,7 +138,7 @@ export default class Login extends Component {
           {this._getContent()}
           <View style={{ flex: 1, justifyContent: "flex-end" }}>
             <SolidButton onPress={this.continue} style={{ width: 180 }}>
-              <Header3 color={"primary"}>
+              <Header3 color={"primary"} style={{ textAlign: "center" }}>
                 {status === 0 ? "Accedi" : "Continua"}
               </Header3>
             </SolidButton>

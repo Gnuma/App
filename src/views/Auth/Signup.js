@@ -187,7 +187,7 @@ export default class Signup extends Component {
           {this._getContent()}
           <View style={{ flex: 1, justifyContent: "flex-end" }}>
             <SolidButton onPress={this.continue} style={{ width: 180 }}>
-              <Header3 color={"primary"}>
+              <Header3 color={"primary"} style={{ textAlign: "center" }}>
                 {status === 2 ? "Registrati" : "Continua"}
               </Header3>
             </SolidButton>

@@ -2,6 +2,7 @@ import * as actionTypes from "./actionTypes";
 import axios from "axios";
 import { newCommentsSingle, newCommentsMulti } from "../../mockData/comments";
 import { localNotification } from "../../service/pushNotification";
+import { ___CREATE_COMMENT___ } from "../constants";
 
 export const notificationsUpdate = notifications => {
   return {

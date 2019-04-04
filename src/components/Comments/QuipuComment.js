@@ -10,6 +10,7 @@ import colors from "../../styles/colors";
 import uuid from "uuid";
 import axios from "axios";
 import { ___CREATE_COMMENT___ } from "../../store/constants";
+import protectedAction from "../../utils/protectedAction";
 
 class QuipuComment extends Component {
   static propTypes = {
@@ -117,7 +118,7 @@ class QuipuComment extends Component {
     this.commentsPosition[pk] = layout.y + layout.height;
     if (moveTo)
       this.setState({ moveTo: false }, () =>
-        this.props.scrollTo(this.commentsPosition[pk] + 120)
+        this.props.scrollTo(this.commentsPosition[pk])
       );
   };
 
@@ -129,97 +130,101 @@ class QuipuComment extends Component {
 
   _onSendAnswer = () => {
     const { user } = this.props;
-    if (user) {
-      for (var i = 0; i < this.state.data.length; i++) {
-        if (this.state.answeringComment == this.state.data[i].pk) {
-          break;
+    protectedAction()
+      .then(() => {
+        for (var i = 0; i < this.state.data.length; i++) {
+          if (this.state.answeringComment == this.state.data[i].pk) {
+            break;
+          }
         }
-      }
-      const remotefatherPK = this.state.data[i].pk;
-      const content = this.state.answeringValue;
-      this.setState(
-        prevState => ({
-          answeringValue: "",
-          answeringComment: null,
-          data: update(prevState.data, {
-            [i]: {
-              answers: {
-                $push: [this.composeComment(prevState.answeringValue)]
+        const remotefatherPK = this.state.data[i].pk;
+        const content = this.state.answeringValue;
+        this.setState(
+          prevState => ({
+            answeringValue: "",
+            answeringComment: null,
+            data: update(prevState.data, {
+              [i]: {
+                answers: {
+                  $push: [this.composeComment(prevState.answeringValue)]
+                }
               }
-            }
-          })
-        }),
-        () => {
-          const fatherPK = i;
-          const childPK = this.state.data[i].answers.length - 1;
-          //console.log(fatherPK, childPK);
-          axios
-            .post(___CREATE_COMMENT___, {
-              type: "answer",
-              item: remotefatherPK,
-              content: content
             })
-            .then(res => {
-              console.log(res);
-              this.sendingConfirmation(fatherPK, childPK, {
-                pk: res.data.pk,
-                created_at: res.data.timestamp
-                //content
-              });
-            })
-            .catch(err => console.log(err.response));
+          }),
+          () => {
+            const fatherPK = i;
+            const childPK = this.state.data[i].answers.length - 1;
+            //console.log(fatherPK, childPK);
+            axios
+              .post(___CREATE_COMMENT___, {
+                type: "answer",
+                item: remotefatherPK,
+                content: content
+              })
+              .then(res => {
+                console.log(res);
+                this.sendingConfirmation(fatherPK, childPK, {
+                  pk: res.data.pk,
+                  created_at: res.data.timestamp
+                  //content
+                });
+              })
+              .catch(err => console.log(err.response));
 
-          this.commentsCreated++;
-          Keyboard.dismiss();
-        }
-      );
-    } else {
-      console.warn("Not logged in");
-    }
+            this.commentsCreated++;
+            Keyboard.dismiss();
+          }
+        );
+      })
+      .catch(() => {
+        console.log("Not logged in");
+      });
   };
 
   _onSend = () => {
     const { user } = this.props;
     const content = this.state.value;
-    if (user) {
-      this.mainCommentQueue++;
-      //console.log(this.mainCommentQueue);
-      this.setState(
-        prevState => ({
-          value: "",
-          data: update(prevState.data, {
-            $unshift: [this.composeComment(prevState.value)]
-          })
-        }),
-        () => {
-          //send validation
-
-          axios
-            .post(___CREATE_COMMENT___, {
-              type: "comment",
-              item: this.props.itemPK,
-              content: content
+    protectedAction()
+      .then(() => {
+        this.mainCommentQueue++;
+        //console.log(this.mainCommentQueue);
+        this.setState(
+          prevState => ({
+            value: "",
+            data: update(prevState.data, {
+              $unshift: [this.composeComment(prevState.value)]
             })
-            .then(res => {
-              console.log(res);
-              this.sendingConfirmation(0, null, {
-                pk: res.data.pk,
-                created_at: res.data.timestamp
-                //content
+          }),
+          () => {
+            //send validation
+
+            axios
+              .post(___CREATE_COMMENT___, {
+                type: "comment",
+                item: this.props.itemPK,
+                content: content
+              })
+              .then(res => {
+                console.log(res);
+                this.sendingConfirmation(0, null, {
+                  pk: res.data.pk,
+                  created_at: res.data.timestamp
+                  //content
+                });
+              })
+              .catch(err => {
+                console.warn(err);
+                console.log(err.response);
               });
-            })
-            .catch(err => {
-              console.warn(err);
-              console.log(err.response);
-            });
 
-          this.commentsCreated++;
-          Keyboard.dismiss();
-        }
-      );
-    } else {
-      console.warn("Not logged in");
-    }
+            this.commentsCreated++;
+            Keyboard.dismiss();
+          }
+        );
+      })
+      .catch(() => {
+        console.log("Not logged in");
+      });
   };
 
   composeComment = content => {

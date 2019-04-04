@@ -12,6 +12,8 @@ import axios from "axios";
 import { ___GET_AD___ } from "../store/constants";
 import * as msgActions from "../store/actions/messaging";
 import { notificationsViewItem } from "../store/actions/notifications";
+import protectedAction from "../utils/protectedAction";
+import NavigationService from "../navigator/NavigationService";
 
 export class Item extends Component {
   state = {
@@ -44,7 +46,7 @@ export class Item extends Component {
       .get(___GET_AD___ + `${id}/`)
       .then(res => {
         this.setState({
-          data: res.data
+          data: this.formatData(res.data)
         });
       })
       .catch(err => {
@@ -58,6 +60,39 @@ export class Item extends Component {
     //To be put in then
     this.props.notificationViewItemRedux(id);
   }
+
+  formatData = data => {
+    let comments = data.comment_ad;
+    let formattedComments = [];
+    for (let i = 0; i < comments.length; i++) {
+      formattedComments.push(this.formatComment(comments[i]));
+    }
+
+    return {
+      ...data,
+      comment_ad: formattedComments
+    };
+  };
+
+  formatComment = comment => {
+    formattedComment = {
+      content: comment.content,
+      created_at: comment.created,
+      pk: comment.pk,
+      user: comment.user.user,
+      answers: []
+    };
+    for (let i = 0; i < comment.parent_child.length; i++) {
+      const answer = comment.parent_child[i];
+      formattedComment.answers.push({
+        content: answer.content,
+        created_at: answer.created,
+        pk: answer.id,
+        user: answer.user.user
+      });
+    }
+    return formattedComment;
+  };
 
   componentWillUnmount() {
     this.keyboardEventListeners &&
@@ -104,7 +139,7 @@ export class Item extends Component {
   };
 
   _handleContact = () => {
-    NavigatorService.protectedNavigation(
+    /*NavigatorService.protectedNavigation(
       "CHAT",
       null,
       this.props.contactRedux(
@@ -112,7 +147,11 @@ export class Item extends Component {
         1,
         this.state.data.seller.user.username
       )
-    );
+    );*/
+    protectedAction().then(() => {
+      this.props.contactRedux();
+      NavigationService.navigate("CHAT");
+    });
   };
 
   _goToComment = () => {

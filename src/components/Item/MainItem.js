@@ -46,7 +46,7 @@ export class MainItem extends Component {
           <Divider style={styles.smallDivider} />
           {/*data.comments*/ true ? (
             <QuipuComment
-              data={data.comments}
+              data={data.comment_ad}
               sellerPK={data.seller.user.pk}
               scrollTo={this._scrollTo}
               ref={comments => (this.comments = comments)}
