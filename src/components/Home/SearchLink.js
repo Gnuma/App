@@ -14,8 +14,7 @@ export default props => {
         padding: 8,
         elevation: 4,
         backgroundColor: "white",
-        borderRadius: 6,
-        justifyContent: "flex-start"
+        borderRadius: 6
       }}
       icon="search"
       iconSize={20}

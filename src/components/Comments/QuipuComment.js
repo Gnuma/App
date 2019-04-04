@@ -7,6 +7,9 @@ import update from "immutability-helper";
 import Comment from "./Comment";
 import Divider from "../Divider";
 import colors from "../../styles/colors";
+import uuid from "uuid";
+import axios from "axios";
+import { ___CREATE_COMMENT___ } from "../../store/constants";
 
 class QuipuComment extends Component {
   static propTypes = {
@@ -21,11 +24,13 @@ class QuipuComment extends Component {
     this.commentsPosition = {};
     this.commentsCreated = 0;
 
+    this.mainCommentQueue = 0;
+
     this.state = {
       value: "",
       answeringComment: null,
       answeringValue: "",
-      data: props.data
+      data: props.data ? props.data : []
     };
   }
 
@@ -38,6 +43,7 @@ class QuipuComment extends Component {
           onTextChange={this._handleComposing}
           onSend={this._onSend}
         />
+
         <View>{this.state.data.map(this._renderMainComment)}</View>
       </View>
     );
@@ -129,38 +135,40 @@ class QuipuComment extends Component {
           break;
         }
       }
-      this.setState(prevState => ({
-        answeringValue: "",
-        answeringComment: null,
-        data: update(
-          prevState.data,
-          {
-            [i]: {
-              answers: { $push: [this.newComment(prevState.answeringValue)] }
-            }
-          },
-          () => {
-            this.commentsCreated++;
-            Keyboard.dismiss();
-          }
-        )
-      }));
-    } else {
-      console.warn("Not logged in");
-    }
-  };
-
-  _onSend = () => {
-    const { user } = this.props;
-    if (user) {
+      const remotefatherPK = this.state.data[i].pk;
+      const content = this.state.answeringValue;
       this.setState(
         prevState => ({
-          value: "",
+          answeringValue: "",
+          answeringComment: null,
           data: update(prevState.data, {
-            $unshift: [this.newComment(prevState.value)]
+            [i]: {
+              answers: {
+                $push: [this.composeComment(prevState.answeringValue)]
+              }
+            }
           })
         }),
         () => {
+          const fatherPK = i;
+          const childPK = this.state.data[i].answers.length - 1;
+          //console.log(fatherPK, childPK);
+          axios
+            .post(___CREATE_COMMENT___, {
+              type: "answer",
+              item: remotefatherPK,
+              content: content
+            })
+            .then(res => {
+              console.log(res);
+              this.sendingConfirmation(fatherPK, childPK, {
+                pk: res.data.pk,
+                created_at: res.data.timestamp
+                //content
+              });
+            })
+            .catch(err => console.log(err.response));
+
           this.commentsCreated++;
           Keyboard.dismiss();
         }
@@ -170,10 +178,51 @@ class QuipuComment extends Component {
     }
   };
 
-  newComment = content => {
-    const now = new Date();
-    const created_at =
-      now.getDate() + "/" + now.getMonth() + 1 + "/" + now.getFullYear();
+  _onSend = () => {
+    const { user } = this.props;
+    const content = this.state.value;
+    if (user) {
+      this.mainCommentQueue++;
+      //console.log(this.mainCommentQueue);
+      this.setState(
+        prevState => ({
+          value: "",
+          data: update(prevState.data, {
+            $unshift: [this.composeComment(prevState.value)]
+          })
+        }),
+        () => {
+          //send validation
+
+          axios
+            .post(___CREATE_COMMENT___, {
+              type: "comment",
+              item: this.props.itemPK,
+              content: content
+            })
+            .then(res => {
+              console.log(res);
+              this.sendingConfirmation(0, null, {
+                pk: res.data.pk,
+                created_at: res.data.timestamp
+                //content
+              });
+            })
+            .catch(err => {
+              console.warn(err);
+              console.log(err.response);
+            });
+
+          this.commentsCreated++;
+          Keyboard.dismiss();
+        }
+      );
+    } else {
+      console.warn("Not logged in");
+    }
+  };
+
+  composeComment = content => {
     return {
       pk: -this.commentsCreated,
       user: {
@@ -181,9 +230,43 @@ class QuipuComment extends Component {
         id: this.props.user.pk
       },
       content,
-      created_at,
-      answers: []
+      created_at: undefined,
+      answers: [],
+      isPending: true
     };
+  };
+
+  sendingConfirmation = (fatherPK, childPK, comment) => {
+    //console.log(fatherPK, childPK, comment);
+    this.mainCommentQueue = Math.max(0, this.mainCommentQueue - 1);
+    if (childPK !== null) {
+      this.setState(prevState => ({
+        data: update(prevState.data, {
+          [fatherPK + this.mainCommentQueue]: {
+            answers: {
+              [childPK]: {
+                $merge: {
+                  ...comment,
+                  isPending: false
+                }
+              }
+            }
+          }
+        })
+      }));
+    } else {
+      //console.log("Setting Father comment", comment, fatherPK);
+      this.setState(prevState => ({
+        data: update(prevState.data, {
+          [fatherPK + this.mainCommentQueue]: {
+            $merge: {
+              ...comment,
+              isPending: false
+            }
+          }
+        })
+      }));
+    }
   };
 }
 

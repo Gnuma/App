@@ -1,6 +1,5 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
-import { StackActions } from "react-navigation";
 import NavigatorService from "../../navigator/NavigationService";
 import { setItem, getItem, removeItem, multiGet } from "../utility";
 import { connect as msgConnect } from "./messaging";
@@ -11,6 +10,10 @@ import {
   ___SIGNUP_ENDPOINT___,
   ___INITUSER_ENDPOINT___
 } from "../constants";
+import {
+  notificationsSubscribe,
+  notificationsUnsubscribe
+} from "./notifications";
 
 const isOffline = false;
 
@@ -93,8 +96,10 @@ export const authLogin = (username, password, resolve) => {
           const token = res.data.key;
           console.log(res);
           dispatch(loginSuccess(token));
+          dispatch(notificationsSubscribe());
           resolve ? resolve(token) : null;
           NavigatorService.navigate("App");
+
         })
         .catch(err => {
           dispatch(authFail(err));
@@ -129,6 +134,7 @@ export const autoLogin = () => {
               )
             );
             dispatch(msgConnect(res.data.pk));
+            dispatch(notificationsSubscribe());
           })
           .catch(err => {
             dispatch(authFail(err));
@@ -157,7 +163,8 @@ export const authLogout = () => {
     axios
       .post(___LOGOUT_ENDPOINT___)
       .then(() => {
-        //dispatch(logoutSuccess());
+        dispatch(notificationsUnsubscribe());
+        dispatch(logoutSuccess());
       })
       .catch(err => {
         //dispatch(authFail(err));
@@ -189,8 +196,10 @@ export const authSignup = (username, email, password1, password2, resolve) => {
             })
             .then(res => {
               dispatch(loginSuccess(token));
+              dispatch(notificationsSubscribe());
               resolve ? resolve(token) : null;
               NavigatorService.goBack(null);
+
             })
             .catch(err => {
               dispatch(authFail(err));

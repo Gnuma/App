@@ -4,7 +4,6 @@ import { withNavigation } from "react-navigation";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import MainList from "../components/List/MainList";
-import { Header1, Header3 } from "../components/Text";
 import SearchResults from "../components/SearchResults/SearchResults";
 import * as searchActions from "../store/actions/search";
 import BookShelf from "../components/Home/BookShelf";
@@ -13,6 +12,8 @@ import { AndroidBackHandler } from "react-navigation-backhandler";
 import { singleResults } from "../mockData/SearchResults";
 import Button from "../components/Button";
 import protectedAction from "../utils/protectedAction";
+import NotificationCenter from "../components/Home/NotificationCenter";
+import _ from "lodash";
 
 export class Home extends Component {
   static propTypes = {
@@ -42,44 +43,39 @@ export class Home extends Component {
       );
     } else if (this.props.showResults) {
       return (
-        //<MainList data={this.props.results} isLoading={this.props.isLoading} />
-        <MainList data={singleResults} isLoading={this.props.isLoading} />
+        <MainList data={this.props.results} isLoading={this.props.isLoading} />
+        //<MainList data={singleResults} isLoading={this.props.isLoading} />
       );
     } else {
       return (
-        <ScrollView
-          contentContainerStyle={{ flex: 1, justifyContent: "center" }}
-        >
+        <ScrollView contentContainerStyle={{ justifyContent: "center" }}>
           <View
             style={{
               justifyContent: "center",
               alignItems: "center",
-              paddingVertical: 30
+              paddingVertical: 25
             }}
           >
             <SearchLink onPress={this._openSearchBar} />
           </View>
+          {this.props.notifications && !_.isEmpty(this.props.notifications) ? (
+            <NotificationCenter
+              data={this.props.notifications}
+              commentHandler={this._onCommentNotificationPress}
+            />
+          ) : null}
           <BookShelf onPress={this._searchOption} />
-          <View>
-            <Button
-              onPress={() =>
-                this.props.navigation.navigate("Item", { goToComment: 1 })
-              }
-            >
-              <Header3>Go to comment in item</Header3>
-            </Button>
-            <Button onPress={() => this.props.navigation.navigate("AUTH")}>
-              <Header3>Go to Modal Auth</Header3>
-            </Button>
-            <Button
-              onPress={() => protectedAction().then(res => console.log(res))}
-            >
-              <Header3>Test protected actions</Header3>
-            </Button>
-          </View>
         </ScrollView>
       );
     }
+  };
+
+  _onCommentNotificationPress = (itemPK, bookTitle, commentPK) => {
+    this.props.navigation.navigate("Item", {
+      itemID: itemPK,
+      bookTitle: bookTitle,
+      goToComment: commentPK
+    });
   };
 
   _onBackButtonPressAndroid = () => {
@@ -107,7 +103,8 @@ const mapStateToProps = state => ({
   results: state.search.results,
   suggestions: state.search.suggestions,
   showResults: state.search.showResults,
-  isLoading: state.search.loading
+  isLoading: state.search.loading,
+  notifications: state.notifications.notifications
 });
 
 const mapDispatchToProps = dispatch => {

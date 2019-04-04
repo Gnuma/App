@@ -11,6 +11,7 @@ import NavigatorService from "../navigator/NavigationService";
 import axios from "axios";
 import { ___GET_AD___ } from "../store/constants";
 import * as msgActions from "../store/actions/messaging";
+import { notificationsViewItem } from "../store/actions/notifications";
 
 export class Item extends Component {
   state = {
@@ -21,6 +22,16 @@ export class Item extends Component {
   };
 
   componentDidMount() {
+    console.log("Mounted");
+    /*
+    this.didFocusSubscription = this.props.navigation.addListener(
+      "didFocus",
+      payload => {
+        console.debug("didFocus", payload);
+      }
+    );
+    */
+
     this.keyboardEventListeners = [
       Keyboard.addListener("keyboardDidShow", this.setKeyboardOpen(true)),
       Keyboard.addListener("keyboardDidHide", this.setKeyboardOpen(false))
@@ -29,7 +40,6 @@ export class Item extends Component {
     const { navigation } = this.props;
     const id = navigation.getParam("itemID", "Undesfineds");
 
-    /*
     axios
       .get(___GET_AD___ + `${id}/`)
       .then(res => {
@@ -40,10 +50,13 @@ export class Item extends Component {
       .catch(err => {
         console.log("ERROR", err);
       });
-      */
-    this.setState({
-      data: itemData
-    });
+
+    //this.setState({
+    //  data: itemData
+    //});
+
+    //To be put in then
+    this.props.notificationViewItemRedux(id);
   }
 
   componentWillUnmount() {
@@ -51,6 +64,9 @@ export class Item extends Component {
       this.keyboardEventListeners.forEach(eventListener =>
         eventListener.remove()
       );
+
+    //this.didFocusSubscription && this.didFocusSubscription.remove();
+    console.log("Unmounting");
   }
 
   setKeyboardOpen = value => () => this.setState({ keyboardOpen: value });
@@ -109,7 +125,8 @@ const mapStateToProps = state => ({});
 const mapDispatchToProps = dispatch => {
   return {
     contactRedux: (itemID, toID, toUsername) =>
-      dispatch(msgActions.contact(itemID, toID, toUsername))
+      dispatch(msgActions.contact(itemID, toID, toUsername)),
+    notificationViewItemRedux: itemPK => dispatch(notificationsViewItem(itemPK))
   };
 };
 
