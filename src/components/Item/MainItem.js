@@ -18,7 +18,7 @@ export class MainItem extends Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, user } = this.props;
     const primaryData = {
       price: data.price,
       conditions: data.condition,
@@ -50,10 +50,7 @@ export class MainItem extends Component {
               sellerPK={data.seller.user.pk}
               scrollTo={this._scrollTo}
               ref={comments => (this.comments = comments)}
-              user={{
-                username: "Bob",
-                id: 10
-              }}
+              user={user}
               itemPK={data.pk}
             />
           ) : null}

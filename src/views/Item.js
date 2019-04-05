@@ -124,7 +124,11 @@ export class Item extends Component {
           </View>
         ) : (
           <View style={{ flex: 1 }}>
-            <MainItem data={data} goToComment={this._goToComment} />
+            <MainItem
+              data={data}
+              goToComment={this._goToComment}
+              user={this.props.user}
+            />
             {!this.state.keyboardOpen ? (
               <ContactButton onContact={this._handleContact} />
             ) : null}
@@ -159,7 +163,12 @@ export class Item extends Component {
   };
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  user: {
+    username: state.auth.username,
+    id: state.auth.id
+  }
+});
 
 const mapDispatchToProps = dispatch => {
   return {
