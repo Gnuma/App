@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { Header3 } from "../Text";
 import { RNCamera } from "react-native-camera";
 import { bottomBar as bottomBarStyle, generalStyle } from "./styles";
+import SolidButton from "../SolidButton";
 
 export class CameraBottom extends Component {
   render() {
@@ -13,8 +14,10 @@ export class CameraBottom extends Component {
       takePicture,
       changeFlashMode,
       flashMode,
-      handleGoNext
+      status,
+      isVisible
     } = this.props;
+    if (!isVisible) return null;
     return (
       <View style={bottomBarStyle.container}>
         <View style={bottomBarStyle.leftBox}>
@@ -35,14 +38,8 @@ export class CameraBottom extends Component {
           <Button style={bottomBarStyle.captureBtn} onPress={takePicture} />
         </View>
         <View style={bottomBarStyle.rightBox}>
-          <Button style={generalStyle.p10} onPress={handleGoNext}>
-            <Icon
-              name="arrow-circle-right"
-              size={40}
-              style={{
-                color: colors.secondary
-              }}
-            />
+          <Button onPress={this.props.openImagePicker} style={generalStyle.w}>
+            <Icon name="paperclip" size={30} style={generalStyle.w} />
           </Button>
         </View>
       </View>
