@@ -210,6 +210,131 @@ export const buyerChatList = {
   }
 };
 
+const item1ID = uuid.v4();
+const item1Chat1ID = uuid.v4();
+const item1Chat1UserToID = uuid.v4();
+const item1Chat2ID = uuid.v4();
+const item1Chat2UserToID = uuid.v4();
+const item2ID = uuid.v4();
+const item2Chat1ID = uuid.v4();
+const item2Chat1UserToID = uuid.v4();
+
+export const sellerChatList = {
+  [item1ID]: {
+    [item1Chat1ID]: {
+      id: item1Chat1ID,
+      UserTO: {
+        id: item1Chat1UserToID,
+        username: "Giancarlo",
+        lastVisit: new Date(2019, 2, 4, 12, 0)
+      },
+      status: null,
+      item: {
+        itemID: uuid.v4(),
+        book: {
+          title: "Matematica Colore",
+          authors: "Massimo Massimi"
+        }
+      },
+      messages: [
+        {
+          id: uuid.v4(),
+          content: "Messsaggio 1",
+          timestamp: new Date(2019, 2, 4, 12, 0),
+          author: item1Chat1UserToID
+        },
+        {
+          id: uuid.v4(),
+          content: "Messsaggio 2",
+          timestamp: new Date(2019, 2, 4, 11, 0),
+          author: myID
+        },
+        {
+          id: uuid.v4(),
+          content: "Messsaggio 3",
+          timestamp: new Date(2019, 2, 4, 10, 0),
+          author: item1Chat1UserToID
+        }
+      ]
+    },
+    [item1Chat2ID]: {
+      id: item1Chat2ID,
+      UserTO: {
+        id: item1Chat2UserToID,
+        username: "Marco",
+        lastVisit: new Date(2019, 2, 4, 12, 0)
+      },
+      status: null,
+      item: {
+        itemID: uuid.v4(),
+        book: {
+          title: "Italiano Carrarar",
+          authors: "Massimo AAAA"
+        }
+      },
+      messages: [
+        {
+          id: uuid.v4(),
+          content: "Messsaggio 1",
+          timestamp: new Date(2019, 2, 4, 11, 30),
+          author: item1Chat2UserToID
+        },
+        {
+          id: uuid.v4(),
+          content: "Messsaggio 2",
+          timestamp: new Date(2019, 2, 4, 11, 0),
+          author: myID
+        },
+        {
+          id: uuid.v4(),
+          content: "Messsaggio 3",
+          timestamp: new Date(2019, 2, 4, 10, 0),
+          author: item1Chat2UserToID
+        }
+      ]
+    }
+  },
+
+  [item2ID]: {
+    [item2Chat1ID]: {
+      id: item2Chat1ID,
+      UserTO: {
+        id: item2Chat1UserToID,
+        username: "Marco",
+        lastVisit: new Date(2019, 2, 4, 12, 0)
+      },
+      status: null,
+      item: {
+        itemID: uuid.v4(),
+        book: {
+          title: "Italiano Carrarar",
+          authors: "Massimo AAAA"
+        }
+      },
+      messages: [
+        {
+          id: uuid.v4(),
+          content: "Messsaggio 1",
+          timestamp: new Date(2019, 2, 4, 11, 30),
+          author: item2Chat1UserToID
+        },
+        {
+          id: uuid.v4(),
+          content: "Messsaggio 2",
+          timestamp: new Date(2019, 2, 4, 11, 0),
+          author: myID
+        },
+        {
+          id: uuid.v4(),
+          content: "Messsaggio 3",
+          timestamp: new Date(2019, 2, 4, 10, 0),
+          author: item2Chat1UserToID
+        }
+      ]
+    }
+  }
+};
+
 /*
   	User1: {UserID, username, lastVisit}
 	User2 ^,

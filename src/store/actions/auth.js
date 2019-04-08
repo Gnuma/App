@@ -14,6 +14,7 @@ import {
   notificationsSubscribe,
   notificationsUnsubscribe
 } from "./notifications";
+import { salesInit } from "./sales";
 
 const isOffline = false;
 
@@ -99,7 +100,6 @@ export const authLogin = (username, password, resolve) => {
           dispatch(notificationsSubscribe());
           resolve ? resolve(token) : null;
           NavigatorService.navigate("App");
-
         })
         .catch(err => {
           dispatch(authFail(err));
@@ -199,7 +199,6 @@ export const authSignup = (username, email, password1, password2, resolve) => {
               dispatch(notificationsSubscribe());
               resolve ? resolve(token) : null;
               NavigatorService.goBack(null);
-
             })
             .catch(err => {
               dispatch(authFail(err));
