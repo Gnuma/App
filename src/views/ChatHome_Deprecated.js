@@ -3,9 +3,9 @@ import { View, Text } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { chats } from "../mockData/Chat";
-import HomeHeader from "../components/Chat/HomeHeader";
+import HomeHeader from "../components/Chat_Deprecated/HomeHeader";
 import BasicHeader from "../components/BasicHeader";
-import ChatsList from "../components/Chat/ChatsList";
+import ChatsList from "../components/Chat_Deprecated/ChatsList";
 export class ChatHome extends Component {
   render() {
     const { sellerChats, buyerChats } = this.props;

@@ -1,97 +1,81 @@
 import React, { Component } from "react";
-import { Text, View, Animated, Image, PanResponder } from "react-native";
+import { View, Animated, PanResponder, Dimensions } from "react-native";
 import Button from "../Button";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Header2, Header5, Header3 } from "../Text";
+import { Header1, Header2, Header5, Header3, Header4 } from "../Text";
 import colors from "../../styles/colors";
+import { CachedImage } from "react-native-cached-image";
+import ConditionCircle from "../ConditionCircle";
 
-const minHeight = 130;
-const maxHeight = 225;
-const SWIPE_THRESHOLD = (maxHeight - minHeight) / 2;
+const minHeight = 120;
+const maxHeight = 280;
+const deltaY = maxHeight - minHeight;
 
 export default class ChatHeader extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isOpen: false,
       scrollY: new Animated.Value(0)
     };
 
     this.panResponder = PanResponder.create({
       onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
-        const { dx, dy } = gestureState;
-        return Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1;
+        const { dy } = gestureState;
+        return Math.abs(dy) > 0.1;
       },
       onPanResponderGrant: (e, gestureState) => {
         this.state.scrollY.setOffset(this.state.scrollY._value);
-        this.state.scrollY.setValue(0);
       },
       onPanResponderMove: Animated.event([null, { dy: this.state.scrollY }]),
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, { vy }) => {
+        this.state.scrollY.setValue(
+          Math.min(this.state.scrollY._value, deltaY)
+        );
         this.state.scrollY.flattenOffset();
-        this.state.scrollY.setValue(Math.min(this.state.scrollY._value, 130));
         Animated.spring(this.state.scrollY, {
           toValue: 0,
           friction: 10
         }).start();
-
-        //Animated.decay(this.state.scrollY, {
-        // toValue: gestureState.vy > 0 ? maxHeight - minHeight : 0,
-        //  duration: 200
-        //}).start();
       }
     });
   }
 
-  handleInspect = () => {
-    this.setState(
-      prevState => {
-        return {
-          isOpen: !prevState.isOpen
-        };
-      },
-      () => {
-        Animated.timing(this.state.animation, {
-          toValue: !this.state.isOpen ? 0 : 1,
-          duration: 300
-        }).start(); // Start the animation
-      }
-    );
-  };
-
   normalizeValue = value => {
-    return (maxHeight - minHeight) * value;
+    return deltaY * value;
   };
 
   render() {
+    const { scrollY } = this.state;
+    const { book, data } = this.props;
     return (
       <Animated.View
         style={{
-          backgroundColor: "white",
-          zIndex: 2,
-          elevation: 6,
-          height: this.state.scrollY.interpolate({
-            inputRange: [0, 0, this.normalizeValue(1), this.normalizeValue(1)],
-            outputRange: [minHeight, minHeight, maxHeight, maxHeight]
+          overflow: "hidden",
+          backgroundColor: colors.white,
+          height: scrollY.interpolate({
+            inputRange: [0, deltaY],
+            outputRange: [minHeight, maxHeight],
+            extrapolate: "clamp"
           }),
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0
+          elevation: 4
         }}
         {...this.panResponder.panHandlers}
       >
         <View
           style={{
             flexDirection: "row",
-            alignItems: "center"
+            alignItems: "center",
+            marginVertical: 10,
+            marginHorizontal: 6
           }}
         >
           <Button
-            onPress={this.props.handleGoBack}
             style={{
-              padding: 10
+              padding: 6,
+              marginRight: 10,
+              borderRadius: 6,
+              backgroundColor: colors.white
             }}
           >
             <Icon
@@ -100,95 +84,105 @@ export default class ChatHeader extends Component {
               style={{ color: colors.black }}
             />
           </Button>
-          <View>
-            <Header2 color={"primary"}>Giovanni 6</Header2>
-          </View>
+          <Header1 color="primary" style={{ flex: 1, lineHeight: 30 }}>
+            {data.UserTO.username}
+          </Header1>
         </View>
-        <View style={{ flex: 1, flexDirection: "row", marginHorizontal: 15 }}>
+        <View style={{ marginHorizontal: contentMargin }}>
           <Animated.View
             style={{
               position: "absolute",
               transform: [
                 {
-                  translateX: this.state.scrollY.interpolate({
-                    inputRange: [
-                      this.normalizeValue(0.2),
-                      this.normalizeValue(0.2),
-                      this.normalizeValue(1),
-                      this.normalizeValue(1)
-                    ],
-                    outputRange: [66, 66, 0, 0]
+                  translateX: scrollY.interpolate({
+                    inputRange: [deltaY / 3, deltaY],
+                    outputRange: [imgMinWidth + 10, 0],
+                    extrapolate: "clamp"
                   })
                 }
               ]
             }}
           >
-            <Header2 color={"primary"}>Matematica Verde 3</Header2>
+            <Header2 color="primary">{book.title}</Header2>
           </Animated.View>
-          <Animated.Image
-            style={{
-              height: this.state.scrollY.interpolate({
-                inputRange: [
-                  this.normalizeValue(0.15),
-                  this.normalizeValue(0.15),
-                  this.normalizeValue(1),
-                  this.normalizeValue(1)
-                ],
-                outputRange: [65, 65, 130, 130]
-              }),
-              width: this.state.scrollY.interpolate({
-                inputRange: [
-                  this.normalizeValue(0.15),
-                  this.normalizeValue(0.15),
-                  this.normalizeValue(1),
-                  this.normalizeValue(1)
-                ],
-                outputRange: [61, 61, 122, 122]
-              }),
-              borderRadius: 4,
-              transform: [
-                {
-                  translateY: this.state.scrollY.interpolate({
-                    inputRange: [
-                      0,
-                      0,
-                      this.normalizeValue(0.2),
-                      this.normalizeValue(0.2)
-                    ],
-                    outputRange: [0, 0, 25, 25]
-                  })
-                }
-              ]
-            }}
-            source={require("../../media/imgs/thumbnail-test.png")}
-          />
-          <View style={{ flex: 1, marginTop: 25, marginLeft: 5 }}>
-            <Header2 color={"primary"}>EUR 15</Header2>
-            <Header5 color={"secondary"}>I.I.S.S J. Von Neumann</Header5>
-          </View>
+          <Animated.View style={{ flexDirection: "row", top: bookTitleHeight }}>
+            <Animated.View
+              style={{
+                overflow: "hidden",
+                backgroundColor: colors.white,
+                borderRadius: 6,
+                width: scrollY.interpolate({
+                  inputRange: [0, deltaY],
+                  outputRange: [imgMinWidth, imgMaxWidth],
+                  extrapolate: "clamp"
+                }),
+                height: scrollY.interpolate({
+                  inputRange: [0, deltaY],
+                  outputRange: [imgMinWidth * imgRatio, imgMaxWidth * imgRatio],
+                  extrapolate: "clamp"
+                }),
+                transform: [
+                  {
+                    translateY: scrollY.interpolate({
+                      inputRange: [0, deltaY / 3],
+                      outputRange: [-bookTitleHeight, 0],
+                      extrapolate: "clamp"
+                    })
+                  }
+                ]
+              }}
+            >
+              <CachedImage
+                style={{ flex: 1 }}
+                resizeMode="cover"
+                source={require("../../media/imgs/thumbnail-test.png")}
+              />
+            </Animated.View>
+            <Animated.View
+              style={{
+                marginHorizontal: 10,
+                width: scrollY.interpolate({
+                  inputRange: [0, deltaY],
+                  outputRange: [
+                    viewportWidth - 10 - imgMinWidth,
+                    viewportWidth - 10 - imgMaxWidth
+                  ],
+                  extrapolate: "clamp"
+                })
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1, marginRight: 5 }}>
+                  <Header2 color="primary">EUR 15</Header2>
+                  <Header3 color="secondary" numberOfLines={1}>
+                    J Von Neumann
+                  </Header3>
+                  <Header4 color="secondary" numberOfLines={2}>
+                    Via Pollenza 1441
+                  </Header4>
+                </View>
+                <View>
+                  <ConditionCircle conditions={0} radius={40} />
+                </View>
+              </View>
+              <View>
+                <Header4 color="black">ISBN</Header4>
+                <Header4 color="black">Materia</Header4>
+                <Header4 color="black">Istituto</Header4>
+              </View>
+            </Animated.View>
+          </Animated.View>
         </View>
       </Animated.View>
     );
   }
 }
 
-/*
-      
-        <Button
-          onPress={this.handleInspect}
-          style={{
-            position: "absolute",
-            right: 0,
-            bottom: 0,
-            zIndex: 1,
-            padding: 10
-          }}
-        >
-          <Icon
-            name={this.state.isOpen ? "chevron-up" : "chevron-down"}
-            size={24}
-            style={{ color: colors.black }}
-          />
-        </Button>
+const contentMargin = 16;
+let { width: viewportWidth, height: viewportHeight } = Dimensions.get("window");
+viewportWidth -= contentMargin * 2;
 
-        */
+const bookTitleHeight = 30;
+const imgMinWidth = 60;
+const imgMaxWidth = 120;
+const imgRatio = 4 / 3;

@@ -1,7 +1,12 @@
 import * as actionTypes from "./actionTypes";
 import { sellerChatList, newSellerMsg } from "../../mockData/Chat2";
+import ws from "../../utils/WebSocket";
 
 export const salesInit = data => {
+  ws.init();
+  ws.onMessage(msg => {
+    console.log(msg);
+  });
   return {
     type: actionTypes.SALES_INIT,
     payload: {

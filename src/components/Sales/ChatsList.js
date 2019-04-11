@@ -17,7 +17,7 @@ export default class ChatsList extends Component {
 
   render() {
     const { data, focus, orderedData } = this.props;
-    console.log(orderedData);
+    //console.log(orderedData);
     return (
       <FlatList
         data={orderedData[focus].chats}
@@ -32,7 +32,10 @@ export default class ChatsList extends Component {
     const { data, orderedData, focus } = this.props;
     return (
       <View>
-        <ChatLink data={data[orderedData[focus].itemID].chats[item]} />
+        <ChatLink
+          data={data[orderedData[focus].itemID].chats[item]}
+          onGoChat={this.props.onGoChat}
+        />
         {index !== orderedData[focus].chats.length - 1 ? (
           <Divider style={{ marginHorizontal: 20, borderBottomWidth: 0.8 }} />
         ) : null}
@@ -50,7 +53,10 @@ export class ChatLink extends Component {
     const { data } = this.props;
 
     return (
-      <Button style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
+      <Button
+        style={{ paddingHorizontal: 20, paddingVertical: 10 }}
+        onPress={this.props.onGoChat}
+      >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ flexDirection: "row", flex: 1 }}>
             <Header2 color={"black"}>{data.UserTO.username}</Header2>

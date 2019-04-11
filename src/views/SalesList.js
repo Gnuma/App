@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import { View, Text } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import SalesTab from "../components/SalesTab/SalesTab";
+import SalesTab from "../components/Sales/SalesTab";
 import * as salesActions from "../store/actions/sales";
 import { Header3 } from "../components/Text";
-import ChatsList from "../components/SalesTab/ChatsList";
-import SellButton from "../components/SalesTab/SellButton";
+import ChatsList from "../components/Sales/ChatsList";
+import SellButton from "../components/Sales/SellButton";
 
 export class SalesList extends Component {
   static propTypes = {
@@ -39,6 +39,7 @@ export class SalesList extends Component {
           data={data}
           orderedData={orderedData}
           focus={focus}
+          onGoChat={this.onGoChat}
         />
         <SellButton onPress={this.onGoSell} />
       </View>
@@ -47,6 +48,12 @@ export class SalesList extends Component {
 
   onGoSell = () => {
     this.props.navigation.navigate("Vendi");
+  };
+
+  onGoChat = chatid => {
+    this.props.navigation.navigate("SaleChat", {
+      chatid
+    });
   };
 }
 

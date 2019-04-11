@@ -4,8 +4,7 @@ import {
   createAppContainer,
   createStackNavigator,
   createBottomTabNavigator,
-  createSwitchNavigator,
-  createMaterialTopTabNavigator
+  createSwitchNavigator
 } from "react-navigation";
 
 import HomeScreen from "../views/Home";
@@ -18,11 +17,12 @@ import Auth from "../views/Auth/Auth";
 import CameraScreen from "../views/Camera";
 import SelectBookScreen from "../views/SelectBook";
 import VendiInfosScreen from "../views/VendiInfos";
-import ChatHomeScreen from "../views/ChatHome";
-import SingleChatScreen from "../views/SingleChat";
+//import ChatHomeScreen from "../views/ChatHome_Deprecated";
+//import SingleChatScreen from "../views/SingleChat_Deprecated";
 import InitProfileScreen from "../views/InitProfile";
 import CreateBookScreen from "../views/CreateBook";
 import SalesListScreen from "../views/SalesList";
+import ChatScreen from "../views/Chat";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -74,6 +74,7 @@ const VendiNavigator = {
   )
 };
 
+/*
 const ChatNavigator = {
   screen: createStackNavigator(
     {
@@ -103,6 +104,7 @@ ChatNavigator.navigationOptions = ({ navigation }) => {
 
   return navigationOptions;
 };
+*/
 
 const InitProfileNavigator = {
   screen: createStackNavigator(
@@ -120,9 +122,24 @@ const InitProfileNavigator = {
   )
 };
 
-const SalesStack = createSwitchNavigator(
+const SalesNavigator = createStackNavigator(
   {
     SalesList: SalesListScreen,
+    SaleChat: {
+      screen: ChatScreen,
+      path: "/sales/:chatid"
+    }
+  },
+  {
+    defaultNavigationOptions: {
+      header: null
+    }
+  }
+);
+
+const SalesStack = createSwitchNavigator(
+  {
+    SalesList: SalesNavigator,
     Vendi: VendiNavigator
   },
   {
@@ -144,8 +161,8 @@ SalesStack.navigationOptions = ({ navigation }) => {
 const AppStack = createBottomTabNavigator(
   {
     SEARCH: SearchNavigator,
-    SALES: SalesStack,
-    CHAT: ChatNavigator
+    SALES: SalesStack
+    //CHAT: ChatNavigator
   },
   {
     tabBarComponent: TabBar
