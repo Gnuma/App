@@ -14,7 +14,8 @@ import {
   notificationsSubscribe,
   notificationsUnsubscribe
 } from "./notifications";
-import { salesInit } from "./sales";
+import { salesInit, testNewMessage } from "./sales";
+import { sellerChatList } from "../../mockData/Chat2";
 
 const isOffline = false;
 
@@ -95,13 +96,11 @@ export const authLogin = (username, password, resolve) => {
         })
         .then(res => {
           const token = res.data.key;
-          console.log(res);
-          dispatch(loginSuccess(token));
-          dispatch(notificationsSubscribe());
-          resolve ? resolve(token) : null;
+          login({ dispatch, resolve, token });
           NavigatorService.navigate("App");
         })
         .catch(err => {
+          console.log(err);
           dispatch(authFail(err));
         });
     }
@@ -111,6 +110,8 @@ export const authLogin = (username, password, resolve) => {
 export const autoLogin = () => {
   return dispatch => {
     dispatch(authStart());
+    dispatch(salesInit(sellerChatList)); // TAKE THIS OUT
+    dispatch(testNewMessage()); //TAKE THIS OUT TOO
     multiGet([tokenKey, officeKey]).then(userInfos => {
       //console.log(userInfos);
       const token = userInfos[0][1];
@@ -125,16 +126,8 @@ export const autoLogin = () => {
           })
           .then(res => {
             if (!res.data.gnuma_user) throw "Gnuma User not initialized";
-            dispatch(
-              loginSuccess(
-                token,
-                res.data.username,
-                res.data.gnuma_user,
-                res.data.pk
-              )
-            );
-            dispatch(msgConnect(res.data.pk));
-            dispatch(notificationsSubscribe());
+            login({ dispatch, resolve, token, data: res.data });
+            //dispatch(msgConnect(res.data.pk));
           })
           .catch(err => {
             dispatch(authFail(err));
@@ -195,9 +188,7 @@ export const authSignup = (username, email, password1, password2, resolve) => {
               office: "J. Von Neumann"
             })
             .then(res => {
-              dispatch(loginSuccess(token));
-              dispatch(notificationsSubscribe());
-              resolve ? resolve(token) : null;
+              login({ dispatch, resolve, token });
               NavigatorService.goBack(null);
             })
             .catch(err => {
@@ -211,4 +202,21 @@ export const authSignup = (username, email, password1, password2, resolve) => {
         });
     }
   };
+};
+
+const login = ({ dispatch, resolve, token, data }) => {
+  if (!token) {
+    console.log("ERROR NOT SET IN LOGIN");
+    throw "Error not set in login";
+  }
+
+  if (data) {
+    dispatch(loginSuccess(token, data.username, data.gnuma_user, data.pk));
+  } else {
+    dispatch(loginSuccess(token));
+  }
+
+  dispatch(salesInit(sellerChatList));
+  //dispatch(notificationsSubscribe());
+  resolve && resolve(token);
 };

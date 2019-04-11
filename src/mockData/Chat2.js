@@ -218,120 +218,194 @@ const item1Chat2UserToID = uuid.v4();
 const item2ID = uuid.v4();
 const item2Chat1ID = uuid.v4();
 const item2Chat1UserToID = uuid.v4();
+const item3ID = uuid.v4();
+const item3Chat1ID = uuid.v4();
+const item3Chat1UserToID = uuid.v4();
+const item4ID = uuid.v4();
+const item5ID = uuid.v4();
+
+export const newSellerMsg = {
+  msg: {
+    id: uuid.v4(),
+    content: "Messsaggio 0",
+    timestamp: new Date(2019, 3, 10, 16, 0),
+    author: item3Chat1UserToID,
+    isRead: false
+  },
+  chat: item3Chat1ID,
+  item: item3ID
+};
 
 export const sellerChatList = {
   [item1ID]: {
-    [item1Chat1ID]: {
-      id: item1Chat1ID,
-      UserTO: {
-        id: item1Chat1UserToID,
-        username: "Giancarlo",
-        lastVisit: new Date(2019, 2, 4, 12, 0)
-      },
-      status: null,
-      item: {
-        itemID: uuid.v4(),
-        book: {
-          title: "Matematica Colore",
-          authors: "Massimo Massimi"
-        }
-      },
-      messages: [
-        {
-          id: uuid.v4(),
-          content: "Messsaggio 1",
-          timestamp: new Date(2019, 2, 4, 12, 0),
-          author: item1Chat1UserToID
-        },
-        {
-          id: uuid.v4(),
-          content: "Messsaggio 2",
-          timestamp: new Date(2019, 2, 4, 11, 0),
-          author: myID
-        },
-        {
-          id: uuid.v4(),
-          content: "Messsaggio 3",
-          timestamp: new Date(2019, 2, 4, 10, 0),
-          author: item1Chat1UserToID
-        }
-      ]
+    id: item1ID,
+    book: {
+      title: "Matematica Colore",
+      authors: "Massimo Massimi"
     },
-    [item1Chat2ID]: {
-      id: item1Chat2ID,
-      UserTO: {
-        id: item1Chat2UserToID,
-        username: "Marco",
-        lastVisit: new Date(2019, 2, 4, 12, 0)
-      },
-      status: null,
-      item: {
-        itemID: uuid.v4(),
-        book: {
-          title: "Italiano Carrarar",
-          authors: "Massimo AAAA"
-        }
-      },
-      messages: [
-        {
-          id: uuid.v4(),
-          content: "Messsaggio 1",
-          timestamp: new Date(2019, 2, 4, 11, 30),
-          author: item1Chat2UserToID
+    price: 14,
+    conditions: 0,
+    newsCount: 2,
+    chats: {
+      [item1Chat1ID]: {
+        id: item1Chat1ID,
+        UserTO: {
+          id: item1Chat1UserToID,
+          username: "Giancarlo",
+          lastVisit: new Date(2019, 2, 4, 12, 0)
         },
-        {
-          id: uuid.v4(),
-          content: "Messsaggio 2",
-          timestamp: new Date(2019, 2, 4, 11, 0),
-          author: myID
+        hasNews: true,
+        status: null,
+        messages: [
+          {
+            id: uuid.v4(),
+            content: "Messsaggio 1",
+            timestamp: new Date(2019, 2, 4, 12, 0),
+            author: item1Chat1UserToID,
+            isRead: false
+          },
+          {
+            id: uuid.v4(),
+            content: "Messsaggio 2",
+            timestamp: new Date(2019, 2, 4, 11, 0),
+            author: myID,
+            isRead: true
+          },
+          {
+            id: uuid.v4(),
+            content: "Messsaggio 3",
+            timestamp: new Date(2019, 2, 4, 10, 0),
+            author: item1Chat1UserToID,
+            isRead: true
+          }
+        ]
+      },
+      [item1Chat2ID]: {
+        id: item1Chat2ID,
+        UserTO: {
+          id: item1Chat2UserToID,
+          username: "Marco",
+          lastVisit: new Date(2019, 2, 4, 12, 0)
         },
-        {
-          id: uuid.v4(),
-          content: "Messsaggio 3",
-          timestamp: new Date(2019, 2, 4, 10, 0),
-          author: item1Chat2UserToID
-        }
-      ]
+        hasNews: true,
+        status: null,
+        messages: [
+          {
+            id: uuid.v4(),
+            content: "Messsaggio 1",
+            timestamp: new Date(2019, 2, 4, 11, 30),
+            author: item1Chat2UserToID,
+            isRead: false
+          },
+          {
+            id: uuid.v4(),
+            content: "Messsaggio 2",
+            timestamp: new Date(2019, 2, 4, 11, 0),
+            author: myID,
+            isRead: false
+          },
+          {
+            id: uuid.v4(),
+            content: "Messsaggio 3",
+            timestamp: new Date(2019, 2, 4, 10, 0),
+            author: item1Chat2UserToID,
+            isRead: true
+          }
+        ]
+      }
     }
   },
 
   [item2ID]: {
-    [item2Chat1ID]: {
-      id: item2Chat1ID,
-      UserTO: {
-        id: item2Chat1UserToID,
-        username: "Marco",
-        lastVisit: new Date(2019, 2, 4, 12, 0)
-      },
-      status: null,
-      item: {
-        itemID: uuid.v4(),
-        book: {
-          title: "Italiano Carrarar",
-          authors: "Massimo AAAA"
-        }
-      },
-      messages: [
-        {
-          id: uuid.v4(),
-          content: "Messsaggio 1",
-          timestamp: new Date(2019, 2, 4, 11, 30),
-          author: item2Chat1UserToID
+    id: item2ID,
+    book: {
+      title: "Italiano Carrarar",
+      authors: "Massimo AAAA"
+    },
+    price: 20,
+    conditions: 1,
+    newsCount: 1,
+    chats: {
+      [item2Chat1ID]: {
+        id: item2Chat1ID,
+        UserTO: {
+          id: item2Chat1UserToID,
+          username: "Marco",
+          lastVisit: new Date(2019, 2, 4, 12, 0)
         },
-        {
-          id: uuid.v4(),
-          content: "Messsaggio 2",
-          timestamp: new Date(2019, 2, 4, 11, 0),
-          author: myID
-        },
-        {
-          id: uuid.v4(),
-          content: "Messsaggio 3",
-          timestamp: new Date(2019, 2, 4, 10, 0),
-          author: item2Chat1UserToID
-        }
-      ]
+        hasNews: true,
+        status: null,
+        messages: [
+          {
+            id: uuid.v4(),
+            content: "Messsaggio 1",
+            timestamp: new Date(2019, 2, 4, 11, 30),
+            author: item2Chat1UserToID,
+            isRead: false
+          },
+          {
+            id: uuid.v4(),
+            content: "Messsaggio 2",
+            timestamp: new Date(2019, 2, 4, 11, 0),
+            author: myID,
+            isRead: true
+          },
+          {
+            id: uuid.v4(),
+            content: "Messsaggio 3",
+            timestamp: new Date(2019, 2, 4, 10, 0),
+            author: item2Chat1UserToID,
+            isRead: true
+          }
+        ]
+      }
     }
+  },
+
+  [item3ID]: {
+    id: item3ID,
+    book: {
+      title: "Tre Carrarar",
+      authors: "Massimo AAAA"
+    },
+    price: 10,
+    conditions: 1,
+    newsCount: 0,
+    chats: {
+      [item3Chat1ID]: {
+        id: item3Chat1ID,
+        UserTO: {
+          id: item3Chat1UserToID,
+          username: "Marco",
+          lastVisit: new Date(2019, 2, 4, 12, 0)
+        },
+        hasNews: false,
+        status: null,
+        messages: []
+      }
+    }
+  },
+  [item4ID]: {
+    id: item4ID,
+    book: {
+      title: "Quatt Carrarar",
+      authors: "Massimo AAAA"
+    },
+    price: 12,
+    conditions: 1,
+    newsCount: 0,
+    chats: {}
+  },
+  [item5ID]: {
+    id: item5ID,
+    book: {
+      title: "Casd Carrarar",
+      authors: "Massimo AAAA"
+    },
+    price: 16,
+    conditions: 2,
+    newsCount: 0,
+    chats: {}
   }
 };
 

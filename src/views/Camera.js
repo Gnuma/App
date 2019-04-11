@@ -34,13 +34,14 @@ export class Camera extends Component {
   };
 
   componentDidMount() {
+    /*
     const { navigation } = this.props;
     navigation.addListener("willFocus", () =>
       this.setState({ focusedScreen: true })
     );
     navigation.addListener("willBlur", () =>
       this.setState({ focusedScreen: false })
-    );
+    );*/
   }
 
   openImagePicker = () => {
@@ -162,7 +163,7 @@ export class Camera extends Component {
   render() {
     const isReviewing = !_.isEmpty(this.state.checking);
     const { flashMode } = this.state;
-    if (!this.state.focusedScreen) return <Header2>Booo</Header2>;
+    //if (!this.state.focusedScreen) return <Header2>Booo</Header2>;
     return (
       <View style={{ flex: 1 }}>
         <RNCamera

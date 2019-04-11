@@ -5,6 +5,7 @@ import authReducer from "./auth";
 import sellReducer from "./sell";
 import messagingReducer from "./messaging";
 import notificationsReducer from "./notifications";
+import salesReducer from "./sales";
 
 export default () =>
   combineReducers({
@@ -13,5 +14,6 @@ export default () =>
     auth: authReducer,
     sell: sellReducer,
     messaging: messagingReducer,
-    notifications: notificationsReducer
+    notifications: notificationsReducer,
+    sales: salesReducer
   });

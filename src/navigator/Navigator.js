@@ -4,7 +4,8 @@ import {
   createAppContainer,
   createStackNavigator,
   createBottomTabNavigator,
-  createSwitchNavigator
+  createSwitchNavigator,
+  createMaterialTopTabNavigator
 } from "react-navigation";
 
 import HomeScreen from "../views/Home";
@@ -21,6 +22,7 @@ import ChatHomeScreen from "../views/ChatHome";
 import SingleChatScreen from "../views/SingleChat";
 import InitProfileScreen from "../views/InitProfile";
 import CreateBookScreen from "../views/CreateBook";
+import SalesListScreen from "../views/SalesList";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -69,10 +71,7 @@ const VendiNavigator = {
         header: null
       }
     }
-  ),
-  navigationOptions: {
-    tabBarVisible: false
-  }
+  )
 };
 
 const ChatNavigator = {
@@ -121,37 +120,31 @@ const InitProfileNavigator = {
   )
 };
 
-/*
-const AuthNavigator = {
-  screen: createStackNavigator(
-    {
-      Signup: {
-        screen: SignupScreen,
-        path: "/signup"
-      },
-      Login: {
-        screen: LoginScreen,
-        path: "/login"
-      }
-    },
-    {
-      defaultNavigationOptions: {
-        header: null
-      },
-      initialRouteName: "Signup",
-      initialRouteKey: "startingAuth"
-    }
-  ),
-  navigationOptions: {
-    tabBarVisible: false
+const SalesStack = createSwitchNavigator(
+  {
+    SalesList: SalesListScreen,
+    Vendi: VendiNavigator
+  },
+  {
+    backBehavior: "order",
+    resetOnBlur: false
   }
+);
+
+SalesStack.navigationOptions = ({ navigation }) => {
+  let { routeName } = navigation.state.routes[navigation.state.index];
+  let navigationOptions = {};
+  if (routeName === "Vendi") {
+    navigationOptions.tabBarVisible = false;
+  }
+
+  return navigationOptions;
 };
-*/
 
 const AppStack = createBottomTabNavigator(
   {
     SEARCH: SearchNavigator,
-    VENDI: VendiNavigator,
+    SALES: SalesStack,
     CHAT: ChatNavigator
   },
   {

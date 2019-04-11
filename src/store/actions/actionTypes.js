@@ -42,3 +42,5 @@ export const NOTIFICATIONS_VIEW_ITEM = "NOTIFICATIONS_VIEW_ITEM";
 
 export const SALES_INIT = "SALES_INIT";
 export const SALES_FAIL = "SALES_FAIL";
+export const SALES_SET_FOCUS = "SALES_SET_FOCUS";
+export const SALES_NEW_MSG = "SALES_NEW_MSG";
