@@ -79,18 +79,18 @@ export class TabBar extends Component {
         </Button>
         <Button
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          onPress={this._goChat}
+          onPress={this._goShopping}
         >
           <Icon
             name="paper-plane"
             size={20}
             style={{
               marginBottom: 5,
-              color: focus === "CHAT" ? colors.secondary : colors.grey
+              color: focus === "SHOPPING" ? colors.secondary : colors.grey
             }}
           />
-          <Header4 color={focus === "CHAT" ? "secondary" : "grey"}>
-            Chat
+          <Header4 color={focus === "SHOPPING" ? "secondary" : "grey"}>
+            Acquisti
           </Header4>
         </Button>
       </View>
@@ -108,10 +108,8 @@ export class TabBar extends Component {
   _goVendi = () => {
     this.props.navigation.navigate("SALES");
   };
-  _goChat = () => {
-    protectedAction()
-      .then(() => NavigationService.navigate("CHAT"))
-      .catch(() => {});
+  _goShopping = () => {
+    this.props.navigation.navigate("SHOPPING");
   };
 }
 

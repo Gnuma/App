@@ -51,6 +51,8 @@ export default class ChatHeader extends Component {
     return (
       <Animated.View
         style={{
+          position: "absolute",
+          zIndex: 1,
           overflow: "hidden",
           backgroundColor: colors.white,
           height: scrollY.interpolate({

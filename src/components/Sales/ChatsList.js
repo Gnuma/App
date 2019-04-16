@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../../styles/colors";
 import Button from "../Button";
 import Divider from "../Divider";
+import BooleanButton from "../BooleanButton";
 
 export default class ChatsList extends Component {
   static propTypes = {
@@ -35,6 +36,7 @@ export default class ChatsList extends Component {
         <ChatLink
           data={data[orderedData[focus].itemID].chats[item]}
           onGoChat={this.props.onGoChat}
+          itemID={orderedData[focus].itemID}
         />
         {index !== orderedData[focus].chats.length - 1 ? (
           <Divider style={{ marginHorizontal: 20, borderBottomWidth: 0.8 }} />
@@ -50,31 +52,27 @@ export default class ChatsList extends Component {
 
 export class ChatLink extends Component {
   render() {
-    const { data } = this.props;
+    const { data, itemID } = this.props;
 
     return (
       <Button
         style={{ paddingHorizontal: 20, paddingVertical: 10 }}
-        onPress={this.props.onGoChat}
+        onPress={e => {
+          //console.log(e.currentTarget);
+          this.props.onGoChat(itemID, data._id);
+        }}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ flexDirection: "row", flex: 1 }}>
             <Header2 color={"black"}>{data.UserTO.username}</Header2>
           </View>
           <Icon
-            name={"chevron-right"}
-            size={20}
-            style={{ color: colors.black }}
+            name={"chevron-circle-right"}
+            size={22}
+            style={{ color: data.hasNews ? colors.darkRed : colors.black }}
           />
         </View>
-        {data.messages.length > 0 ? (
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Header4 color={"black"} style={{ flex: 1 }}>
-              {data.messages[0].content}
-            </Header4>
-            <Header5>{this.dateDisplay(data.messages[0].timestamp)}</Header5>
-          </View>
-        ) : null}
+        {this.renderFooter()}
       </Button>
     );
   }
@@ -91,6 +89,42 @@ export class ChatLink extends Component {
       return (
         date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
       );
+  };
+
+  renderFooter = () => {
+    const { data } = this.props;
+    if (data.status === "pending" || data.status === "loadingDecision") {
+      return (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Header4
+            color={data.hasNews ? "darkRed" : "black"}
+            style={{ flex: 1, marginRight: 10 }}
+            numberOfLines={1}
+          >
+            {data.UserTO.username} vuole contattarti
+          </Header4>
+          <View onStartShouldSetResponder={event => true}>
+            <BooleanButton />
+          </View>
+        </View>
+      );
+    } else if (data.messages.length > 0) {
+      return (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Header4
+            color={data.hasNews ? "darkRed" : "black"}
+            style={{ flex: 1, marginRight: 10 }}
+            numberOfLines={1}
+          >
+            {data.messages[0].text}
+          </Header4>
+          <Header5 color={data.hasNews ? "darkRed" : "grey"}>
+            {this.dateDisplay(data.messages[0].createdAt)}
+          </Header5>
+        </View>
+      );
+    }
+    return null;
   };
 }
 

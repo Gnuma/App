@@ -50,9 +50,10 @@ export class SalesList extends Component {
     this.props.navigation.navigate("Vendi");
   };
 
-  onGoChat = chatid => {
+  onGoChat = (itemID, chatID) => {
     this.props.navigation.navigate("SaleChat", {
-      chatid
+      itemID,
+      chatID
     });
   };
 }

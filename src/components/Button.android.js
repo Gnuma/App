@@ -8,27 +8,23 @@ import {
 
 export class Button extends Component {
   render() {
-    if (this.props.disabled) {
+    const { disabled, children, style, onPress, ...rest } = this.props;
+    if (disabled) {
       return (
-        <View
-          pointerEvents="box-only"
-          style={[styles.button, this.props.style]}
-        >
-          {this.props.children}
+        <View pointerEvents="box-only" style={[styles.button, style]}>
+          {children}
         </View>
       );
     } else {
       return (
         <TouchableNativeFeedback
-          onPress={this.props.onPress}
+          onPress={onPress}
           //background={TouchableNativeFeedback.Ripple()}
           useForeground={true}
+          {...rest}
         >
-          <View
-            pointerEvents="box-only"
-            style={[styles.button, this.props.style]}
-          >
-            {this.props.children}
+          <View pointerEvents="box-only" style={[styles.button, style]}>
+            {children}
           </View>
         </TouchableNativeFeedback>
       );

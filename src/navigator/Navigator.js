@@ -23,6 +23,7 @@ import InitProfileScreen from "../views/InitProfile";
 import CreateBookScreen from "../views/CreateBook";
 import SalesListScreen from "../views/SalesList";
 import ChatScreen from "../views/Chat";
+import ShoppingListScreen from "../views/ShoppingList";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -44,34 +45,6 @@ const SearchNavigator = {
       })
     }
   })
-};
-
-const VendiNavigator = {
-  screen: createStackNavigator(
-    {
-      Camera: {
-        screen: CameraScreen,
-        path: "/vendi/camera"
-      },
-      SelectBook: {
-        screen: SelectBookScreen,
-        path: "/vendi/selectbook"
-      },
-      VendiInfos: {
-        screen: VendiInfosScreen,
-        path: "/vendi/vendiinfos"
-      },
-      CreateBook: {
-        screen: CreateBookScreen,
-        path: "/vendi/createbook"
-      }
-    },
-    {
-      defaultNavigationOptions: {
-        header: null
-      }
-    }
-  )
 };
 
 /*
@@ -122,6 +95,34 @@ const InitProfileNavigator = {
   )
 };
 
+const VendiNavigator = {
+  screen: createStackNavigator(
+    {
+      Camera: {
+        screen: CameraScreen,
+        path: "/vendi/camera"
+      },
+      SelectBook: {
+        screen: SelectBookScreen,
+        path: "/vendi/selectbook"
+      },
+      VendiInfos: {
+        screen: VendiInfosScreen,
+        path: "/vendi/vendiinfos"
+      },
+      CreateBook: {
+        screen: CreateBookScreen,
+        path: "/vendi/createbook"
+      }
+    },
+    {
+      defaultNavigationOptions: {
+        header: null
+      }
+    }
+  )
+};
+
 const SalesNavigator = createStackNavigator(
   {
     SalesList: SalesListScreen,
@@ -149,20 +150,40 @@ const SalesStack = createSwitchNavigator(
 );
 
 SalesStack.navigationOptions = ({ navigation }) => {
-  let { routeName } = navigation.state.routes[navigation.state.index];
+  const { routes } = navigation.state.routes[navigation.state.index];
+  let routeName;
+  if (routes[1]) {
+    routeName = routes[1].routeName;
+  } else {
+    routeName = routes[0].routeName;
+  }
+  console.log(routeName);
+
   let navigationOptions = {};
-  if (routeName === "Vendi") {
+  if (routeName === "Camera" || routeName === "SaleChat") {
     navigationOptions.tabBarVisible = false;
   }
 
   return navigationOptions;
 };
 
+const ShoppingNavigator = createStackNavigator(
+  {
+    ShoppingList: ShoppingListScreen
+  },
+  {
+    defaultNavigationOptions: {
+      header: null
+    }
+  }
+);
+
 const AppStack = createBottomTabNavigator(
   {
     SEARCH: SearchNavigator,
-    SALES: SalesStack
-    //CHAT: ChatNavigator
+    SALES: SalesStack,
+    SHOPPING: ShoppingNavigator
+    //CHAT: ShoppingNavigator
   },
   {
     tabBarComponent: TabBar

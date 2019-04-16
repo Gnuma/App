@@ -217,6 +217,6 @@ const login = ({ dispatch, resolve, token, data }) => {
   }
 
   dispatch(salesInit(sellerChatList));
-  //dispatch(notificationsSubscribe());
+  dispatch(notificationsSubscribe());
   resolve && resolve(token);
 };

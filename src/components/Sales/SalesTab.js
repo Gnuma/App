@@ -38,8 +38,8 @@ export class SalesTab extends Component {
       <View
         style={{
           backgroundColor: colors.white,
-          borderBottomLeftRadius: 6,
-          borderBottomRightRadius: 6,
+          //borderBottomLeftRadius: 6,
+          //borderBottomRightRadius: 6,
           elevation: 2,
           paddingVertical: 5
         }}
