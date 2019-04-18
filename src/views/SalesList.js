@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import SalesTab from "../components/Sales/SalesTab";
 import * as salesActions from "../store/actions/sales";
 import { Header3 } from "../components/Text";
-import ChatsList from "../components/Sales/ChatsList";
+import SalesChatsList from "../components/Sales/SalesChatsList";
 import SellButton from "../components/Sales/SellButton";
 
 export class SalesList extends Component {
@@ -34,7 +34,7 @@ export class SalesList extends Component {
           orderedData={orderedData}
           focus={focus}
         />
-        <ChatsList
+        <SalesChatsList
           isAuthenticated={isAuthenticated}
           data={data}
           orderedData={orderedData}

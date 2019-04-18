@@ -7,19 +7,27 @@ import _ from "lodash";
 import colors from "../../styles/colors";
 
 export class ShoppingTab extends Component {
+  static propTypes = {
+    isAuthenticated: PropTypes.bool,
+    goTo: PropTypes.func,
+    data: PropTypes.object,
+    orderedData: PropTypes.array,
+    focus: PropTypes.number
+  };
+
   constructor(props) {
     super(props);
 
     this.layout = {};
+    this.mounted = false;
     this.state = {
       barPosition: new Animated.Value(-1),
       barScale: new Animated.Value(0)
     };
   }
 
-  static propTypes = {};
-
-  initBar = itemID => {
+  initBar = () => {
+    const itemID = this.props.orderedData[this.props.focus].subjectID;
     this.moveBar(itemID);
   };
 
@@ -37,12 +45,13 @@ export class ShoppingTab extends Component {
     }).start();
   };
 
-  switchTab = itemID => {
+  switchTab = (itemID, index) => {
     this.moveBar(itemID);
+    this.props.goTo(index);
   };
 
   render() {
-    const { data } = this.props;
+    const { orderedData, focus, data } = this.props;
     return (
       <View
         style={{
@@ -60,7 +69,9 @@ export class ShoppingTab extends Component {
           showsHorizontalScrollIndicator={false}
         >
           <View style={{ flexDirection: "row" }}>
-            {data.map(item => this._renderItem(item))}
+            {orderedData.map((item, index) =>
+              this._renderItem(data[item.subjectID], index)
+            )}
           </View>
           <Animated.View
             style={{
@@ -90,25 +101,24 @@ export class ShoppingTab extends Component {
     );
   }
 
-  _renderItem = item => {
+  _renderItem = (item, index) => {
     return (
       <Button
         onLayout={event => {
-          if (_.isEmpty(this.layout)) {
-            this.layout[item._id] = {
-              x: event.nativeEvent.layout.x,
-              width: event.nativeEvent.layout.width
-            };
-            this.initBar(item._id);
-          } else {
-            this.layout[item._id] = {
-              x: event.nativeEvent.layout.x,
-              width: event.nativeEvent.layout.width
-            };
+          this.layout[item._id] = {
+            x: event.nativeEvent.layout.x,
+            width: event.nativeEvent.layout.width
+          };
+          if (
+            !this.mounted &&
+            _.size(this.layout) === _.size(this.props.orderedData)
+          ) {
+            this.initBar();
+            this.mounted = true;
           }
         }}
         key={item._id}
-        onPress={() => this.switchTab(item._id)}
+        onPress={() => this.switchTab(item._id, index)}
         style={{
           paddingHorizontal: 10
         }}
@@ -116,13 +126,15 @@ export class ShoppingTab extends Component {
         <Header2 color="black" style={{ marginVertical: 10 }}>
           {item.title}
         </Header2>
-        <View
-          style={{
-            borderBottomWidth: 2,
-            borderColor: colors.red,
-            marginHorizontal: 10
-          }}
-        />
+        {item.newsCount ? (
+          <View
+            style={{
+              borderBottomWidth: 2,
+              borderColor: colors.secondary,
+              marginHorizontal: 10
+            }}
+          />
+        ) : null}
       </Button>
     );
   };

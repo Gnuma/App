@@ -6,6 +6,7 @@ import sellReducer from "./sell";
 import messagingReducer from "./messaging";
 import notificationsReducer from "./notifications";
 import salesReducer from "./sales";
+import shoppingReducer from "./shopping"
 
 export default () =>
   combineReducers({
@@ -15,5 +16,6 @@ export default () =>
     sell: sellReducer,
     messaging: messagingReducer,
     notifications: notificationsReducer,
-    sales: salesReducer
+    sales: salesReducer,
+    shopping: shoppingReducer
   });

@@ -60,9 +60,9 @@ export default class Chat extends Component {
   };
 
   render() {
-    const { data: dataRedux, itemID, chatID } = this.props;
+    const { data, itemID, chatID, type } = this.props;
     //console.log(dataRedux, itemID, chatID);
-    const data = dataRedux[itemID].chats[chatID];
+    //const data = dataRedux[itemID].chats[chatID];
 
     return (
       <View style={{ flex: 1 }}>
@@ -83,6 +83,8 @@ export default class Chat extends Component {
           onSend={this.onSend}
           onComposerTextChanged={this.onComposerTextChanged}
           text={data.composer}
+          type={type}
+          data={data}
         />
       </View>
     );

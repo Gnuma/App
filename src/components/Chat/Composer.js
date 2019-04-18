@@ -3,11 +3,12 @@ import { View, Text, TextInput, KeyboardAvoidingView } from "react-native";
 import Button from "../Button";
 import colors from "../../styles/colors";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { Header4 } from "../Text";
 
 export default class Composer extends Component {
   render() {
-    const { text, onSend, onComposerTextChanged } = this.props;
-
+    const { text, onSend, onComposerTextChanged, data, type } = this.props;
+    const showPendingWarning = type === "shopping" && data.status === "pending";
     return (
       <View
         style={{
@@ -15,6 +16,12 @@ export default class Composer extends Component {
           alignItems: "center"
         }}
       >
+        {showPendingWarning ? (
+          <Header4 style={{ marginHorizontal: 20 }}>
+            Ricorda che {data.UserTO.username} non potrà vedere i tuoi messaggi
+            finchè non accetterà la conversazione
+          </Header4>
+        ) : null}
         <View
           style={{
             flexDirection: "row",

@@ -82,7 +82,7 @@ export class TabBar extends Component {
           onPress={this._goShopping}
         >
           <Icon
-            name="paper-plane"
+            name="tags"
             size={20}
             style={{
               marginBottom: 5,

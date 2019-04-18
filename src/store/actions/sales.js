@@ -18,6 +18,16 @@ export const salesInit = data => {
   };
 };
 
+export const salesStartAction = (itemID, chatID) => {
+  return {
+    type: actionTypes.SALES_START_ACTION,
+    payload: {
+      itemID,
+      chatID
+    }
+  };
+};
+
 export const salesFail = error => {
   return {
     type: actionTypes.SALES_FAIL,
@@ -154,7 +164,7 @@ export const salesRead = (itemID, chatID) => {
 
 export const salesSettle = (itemID, chatID, isAccepting) => {
   return dispatch => {
-    dispatch(salesSettleChat(itemID, chatID, "loadingDecision"));
+    dispatch(salesStartAction(itemID, chatID));
     //API
     setTimeout(() => {
       if (isAccepting) {

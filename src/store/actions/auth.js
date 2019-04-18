@@ -15,7 +15,8 @@ import {
   notificationsUnsubscribe
 } from "./notifications";
 import { salesInit, testNewMessage } from "./sales";
-import { sellerChatList } from "../../mockData/Chat2";
+import { sellerChatList, buyerChatList } from "../../mockData/Chat2";
+import { shoppingInit } from "./shopping";
 
 const isOffline = false;
 
@@ -110,8 +111,11 @@ export const authLogin = (username, password, resolve) => {
 export const autoLogin = () => {
   return dispatch => {
     dispatch(authStart());
+
     dispatch(salesInit(sellerChatList)); // TAKE THIS OUT
+    dispatch(shoppingInit(buyerChatList)); //TAKE THIS OUT
     dispatch(testNewMessage()); //TAKE THIS OUT TOO
+
     multiGet([tokenKey, officeKey]).then(userInfos => {
       //console.log(userInfos);
       const token = userInfos[0][1];

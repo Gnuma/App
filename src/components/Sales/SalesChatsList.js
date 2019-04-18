@@ -7,13 +7,15 @@ import colors from "../../styles/colors";
 import Button from "../Button";
 import Divider from "../Divider";
 import BooleanButton from "../BooleanButton";
+import helper from "../../utils/helper";
 
-export default class ChatsList extends Component {
+export default class SalesChatsList extends Component {
   static propTypes = {
     isAuthenticated: PropTypes.bool,
     focus: PropTypes.number,
     data: PropTypes.object,
-    orderedData: PropTypes.array
+    orderedData: PropTypes.array,
+    onGoChat: PropTypes.func
   };
 
   render() {
@@ -77,20 +79,6 @@ export class ChatLink extends Component {
     );
   }
 
-  dateDisplay = date => {
-    if (Math.abs(new Date() - date) < dayInMilliseconds)
-      return (
-        date.getHours() +
-        ":" +
-        (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes())
-      );
-    else if (Math.abs(new Date() - date) < dayInMilliseconds * 2) return "Ieri";
-    else
-      return (
-        date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
-      );
-  };
-
   renderFooter = () => {
     const { data } = this.props;
     if (data.status === "pending" || data.status === "loadingDecision") {
@@ -119,7 +107,7 @@ export class ChatLink extends Component {
             {data.messages[0].text}
           </Header4>
           <Header5 color={data.hasNews ? "darkRed" : "grey"}>
-            {this.dateDisplay(data.messages[0].createdAt)}
+            {helper.dateDisplay(data.messages[0].createdAt)}
           </Header5>
         </View>
       );
@@ -127,5 +115,3 @@ export class ChatLink extends Component {
     return null;
   };
 }
-
-const dayInMilliseconds = 1000 * 60 * 60 * 24;

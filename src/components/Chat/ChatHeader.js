@@ -79,6 +79,7 @@ export default class ChatHeader extends Component {
               borderRadius: 6,
               backgroundColor: colors.white
             }}
+            onPress={this.props.goBack}
           >
             <Icon
               name="chevron-left"

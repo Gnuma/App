@@ -169,7 +169,11 @@ SalesStack.navigationOptions = ({ navigation }) => {
 
 const ShoppingNavigator = createStackNavigator(
   {
-    ShoppingList: ShoppingListScreen
+    ShoppingList: ShoppingListScreen,
+    ShoppingChat: {
+      screen: ChatScreen,
+      path: "/shopping/:chatid"
+    }
   },
   {
     defaultNavigationOptions: {
@@ -177,6 +181,24 @@ const ShoppingNavigator = createStackNavigator(
     }
   }
 );
+
+ShoppingNavigator.navigationOptions = ({ navigation }) => {
+  const { routes } = navigation.state.routes[navigation.state.index];
+  /*let routeName;
+  if (routes[1]) {
+    routeName = routes[1].routeName;
+  } else {
+    routeName = routes[0].routeName;
+  }
+  console.log(routeName);
+  */
+  let navigationOptions = {};
+  //if (routeName === "Camera" || routeName === "SaleChat") {
+  //  navigationOptions.tabBarVisible = false;
+  //}
+  console.log(routes);
+  return navigationOptions;
+};
 
 const AppStack = createBottomTabNavigator(
   {

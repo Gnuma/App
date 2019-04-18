@@ -9,30 +9,30 @@ const initialState = {
   focus: null
 };
 
-const salesInit = (state, action) => {
+const shoppingInit = (state, action) => {
   const data = action.payload.data;
   let orderedData = [];
-  for (itemKey in data) {
+  for (subjectKey in data) {
     let lastMsg = new Date(0, 0, 0);
-    const item = data[itemKey].chats;
-    //orderedData.push(itemKey);
+    const subject = data[subjectKey].chats;
     let orderedChats = [];
-    for (chatKey in item) {
+    for (chatKey in subject) {
       orderedChats.push(chatKey); //TO-DO
-      const chat = item[chatKey];
+      const chat = subject[chatKey];
       lastMsg =
         chat.messages[0] && chat.messages[0].createdAt > lastMsg
           ? chat.messages[0].createdAt
           : lastMsg;
-      data[itemKey].chats[chatKey] = {
-        ...data[itemKey].chats[chatKey],
+      data[subjectKey].chats[chatKey] = {
+        ...data[subjectKey].chats[chatKey],
         composer: "",
         loading: false
       };
     }
-    orderedData.push({ itemID: itemKey, chats: orderedChats }); //TO-DO
-    data[itemKey] = { ...data[itemKey], lastMsg };
+    orderedData.push({ subjectID: subjectKey, chats: orderedChats }); //TO-DO
+    data[subjectKey] = { ...data[subjectKey], lastMsg };
   }
+
   return updateObject(state, {
     data,
     orderedData,
@@ -40,11 +40,11 @@ const salesInit = (state, action) => {
   });
 };
 
-const salesStartAction = (state, action) => {
-  const { itemID, chatID } = action.payload;
+const shoppingStartAction = (state, action) => {
+  const { subjectID, chatID } = action.payload;
   return update(state, {
     data: {
-      [itemID]: {
+      [subjectID]: {
         chats: {
           [chatID]: {
             loading: { $set: true }
@@ -55,23 +55,23 @@ const salesStartAction = (state, action) => {
   });
 };
 
-const salesError = (state, action) => {
+const shoppingError = (state, action) => {
   return updateObject(state, {
     error: action.payload.error
   });
 };
 
-const salesFocus = (state, action) => {
+const shoppingFocus = (state, action) => {
   return updateObject(state, {
     focus: action.payload.focus
   });
 };
 
-const salesComposer = (state, action) => {
-  const { itemID, chatID, composer } = action.payload;
+const shoppingComposer = (state, action) => {
+  const { subjectID, chatID, composer } = action.payload;
   return update(state, {
     data: {
-      [itemID]: {
+      [subjectID]: {
         chats: {
           [chatID]: {
             composer: { $set: composer }
@@ -82,34 +82,35 @@ const salesComposer = (state, action) => {
   });
 };
 
-const salesReceiveMsg = (state, action) => {
+const shoppingReceiveMsg = (state, action) => {
+  const { subjectID, chatID, msg } = action.payload;
   hasNews = true; //TO-DO
 
   return update(state, {
     data: {
-      [action.payload.item]: {
+      [subjectID]: {
         chats: {
-          [action.payload.chat]: {
-            messages: { $unshift: [action.payload.msg] },
+          [chatID]: {
+            messages: { $unshift: [msg] },
             hasNews: { $set: hasNews }
           }
         },
         newsCount: {
           $set: hasNews
-            ? state.data[action.payload.item].newsCount + 1
-            : state.data[action.payload.item].newsCount
+            ? state.data[subjectID].newsCount + 1
+            : state.data[subjectID].newsCount
         }
       }
     }
   });
 };
 
-const salesSendMsg = (state, action) => {
-  const { itemID, chatID, msg } = action.payload;
-  console.log(itemID, chatID, msg);
+const shoppingSendMsg = (state, action) => {
+  const { subjectID, chatID, msg } = action.payload;
+  console.log(subjectID, chatID, msg);
   return update(state, {
     data: {
-      [itemID]: {
+      [subjectID]: {
         chats: {
           [chatID]: {
             messages: { $unshift: [msg] },
@@ -121,16 +122,16 @@ const salesSendMsg = (state, action) => {
   });
 };
 
-const salesConfirmMsg = (state, action) => {
-  const { itemID, chatID, msgID, data } = action.payload;
+const shoppingConfirmMsg = (state, action) => {
+  const { subjectID, chatID, msgID, data } = action.payload;
   try {
-    const chat = state.data[itemID].chats[chatID].messages;
+    const chat = state.data[subjectID].chats[chatID].messages;
     console.log(data);
     for (let i = 0; i < chat.length; i++) {
       if (chat[i]._id == msgID) {
         return update(state, {
           data: {
-            [itemID]: {
+            [subjectID]: {
               chats: {
                 [chatID]: {
                   messages: { [i]: { $merge: data } }
@@ -149,13 +150,14 @@ const salesConfirmMsg = (state, action) => {
   return state;
 };
 
-const salesReadChat = (state, action) => {
-  const { itemID, chatID } = action.payload;
-  const hasNews = state.data[itemID].chats[chatID].hasNews;
-  console.log(state, action);
+const shoppingReadChat = (state, action) => {
+  const { subjectID, chatID } = action.payload;
+  //console.log(subjectID, chatID);
+  const hasNews = state.data[subjectID].chats[chatID].hasNews;
+  //console.log(hasNews);
   return update(state, {
     data: {
-      [itemID]: {
+      [subjectID]: {
         newsCount: {
           $apply: oldCount => {
             return hasNews ? oldCount - 1 : oldCount;
@@ -171,11 +173,11 @@ const salesReadChat = (state, action) => {
   });
 };
 
-const salesSettleChat = (state, action) => {
-  const { itemID, chatID, status } = action.payload;
+const shoppingSettleChat = (state, action) => {
+  const { subjectID, chatID, status } = action.payload;
   return update(state, {
     data: {
-      [itemID]: {
+      [subjectID]: {
         chats: {
           [chatID]: {
             status: { $set: status },
@@ -189,35 +191,35 @@ const salesSettleChat = (state, action) => {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.SALES_INIT:
-      return salesInit(state, action);
+    case actionTypes.SHOPPING_INIT:
+      return shoppingInit(state, action);
 
-    case actionTypes.SALES_START_ACTION:
-      return salesStartAction(state, action);
+    case actionTypes.SHOPPING_START_ACTION:
+      return shoppingStartAction(state, action);
 
-    case actionTypes.SALES_FAIL:
-      return salesError(state, action);
+    case actionTypes.SHOPPING_FAIL:
+      return shoppingError(state, action);
 
-    case actionTypes.SALES_SET_FOCUS:
-      return salesFocus(state, action);
+    case actionTypes.SHOPPING_SET_FOCUS:
+      return shoppingFocus(state, action);
 
-    case actionTypes.SALES_SET_COMPOSER:
-      return salesComposer(state, action);
+    case actionTypes.SHOPPING_SET_COMPOSER:
+      return shoppingComposer(state, action);
 
-    case actionTypes.SALES_RECEIVE_MSG:
-      return salesReceiveMsg(state, action);
+    case actionTypes.SHOPPING_RECEIVE_MSG:
+      return shoppingReceiveMsg(state, action);
 
-    case actionTypes.SALES_SEND_MSG:
-      return salesSendMsg(state, action);
+    case actionTypes.SHOPPING_SEND_MSG:
+      return shoppingSendMsg(state, action);
 
-    case actionTypes.SALES_CONFIRM_MSG:
-      return salesConfirmMsg(state, action);
+    case actionTypes.SHOPPING_CONFIRM_MSG:
+      return shoppingConfirmMsg(state, action);
 
-    case actionTypes.SALES_READ_CHAT:
-      return salesReadChat(state, action);
+    case actionTypes.SHOPPING_READ_CHAT:
+      return shoppingReadChat(state, action);
 
-    case actionTypes.SALES_SETTLE_CHAT:
-      return salesSettleChat(state, action);
+    case actionTypes.SHOPPING_SETTLE_CHAT:
+      return shoppingSettleChat(state, action);
 
     default:
       return state;
