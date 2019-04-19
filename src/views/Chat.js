@@ -105,7 +105,7 @@ export class Chat extends Component {
             />
           ) : (
             <ChatView
-              itemID={objectID}
+              objectID={objectID}
               chatID={chatID}
               data={chatData}
               salesSend={this.sendMsg}

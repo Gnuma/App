@@ -15,11 +15,11 @@ import Composer from "./Composer";
 
 export default class Chat extends Component {
   onSend = () => {
-    this.props.salesSend(this.props.itemID, this.props.chatID);
+    this.props.salesSend(this.props.objectID, this.props.chatID);
   };
 
   onComposerTextChanged = text => {
-    this.props.salesSetComposer(this.props.itemID, this.props.chatID, text);
+    this.props.salesSetComposer(this.props.objectID, this.props.chatID, text);
   };
 
   renderBubble = props => {
@@ -60,9 +60,7 @@ export default class Chat extends Component {
   };
 
   render() {
-    const { data, itemID, chatID, type } = this.props;
-    //console.log(dataRedux, itemID, chatID);
-    //const data = dataRedux[itemID].chats[chatID];
+    const { data, type } = this.props;
 
     return (
       <View style={{ flex: 1 }}>

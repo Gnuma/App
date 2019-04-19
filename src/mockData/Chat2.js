@@ -24,12 +24,12 @@ export const newSellerMsg = {
     text: "Messsaggio 0",
     createdAt: new Date(2019, 3, 10, 16, 0),
     user: {
-      _id: item3Chat1UserToID
+      _id: item1Chat2UserToID
     },
     isRead: false
   },
-  chat: item3Chat1ID,
-  item: item3ID
+  chat: item1Chat2ID,
+  item: item1ID
 };
 
 export const sellerChatList = {

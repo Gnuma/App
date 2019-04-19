@@ -1,6 +1,11 @@
 import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
 import update from "immutability-helper";
+import {
+  getItemIndex,
+  getChatIndex,
+  highlightItem
+} from "../../utils/chatUtility";
 
 const initialState = {
   data: null,
@@ -84,20 +89,33 @@ const salesComposer = (state, action) => {
 
 const salesReceiveMsg = (state, action) => {
   hasNews = true; //TO-DO
+  const { item, chat, msg } = action.payload;
+
+  const itemIndex = getItemIndex(item, state);
+  console.log(state.orderedData, itemIndex);
+  const chatIndex = getChatIndex(chat, state.orderedData[itemIndex]);
+  console.log(itemIndex, chatIndex);
 
   return update(state, {
     data: {
-      [action.payload.item]: {
+      [item]: {
         chats: {
-          [action.payload.chat]: {
-            messages: { $unshift: [action.payload.msg] },
+          [chat]: {
+            messages: { $unshift: [msg] },
             hasNews: { $set: hasNews }
           }
         },
         newsCount: {
           $set: hasNews
-            ? state.data[action.payload.item].newsCount + 1
-            : state.data[action.payload.item].newsCount
+            ? state.data[item].newsCount + 1
+            : state.data[item].newsCount
+        }
+      }
+    },
+    orderedData: {
+      [itemIndex]: {
+        chats: {
+          $apply: item => highlightItem(item, chatIndex)
         }
       }
     }
@@ -106,6 +124,10 @@ const salesReceiveMsg = (state, action) => {
 
 const salesSendMsg = (state, action) => {
   const { itemID, chatID, msg } = action.payload;
+
+  const itemIndex = getItemIndex(itemID, state);
+  const chatIndex = getChatIndex(chatID, state.orderedData[itemIndex]);
+
   console.log(itemID, chatID, msg);
   return update(state, {
     data: {
@@ -115,6 +137,13 @@ const salesSendMsg = (state, action) => {
             messages: { $unshift: [msg] },
             composer: { $set: "" }
           }
+        }
+      }
+    },
+    orderedData: {
+      [itemIndex]: {
+        chats: {
+          $apply: item => highlightItem(item, chatIndex)
         }
       }
     }

@@ -2,14 +2,9 @@ import * as actionTypes from "./actionTypes";
 import { sellerChatList, newSellerMsg } from "../../mockData/Chat2";
 import ws from "../../utils/WebSocket";
 import uuid from "uuid";
+import NetInfo from "@react-native-community/netinfo";
 
-export const salesInit = data => {
-  /*
-  ws.init();
-  ws.onMessage(msg => {
-    console.log(msg.data);
-  });
-  */
+const init = data => {
   return {
     type: actionTypes.SALES_INIT,
     payload: {
@@ -112,6 +107,27 @@ export const salesSettleChat = (itemID, chatID, status) => {
   };
 };
 
+connectionSubscription = null;
+export const salesInit = data => {
+  return dispatch => {
+    connectionSubscription = NetInfo.isConnected.addEventListener(
+      "connectionChange",
+      isConnected => {
+        if (isConnected) {
+          dispatch(salesConnectionRestablished());
+        }
+      }
+    );
+    /*
+    ws.init();
+    ws.onMessage(msg => {
+      console.log(msg.data);
+    });
+    */
+    dispatch(init(data));
+  };
+};
+
 export const testNewMessage = () => {
   return dispatch => {
     setTimeout(() => {
@@ -128,17 +144,30 @@ export const salesSend = (itemID, chatID) => {
     const content = getState().sales.data[itemID].chats[chatID].composer;
     const msg = createMsg(content, myID);
     dispatch(salesSendMsg(itemID, chatID, msg));
-    setTimeout(
-      () =>
-        dispatch(
-          salesConfirmMsg(itemID, chatID, msg._id, {
-            isSending: false,
-            _id: uuid.v4()
-          })
-        ),
-      2000
-    );
-    //ADD Reject
+
+    //Connection CHECK
+    NetInfo.isConnected.fetch().then(isConnected => {
+      if (isConnected) {
+        setTimeout(
+          //FAKE API ||| ADD REJECT
+          () =>
+            dispatch(
+              salesConfirmMsg(itemID, chatID, msg._id, {
+                isSending: false,
+                _id: uuid.v4()
+              })
+            ),
+          2000
+        );
+        //ADD Reject
+      } else {
+        saleQueue.push({
+          itemID,
+          chatID,
+          msg
+        });
+      }
+    });
   };
 };
 
@@ -173,5 +202,38 @@ export const salesSettle = (itemID, chatID, isAccepting) => {
         dispatch(salesSettleChat(itemID, chatID, "rejected"));
       }
     }, 1000);
+  };
+};
+
+saleQueue = [];
+isSaleResending = false;
+const salesConnectionRestablished = () => {
+  return dispatch => {
+    if (!isSaleResending) {
+      isSaleResending = true;
+      dispatch(salesRetrySend());
+    }
+  };
+};
+
+const salesRetrySend = () => {
+  return dispatch => {
+    if (saleQueue.length === 0) {
+      isSaleResending = false;
+    } else {
+      const { itemID, chatID, msg } = saleQueue[0];
+      //API
+      setTimeout(() => {
+        dispatch(
+          salesConfirmMsg(itemID, chatID, msg._id, {
+            //Just for testing | replace with API results
+            isSending: false,
+            _id: uuid.v4()
+          })
+        );
+        saleQueue.splice(0, 1);
+        dispatch(salesRetrySend());
+      }, 1000);
+    }
   };
 };

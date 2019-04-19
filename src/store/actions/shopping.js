@@ -1,7 +1,8 @@
 import * as actionTypes from "./actionTypes";
 import uuid from "uuid";
+import NetInfo from "@react-native-community/netinfo";
 
-export const shoppingInit = data => ({
+const init = data => ({
   type: actionTypes.SHOPPING_INIT,
   payload: {
     data
@@ -87,6 +88,20 @@ export const shoppingSettleChat = (subjectID, chatID, status) => {
     }
   };
 };
+connectionSubscription = null;
+export const shoppingInit = data => {
+  return dispatch => {
+    connectionSubscription = NetInfo.isConnected.addEventListener(
+      "connectionChange",
+      isConnected => {
+        if (isConnected) {
+          dispatch(shoppingConnectionRestablished());
+        }
+      }
+    );
+    dispatch(init(data));
+  };
+};
 
 export const shoppingSend = (subjectID, chatID) => {
   return (dispatch, getState) => {
@@ -94,17 +109,29 @@ export const shoppingSend = (subjectID, chatID) => {
     const content = getState().shopping.data[subjectID].chats[chatID].composer;
     const msg = createMsg(content, myID);
     dispatch(shoppingSendMsg(subjectID, chatID, msg));
-    setTimeout(
-      () =>
-        dispatch(
-          shoppingConfirmMsg(subjectID, chatID, msg._id, {
-            isSending: false,
-            _id: uuid.v4()
-          })
-        ),
-      2000
-    );
-    //ADD Reject
+    //Connection Check
+    NetInfo.isConnected.fetch().then(isConnected => {
+      if (isConnected) {
+        setTimeout(
+          //FAKE API ||| ADD REJECT
+          () =>
+            dispatch(
+              shoppingConfirmMsg(subjectID, chatID, msg._id, {
+                isSending: false,
+                _id: uuid.v4()
+              })
+            ),
+          2000
+        );
+        //ADD Reject
+      } else {
+        shoppingQueue.push({
+          subjectID,
+          chatID,
+          msg
+        });
+      }
+    });
   };
 };
 
@@ -135,5 +162,38 @@ export const shoppingRequestContact = (subjectID, chatID) => {
     setTimeout(() => {
       dispatch(shoppingSettleChat(subjectID, chatID, "pending"));
     }, 1000);
+  };
+};
+
+shoppingQueue = [];
+isShoppingResending = false;
+const shoppingConnectionRestablished = () => {
+  return dispatch => {
+    if (!isShoppingResending) {
+      isShoppingResending = true;
+      dispatch(shoppingRetrySend());
+    }
+  };
+};
+
+const shoppingRetrySend = () => {
+  return dispatch => {
+    if (shoppingQueue.length === 0) {
+      isShoppingResending = false;
+    } else {
+      const { subjectID, chatID, msg } = shoppingQueue[0];
+      //API
+      setTimeout(() => {
+        dispatch(
+          shoppingConfirmMsg(subjectID, chatID, msg._id, {
+            //Just for testing | replace with API results
+            isSending: false,
+            _id: uuid.v4()
+          })
+        );
+        shoppingQueue.splice(0, 1);
+        dispatch(shoppingRetrySend());
+      }, 1000);
+    }
   };
 };

@@ -1,6 +1,11 @@
 import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
 import update from "immutability-helper";
+import {
+  getSubjectIndex,
+  getChatIndex,
+  highlightItem
+} from "../../utils/chatUtility";
 
 const initialState = {
   data: null,
@@ -85,6 +90,8 @@ const shoppingComposer = (state, action) => {
 const shoppingReceiveMsg = (state, action) => {
   const { subjectID, chatID, msg } = action.payload;
   hasNews = true; //TO-DO
+  const subjectIndex = getSubjectIndex(subjectID, state);
+  const chatIndex = getChatIndex(chatID, state.orderedData[subjectIndex]);
 
   return update(state, {
     data: {
@@ -101,13 +108,23 @@ const shoppingReceiveMsg = (state, action) => {
             : state.data[subjectID].newsCount
         }
       }
+    },
+    orderedData: {
+      [subjectIndex]: {
+        chats: {
+          $apply: subject => highlightItem(subject, chatIndex)
+        }
+      }
     }
   });
 };
 
 const shoppingSendMsg = (state, action) => {
   const { subjectID, chatID, msg } = action.payload;
-  console.log(subjectID, chatID, msg);
+  //console.log(subjectID, chatID, msg);
+  const subjectIndex = getSubjectIndex(subjectID, state);
+  const chatIndex = getChatIndex(chatID, state.orderedData[subjectIndex]);
+
   return update(state, {
     data: {
       [subjectID]: {
@@ -116,6 +133,13 @@ const shoppingSendMsg = (state, action) => {
             messages: { $unshift: [msg] },
             composer: { $set: "" }
           }
+        }
+      }
+    },
+    orderedData: {
+      [subjectIndex]: {
+        chats: {
+          $apply: subject => highlightItem(subject, chatIndex)
         }
       }
     }
