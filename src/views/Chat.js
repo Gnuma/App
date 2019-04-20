@@ -32,7 +32,29 @@ export class Chat extends Component {
 
   componentDidMount() {
     this.readChat(this.state.objectID, this.state.chatID);
+    const { navigation } = this.props;
+    this.setChatFocus(true);
+    this.focusListeners = [
+      navigation.addListener("didFocus", () => this.setChatFocus(true)),
+      navigation.addListener("didBlur", () => this.setChatFocus(false))
+    ];
   }
+
+  componentWillUnmount() {
+    this.focusListeners.forEach(element => {
+      element.remove();
+    });
+    this.setChatFocus(false);
+  }
+
+  setChatFocus = isFocused => {
+    const chatID = isFocused ? this.state.chatID : null;
+    if (this.type === sale) {
+      this.props.salesSetChatFocus(chatID);
+    } else {
+      this.props.shoppingSetChatFocus(chatID);
+    }
+  };
 
   getData = () => {
     if (this.type === sale) {
@@ -147,7 +169,10 @@ const mapDispatchToProps = dispatch => ({
   salesSettle: (itemID, chatID, isAccepting) =>
     dispatch(salesActions.salesSettle(itemID, chatID, isAccepting)),
   shoppingRequestContact: (subjectID, chatID) =>
-    dispatch(shoppingActions.shoppingRequestContact(subjectID, chatID))
+    dispatch(shoppingActions.shoppingRequestContact(subjectID, chatID)),
+  shoppingSetChatFocus: chatID =>
+    dispatch(shoppingActions.shoppingSetChatFocus(chatID)),
+  salesSetChatFocus: chatID => dispatch(salesActions.salesSetChatFocus(chatID))
 });
 
 export default connect(

@@ -11,7 +11,8 @@ const initialState = {
   data: null,
   orderedData: null,
   error: null,
-  focus: null
+  focus: null,
+  chatFocus: null
 };
 
 const shoppingInit = (state, action) => {
@@ -89,7 +90,7 @@ const shoppingComposer = (state, action) => {
 
 const shoppingReceiveMsg = (state, action) => {
   const { subjectID, chatID, msg } = action.payload;
-  hasNews = true; //TO-DO
+  inChat = state.chatFocus === chatID; //TO-DO
   const subjectIndex = getSubjectIndex(subjectID, state);
   const chatIndex = getChatIndex(chatID, state.orderedData[subjectIndex]);
 
@@ -99,11 +100,11 @@ const shoppingReceiveMsg = (state, action) => {
         chats: {
           [chatID]: {
             messages: { $unshift: [msg] },
-            hasNews: { $set: hasNews }
+            hasNews: { $set: !inChat }
           }
         },
         newsCount: {
-          $set: hasNews
+          $set: !inChat
             ? state.data[subjectID].newsCount + 1
             : state.data[subjectID].newsCount
         }
@@ -213,6 +214,13 @@ const shoppingSettleChat = (state, action) => {
   });
 };
 
+const shoppingSetChatFocus = (state, action) => {
+  const { chatID } = action.payload;
+  return updateObject(state, {
+    chatFocus: chatID
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SHOPPING_INIT:
@@ -244,6 +252,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SHOPPING_SETTLE_CHAT:
       return shoppingSettleChat(state, action);
+
+    case actionTypes.SHOPPING_SET_CHAT_FOCUS:
+      return shoppingSetChatFocus(state, action);
 
     default:
       return state;

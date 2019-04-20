@@ -88,6 +88,16 @@ export const shoppingSettleChat = (subjectID, chatID, status) => {
     }
   };
 };
+
+export const shoppingSetChatFocus = chatID => {
+  return {
+    type: actionTypes.SHOPPING_SET_CHAT_FOCUS,
+    payload: {
+      chatID
+    }
+  };
+};
+
 connectionSubscription = null;
 export const shoppingInit = data => {
   return dispatch => {
@@ -194,6 +204,15 @@ const shoppingRetrySend = () => {
         shoppingQueue.splice(0, 1);
         dispatch(shoppingRetrySend());
       }, 1000);
+    }
+  };
+};
+
+export const onNewShoppingMsg = (subjectID, chatID, msg) => {
+  return (dispatch, getState) => {
+    dispatch(shoppingReceiveMsg(subjectID, chatID, msg));
+    if (getState().shopping.chatFocus === chatID) {
+      //Send API for read
     }
   };
 };

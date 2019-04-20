@@ -11,7 +11,8 @@ const initialState = {
   data: null,
   orderedData: null,
   error: null,
-  focus: null
+  focus: null,
+  chatFocus: null
 };
 
 const salesInit = (state, action) => {
@@ -88,9 +89,8 @@ const salesComposer = (state, action) => {
 };
 
 const salesReceiveMsg = (state, action) => {
-  hasNews = true; //TO-DO
   const { item, chat, msg } = action.payload;
-
+  inChat = state.chatFocus === chat; //TO-DO
   const itemIndex = getItemIndex(item, state);
   console.log(state.orderedData, itemIndex);
   const chatIndex = getChatIndex(chat, state.orderedData[itemIndex]);
@@ -102,11 +102,11 @@ const salesReceiveMsg = (state, action) => {
         chats: {
           [chat]: {
             messages: { $unshift: [msg] },
-            hasNews: { $set: hasNews }
+            hasNews: { $set: !inChat }
           }
         },
         newsCount: {
-          $set: hasNews
+          $set: !inChat
             ? state.data[item].newsCount + 1
             : state.data[item].newsCount
         }
@@ -216,6 +216,13 @@ const salesSettleChat = (state, action) => {
   });
 };
 
+const salesSetChatFocus = (state, action) => {
+  const { chatID } = action.payload;
+  return updateObject(state, {
+    chatFocus: chatID
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SALES_INIT:
@@ -247,6 +254,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SALES_SETTLE_CHAT:
       return salesSettleChat(state, action);
+
+    case actionTypes.SALES_SET_CHAT_FOCUS:
+      return salesSetChatFocus(state, action);
 
     default:
       return state;

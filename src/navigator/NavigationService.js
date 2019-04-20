@@ -1,5 +1,6 @@
 import { NavigationActions } from "react-navigation";
 import store from "../store/store";
+
 let _navigator;
 
 function setTopLevelNavigator(navigatorRef) {

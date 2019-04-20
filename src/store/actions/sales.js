@@ -1,5 +1,4 @@
 import * as actionTypes from "./actionTypes";
-import { sellerChatList, newSellerMsg } from "../../mockData/Chat2";
 import ws from "../../utils/WebSocket";
 import uuid from "uuid";
 import NetInfo from "@react-native-community/netinfo";
@@ -107,6 +106,15 @@ export const salesSettleChat = (itemID, chatID, status) => {
   };
 };
 
+export const salesSetChatFocus = chatID => {
+  return {
+    type: actionTypes.SALES_SET_CHAT_FOCUS,
+    payload: {
+      chatID
+    }
+  };
+};
+
 connectionSubscription = null;
 export const salesInit = data => {
   return dispatch => {
@@ -125,16 +133,6 @@ export const salesInit = data => {
     });
     */
     dispatch(init(data));
-  };
-};
-
-export const testNewMessage = () => {
-  return dispatch => {
-    setTimeout(() => {
-      dispatch(
-        salesReceiveMsg(newSellerMsg.item, newSellerMsg.chat, newSellerMsg.msg)
-      );
-    }, 6000);
   };
 };
 
@@ -234,6 +232,15 @@ const salesRetrySend = () => {
         saleQueue.splice(0, 1);
         dispatch(salesRetrySend());
       }, 1000);
+    }
+  };
+};
+
+export const onNewSalesMsg = (itemID, chatID, msg) => {
+  return (dispatch, getState) => {
+    dispatch(salesReceiveMsg(itemID, chatID, msg));
+    if (getState().sales.chatFocus === chatID) {
+      //Send API for read
     }
   };
 };

@@ -21,15 +21,15 @@ const item5ID = uuid.v4();
 export const newSellerMsg = {
   msg: {
     _id: uuid.v4(),
-    text: "Messsaggio 0",
-    createdAt: new Date(2019, 3, 10, 16, 0),
+    text: "Nuovo messaggio seller",
+    createdAt: new Date(),
     user: {
       _id: item1Chat2UserToID
     },
     isRead: false
   },
-  chat: item1Chat2ID,
-  item: item1ID
+  chatID: item1Chat2ID,
+  itemID: item1ID
 };
 
 export const sellerChatList = {
@@ -315,6 +315,20 @@ const subject4ID = uuid.v4();
 const subject4Chat1ID = uuid.v4();
 const subject4Chat1UserToID = uuid.v4();
 const subject5ID = uuid.v4();
+
+export const newBuyerMsg = {
+  msg: {
+    _id: uuid.v4(),
+    text: "Nuovo messaggio Buyer",
+    createdAt: new Date(),
+    user: {
+      _id: subject1Chat3UserToID
+    },
+    isRead: false
+  },
+  chatID: subject1Chat3ID,
+  subjectID: subject1ID
+};
 
 export const buyerChatList = {
   [subject1ID]: {

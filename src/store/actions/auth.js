@@ -14,9 +14,14 @@ import {
   notificationsSubscribe,
   notificationsUnsubscribe
 } from "./notifications";
-import { salesInit, testNewMessage } from "./sales";
-import { sellerChatList, buyerChatList } from "../../mockData/Chat2";
-import { shoppingInit } from "./shopping";
+import { salesInit, onNewSalesMsg } from "./sales";
+import {
+  sellerChatList,
+  buyerChatList,
+  newBuyerMsg,
+  newSellerMsg
+} from "../../mockData/Chat2";
+import { shoppingInit, onNewShoppingMsg } from "./shopping";
 
 const isOffline = false;
 
@@ -114,7 +119,22 @@ export const autoLogin = () => {
 
     dispatch(salesInit(sellerChatList)); // TAKE THIS OUT
     dispatch(shoppingInit(buyerChatList)); //TAKE THIS OUT
-    dispatch(testNewMessage()); //TAKE THIS OUT TOO
+    setTimeout(() => {
+      dispatch(
+        onNewShoppingMsg(
+          newBuyerMsg.subjectID,
+          newBuyerMsg.chatID,
+          newBuyerMsg.msg
+        )
+      );
+      dispatch(
+        onNewSalesMsg(
+          newSellerMsg.itemID,
+          newSellerMsg.chatID,
+          newSellerMsg.msg
+        )
+      );
+    }, 6000);
 
     multiGet([tokenKey, officeKey]).then(userInfos => {
       //console.log(userInfos);
