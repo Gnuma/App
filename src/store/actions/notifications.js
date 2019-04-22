@@ -24,8 +24,8 @@ export const notificationsSetSubscription = idSubscription => {
 
 export const notificationsSubscribe = () => {
   return dispatch => {
-    const idSubscription = setInterval(() => dispatch(update()), 10000);
-    dispatch(notificationsSetSubscription(idSubscription));
+    //const idSubscription = setInterval(() => dispatch(update()), 10000);
+    //dispatch(notificationsSetSubscription(idSubscription));
   };
 };
 

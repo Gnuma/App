@@ -24,6 +24,8 @@ import {
 } from "../../mockData/Chat2";
 import { shoppingInit, onNewShoppingMsg } from "./shopping";
 import TestTask from "../../service/TestTask";
+import { commentsInit } from "./comments";
+import { commentList } from "../../mockData/comments";
 
 const isOffline = false;
 
@@ -119,9 +121,11 @@ export const autoLogin = () => {
   return dispatch => {
     dispatch(authStart());
 
+    dispatch(commentsInit(commentList)); //TAKE THIS OUT
     dispatch(salesInit(sellerChatList)); // TAKE THIS OUT
     dispatch(shoppingInit(buyerChatList)); //TAKE THIS OUT
     setTimeout(() => {
+      ///TAKE THIS OUT
       dispatch(
         onNewShoppingMsg(
           newBuyerMsg.subjectID,

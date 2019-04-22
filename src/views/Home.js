@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, TouchableWithoutFeedback } from "react-native";
 import { withNavigation } from "react-navigation";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
@@ -19,7 +19,9 @@ export class Home extends Component {
   static propTypes = {
     results: PropTypes.object,
     isSearchActive: PropTypes.bool,
-    suggestions: PropTypes.array,
+    suggestions: PropTypes.array, // take out
+    commentsData: PropTypes.object,
+    commentsOrder: PropTypes.array,
     searchRedux: PropTypes.func,
     showResults: PropTypes.bool,
     isLoading: PropTypes.bool
@@ -48,33 +50,40 @@ export class Home extends Component {
       );
     } else {
       return (
-        <ScrollView contentContainerStyle={{ justifyContent: "center" }}>
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              paddingVertical: 25
-            }}
-          >
-            <SearchLink onPress={this._openSearchBar} />
+        <TouchableWithoutFeedback onPress={() => console.log("SEnti un po")}>
+          <View style={{ justifyContent: "center", flex: 1 }}>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                paddingVertical: 25
+              }}
+            >
+              <SearchLink onPress={this._openSearchBar} />
+            </View>
+            <View style={{ flex: 1 }}>
+              {this.props.commentsOrder &&
+              !_.isEmpty(this.props.commentsOrder) ? (
+                <NotificationCenter
+                  data={this.props.commentsData}
+                  orderedData={this.props.commentsOrder}
+                  commentHandler={this._onCommentNotificationPress}
+                />
+              ) : null}
+              <BookShelf onPress={this._searchOption} />
+            </View>
           </View>
-          {this.props.notifications && !_.isEmpty(this.props.notifications) ? (
-            <NotificationCenter
-              data={this.props.notifications}
-              commentHandler={this._onCommentNotificationPress}
-            />
-          ) : null}
-          <BookShelf onPress={this._searchOption} />
-        </ScrollView>
+        </TouchableWithoutFeedback>
       );
     }
   };
 
-  _onCommentNotificationPress = (itemPK, bookTitle, commentPK) => {
+  _onCommentNotificationPress = (itemPK, book, commentIDList) => {
     this.props.navigation.navigate("Item", {
       itemID: itemPK,
-      bookTitle: bookTitle,
-      goToComment: commentPK
+      commentIDList: commentIDList,
+      name: book.title,
+      authors: book.authors
     });
   };
 
@@ -104,7 +113,9 @@ const mapStateToProps = state => ({
   suggestions: state.search.suggestions,
   showResults: state.search.showResults,
   isLoading: state.search.loading,
-  notifications: state.notifications.notifications
+  notifications: state.notifications.notifications, //TAke out
+  commentsData: state.comments.data,
+  commentsOrder: state.comments.orderedData
 });
 
 const mapDispatchToProps = dispatch => {

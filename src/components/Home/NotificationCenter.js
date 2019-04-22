@@ -1,43 +1,61 @@
 import React, { Component } from "react";
-import { View, Dimensions, FlatList } from "react-native";
+import {
+  View,
+  Dimensions,
+  FlatList,
+  TouchableWithoutFeedback
+} from "react-native";
 import colors from "../../styles/colors";
-import { Header2, Header3 } from "../Text";
+import { Header2, Header3, Header4 } from "../Text";
 import memoize from "memoize-one";
 import SolidButton from "../SolidButton";
-export default class NotificationCenter extends Component {
-  filter = memoize(data => this.formatNotifications(data));
+import Button from "../Button";
+import Icon from "react-native-vector-icons/FontAwesome";
 
-  formatNotifications = data => {
-    return Object.keys(data).map(function(key) {
-      return data[key];
-    });
+export default class NotificationCenter extends Component {
+  state = {
+    isActive: false
   };
 
+  setActive = () => {
+    this.setState(prevState => ({
+      isActive: !prevState.isActive
+    }));
+  };
+
+  filter = memoize(data => this.formatNotifications(data));
+
   _keyExtractor = item => {
-    return item.itemPK.toString();
+    return item.toString();
   };
 
   _renderItem = ({ item, index }) => {
-    const singleComment = item.commentPK !== null;
-    const text = singleComment
-      ? "Nuova domanda su " + item.book
-      : "Nuove domande su " + item.book;
+    const data = this.props.data[item];
+    const number = data.data.length == 0 ? "a " : "e ";
+    const type = (data.type === "sales" ? "domand" : "rispost") + number;
+    let commentIDs = [];
+    data.data.forEach(comment => commentIDs.push(comment.pk));
+
+    const text = "Nuov" + number + type + "su ";
+    const bookTitle = data.book.title;
     return (
       <SolidButton
         style={{
-          margin: 4
+          marginHorizontal: 10,
+          marginVertical: 5
         }}
         icon="chevron-circle-right"
         iconSize={20}
         iconStyle={{
-          color: colors.darkRed
+          color: colors.secondary
         }}
         onPress={() =>
-          this.props.commentHandler(item.itemPK, item.book, item.commentPK)
+          this.props.commentHandler(data.pk, data.book, commentIDs)
         }
       >
-        <Header3 color="black" style={{ fontSize: 17 }}>
+        <Header3 color="black" style={{ fontSize: 17 }} numberOfLines={1}>
           {text}
+          <Header3 color="secondary">{bookTitle}</Header3>
         </Header3>
       </SolidButton>
     );
@@ -45,26 +63,53 @@ export default class NotificationCenter extends Component {
 
   render() {
     const data = this.props.data;
-    const arrayData = this.filter(data);
-
+    const orderedData = this.props.orderedData;
     return (
       <View
         style={{
-          marginHorizontal: 20,
-          marginBottom: 10
+          height: 46
         }}
       >
-        <Header2 color={"primary"} style={{ marginLeft: 20 }}>
-          Notifiche
-        </Header2>
-        <FlatList
-          contentContainerStyle={{
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            zIndex: 1,
             backgroundColor: colors.white
           }}
-          renderItem={this._renderItem}
-          data={arrayData}
-          keyExtractor={this._keyExtractor}
-        />
+        >
+          <Button
+            style={{
+              alignSelf: "center",
+              padding: 10,
+              borderRadius: 6,
+              elevation: this.state.isActive ? 0 : 2,
+              backgroundColor: colors.white
+            }}
+            onPress={this.setActive}
+          >
+            <Icon name={"bell"} size={24} style={{ color: colors.darkRed }} />
+          </Button>
+          {this.state.isActive ? (
+            <FlatList
+              contentContainerStyle={{
+                backgroundColor: colors.white,
+                overflow: "visible",
+                borderRadius: 6,
+                borderWidth: 1,
+                flex: 1,
+                marginHorizontal: 20,
+                paddingVertical: 5
+              }}
+              renderItem={this._renderItem}
+              data={orderedData}
+              extraData={data}
+              keyExtractor={this._keyExtractor}
+              onStartShouldSetResponderCapture={() => true}
+            />
+          ) : null}
+        </View>
       </View>
     );
   }

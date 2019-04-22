@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { View, Image, Dimensions, StyleSheet } from "react-native";
+import {
+  View,
+  Image,
+  Dimensions,
+  StyleSheet,
+  PanResponder
+} from "react-native";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 import BookTemplate from "./BookTemplate";
 import { sliderWidth, itemWidth } from "./styles";
