@@ -12,38 +12,13 @@ const initialState = {
   orderedData: null,
   error: null,
   focus: null,
-  chatFocus: null
+  chatFocus: null,
+  loading: false
 };
 
 const salesInit = (state, action) => {
   const data = action.payload.data;
-  let orderedData = [];
-  for (itemKey in data) {
-    let lastMsg = new Date(0, 0, 0);
-    const item = data[itemKey].chats;
-    //orderedData.push(itemKey);
-    let orderedChats = [];
-    for (chatKey in item) {
-      orderedChats.push(chatKey); //TO-DO
-      const chat = item[chatKey];
-      lastMsg =
-        chat.messages[0] && chat.messages[0].createdAt > lastMsg
-          ? chat.messages[0].createdAt
-          : lastMsg;
-      data[itemKey].chats[chatKey] = {
-        ...data[itemKey].chats[chatKey],
-        composer: "",
-        loading: false
-      };
-    }
-    orderedData.push({ itemID: itemKey, chats: orderedChats }); //TO-DO
-    data[itemKey] = { ...data[itemKey], lastMsg };
-  }
-  return updateObject(state, {
-    data,
-    orderedData,
-    focus: 0
-  });
+  return updateObject(state, formatData(data));
 };
 
 const salesStartAction = (state, action) => {
@@ -58,6 +33,12 @@ const salesStartAction = (state, action) => {
         }
       }
     }
+  });
+};
+
+const salesStartGlobalAction = (state, action) => {
+  return updateObject(state, {
+    loading: true
   });
 };
 
@@ -223,6 +204,27 @@ const salesSetChatFocus = (state, action) => {
   });
 };
 
+const salesRetrieveData = (state, action) => {
+  const { data } = action.payload;
+  return updateObject(state, formatData(data, state.focus));
+};
+
+const salesLoadEarlier = (state, action) => {
+  const { itemID, chatID, data } = action.payload;
+  return update(state, {
+    data: {
+      [itemID]: {
+        chats: {
+          [chatID]: {
+            messages: { $push: data },
+            loading: { $set: false }
+          }
+        }
+      }
+    }
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SALES_INIT:
@@ -258,9 +260,50 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SALES_SET_CHAT_FOCUS:
       return salesSetChatFocus(state, action);
 
+    case actionTypes.SALES_START_GLOBAL_ACTION:
+      return salesStartGlobalAction(state, action);
+
+    case actionTypes.SALES_RETRIEVE_DATA:
+      return salesRetrieveData(state, action);
+
+    case actionTypes.SALES_LOAD_EARLIER:
+      return salesLoadEarlier(state, action);
+
     default:
       return state;
   }
 };
 
 export default reducer;
+
+const formatData = (data, focus = 0) => {
+  let orderedData = [];
+  for (itemKey in data) {
+    let lastMsg = new Date(0, 0, 0);
+    const item = data[itemKey].chats;
+    //orderedData.push(itemKey);
+    let orderedChats = [];
+    for (chatKey in item) {
+      orderedChats.push(chatKey); //TO-DO
+      const chat = item[chatKey];
+      lastMsg =
+        chat.messages[0] && chat.messages[0].createdAt > lastMsg
+          ? chat.messages[0].createdAt
+          : lastMsg;
+      data[itemKey].chats[chatKey] = {
+        ...data[itemKey].chats[chatKey],
+        composer: "",
+        loading: false
+      };
+    }
+    orderedData.push({ itemID: itemKey, chats: orderedChats }); //TO-DO
+    data[itemKey] = { ...data[itemKey], lastMsg };
+  }
+
+  return {
+    data,
+    orderedData,
+    focus,
+    loading: false
+  };
+};

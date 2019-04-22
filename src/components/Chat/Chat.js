@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { View, Text, TextInput, KeyboardAvoidingView } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  KeyboardAvoidingView,
+  ActivityIndicator
+} from "react-native";
 import PropTypes from "prop-types";
 import { Header2, Header4, Header5 } from "../Text";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -20,6 +26,10 @@ export default class Chat extends Component {
 
   onComposerTextChanged = text => {
     this.props.salesSetComposer(this.props.objectID, this.props.chatID, text);
+  };
+
+  loadEarlier = () => {
+    !this.props.data.loading && this.props.loadEarlier();
   };
 
   renderBubble = props => {
@@ -59,8 +69,17 @@ export default class Chat extends Component {
     else return <Time {...props} />;
   };
 
+  isCloseToTop = ({ layoutMeasurement, contentOffset, contentSize }) => {
+    return (
+      contentSize.height -
+        layoutMeasurement.height -
+        contentSize.height * 0.2 <=
+      contentOffset.y
+    );
+  };
+
   render() {
-    const { data, type } = this.props;
+    const { data, type, globalLoading } = this.props;
 
     return (
       <View style={{ flex: 1 }}>
@@ -76,6 +95,19 @@ export default class Chat extends Component {
           renderComposer={this.renderNull}
           minInputToolbarHeight={0}
           maxComposerHeight={0}
+          listViewProps={this.listViewProps}
+          loadEarlier={data.loading}
+          extraData={{ loading: data.loading }}
+          renderLoadEarlier={() => {
+            return (
+              <ActivityIndicator
+                style={{
+                  alignSelf: "center"
+                }}
+                size="large"
+              />
+            );
+          }}
         />
         <Composer
           onSend={this.onSend}
@@ -84,10 +116,28 @@ export default class Chat extends Component {
           type={type}
           data={data}
         />
+        {globalLoading ? (
+          <ActivityIndicator
+            style={{
+              position: "absolute",
+              top: 15,
+              alignSelf: "center"
+            }}
+            size="large"
+          />
+        ) : null}
       </View>
     );
   }
   renderNull = () => null;
+
+  onScroll = ({ nativeEvent }) => {
+    this.isCloseToTop(nativeEvent) && this.loadEarlier();
+  };
+
+  listViewProps = {
+    onScroll: this.onScroll
+  };
 }
 
 /*

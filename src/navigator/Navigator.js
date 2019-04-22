@@ -128,7 +128,7 @@ const SalesNavigator = createStackNavigator(
     SalesList: SalesListScreen,
     SaleChat: {
       screen: ChatScreen,
-      path: "/sales/:chatid"
+      path: "/sales/:chatID"
     }
   },
   {
@@ -172,7 +172,7 @@ const ShoppingNavigator = createStackNavigator(
     ShoppingList: ShoppingListScreen,
     ShoppingChat: {
       screen: ChatScreen,
-      path: "/shopping/:chatid"
+      path: "/shopping/:chatID"
     }
   },
   {

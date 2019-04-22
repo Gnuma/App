@@ -2,6 +2,8 @@ import * as actionTypes from "./actionTypes";
 import ws from "../../utils/WebSocket";
 import uuid from "uuid";
 import NetInfo from "@react-native-community/netinfo";
+import { AppState } from "react-native";
+import { sellerChatList, loadMockNew } from "../../mockData/Chat2";
 
 const init = data => {
   return {
@@ -21,6 +23,10 @@ export const salesStartAction = (itemID, chatID) => {
     }
   };
 };
+
+export const salesStartGlobalAction = () => ({
+  type: actionTypes.SALES_START_GLOBAL_ACTION
+});
 
 export const salesFail = error => {
   return {
@@ -115,10 +121,31 @@ export const salesSetChatFocus = chatID => {
   };
 };
 
-connectionSubscription = null;
+export const salesRetrieveData = data => {
+  return {
+    type: actionTypes.SALES_RETRIEVE_DATA,
+    payload: {
+      data
+    }
+  };
+};
+
+export const salesLoadEarlierData = (itemID, chatID, data) => ({
+  type: actionTypes.SALES_LOAD_EARLIER,
+  payload: {
+    itemID,
+    chatID,
+    data
+  }
+});
+
+salesConnectionSubscription = null;
+salesStateSubscription = null;
+salesLastAppState = null;
 export const salesInit = data => {
   return dispatch => {
-    connectionSubscription = NetInfo.isConnected.addEventListener(
+    //Connection Listener
+    salesConnectionSubscription = NetInfo.isConnected.addEventListener(
       "connectionChange",
       isConnected => {
         if (isConnected) {
@@ -132,6 +159,17 @@ export const salesInit = data => {
       console.log(msg.data);
     });
     */
+    //AppState Listener
+    salesConnectionSubscription = AppState.addEventListener(
+      "change",
+      appState => {
+        if (appState == "active" && salesLastAppState == "background") {
+          dispatch(salesRetrieve());
+        }
+        salesLastAppState = appState;
+      }
+    );
+
     dispatch(init(data));
   };
 };
@@ -242,5 +280,25 @@ export const onNewSalesMsg = (itemID, chatID, msg) => {
     if (getState().sales.chatFocus === chatID) {
       //Send API for read
     }
+  };
+};
+
+export const salesRetrieve = () => {
+  return dispatch => {
+    dispatch(salesStartGlobalAction());
+    //API
+    setTimeout(() => {
+      dispatch(salesRetrieveData(sellerChatList));
+    }, 2000);
+  };
+};
+
+export const salesLoadEarlier = (itemID, chatID) => {
+  return dispatch => {
+    dispatch(salesStartAction(itemID, chatID));
+    //API
+    setTimeout(() => {
+      dispatch(salesLoadEarlierData(itemID, chatID, loadMockNew()));
+    }, 2000);
   };
 };

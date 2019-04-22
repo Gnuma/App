@@ -1,5 +1,6 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
+import { AppRegistry } from "react-native";
 import NavigatorService from "../../navigator/NavigationService";
 import { setItem, getItem, removeItem, multiGet } from "../utility";
 import { connect as msgConnect } from "./messaging";
@@ -22,6 +23,7 @@ import {
   newSellerMsg
 } from "../../mockData/Chat2";
 import { shoppingInit, onNewShoppingMsg } from "./shopping";
+import TestTask from "../../service/TestTask";
 
 const isOffline = false;
 

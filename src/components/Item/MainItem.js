@@ -9,7 +9,7 @@ import QuipuComment from "../Comments/QuipuComment";
 
 export class MainItem extends Component {
   componentDidMount() {
-    console.log(this.props.goToComment());
+    //console.log(this.props.goToComment());
     if (this.props.goToComment && this.props.goToComment()) {
       InteractionManager.runAfterInteractions(() => {
         this.comments._onAnswer(this.props.goToComment());

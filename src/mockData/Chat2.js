@@ -478,7 +478,6 @@ export const buyerChatList = {
   },
   [subject2ID]: {
     _id: subject2ID,
-
     title: "Italiano",
     newsCount: 1,
     chats: {
@@ -566,5 +565,89 @@ export const buyerChatList = {
     title: "Quarta Materia",
     newsCount: 0,
     chats: {}
+  }
+};
+
+export const loadMockNew = () => {
+  return [
+    {
+      _id: uuid.v4(),
+      text: "Ciao certo capo" + uuid.v4(),
+      createdAt: new Date(2019, 1, 4, 11, 30),
+      user: {
+        _id: myID
+      },
+      isRead: true
+    },
+    {
+      _id: uuid.v4(),
+      text: "Ciao certo capo" + uuid.v4(),
+      createdAt: new Date(2019, 1, 4, 10, 30),
+      user: {
+        _id: myID
+      },
+      isRead: true
+    },
+    {
+      _id: uuid.v4(),
+      text: "Ciao certo capo" + uuid.v4(),
+      createdAt: new Date(2019, 1, 4, 9, 30),
+      user: {
+        _id: myID
+      },
+      isRead: true
+    },
+    {
+      _id: uuid.v4(),
+      text: "Ciao certo capo" + uuid.v4(),
+      createdAt: new Date(2019, 1, 4, 11, 30),
+      user: {
+        _id: myID
+      },
+      isRead: true
+    },
+    {
+      _id: uuid.v4(),
+      text: "Ciao certo capo" + uuid.v4(),
+      createdAt: new Date(2019, 1, 4, 10, 30),
+      user: {
+        _id: myID
+      },
+      isRead: true
+    },
+    {
+      _id: uuid.v4(),
+      text: "Ciao certo capo" + uuid.v4(),
+      createdAt: new Date(2019, 1, 4, 9, 30),
+      user: {
+        _id: myID
+      },
+      isRead: true
+    }
+  ];
+};
+
+export default {
+  sellerChatList,
+  buyerChatList
+};
+
+export const mockContactItem = {
+  _id: uuid.v4(),
+  book: {
+    title: "Casdas Carrarar",
+    authors: "Massimo AAAA",
+    subject: {
+      _id: uuid.v4(),
+      title: "Italiano"
+    }
+  },
+  price: 5,
+  conditions: 0,
+  seller: {
+    user: {
+      _id: subject2Chat1UserToID,
+      username: "CapoCapo"
+    }
   }
 };

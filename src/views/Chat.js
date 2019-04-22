@@ -101,9 +101,32 @@ export class Chat extends Component {
     }
   };
 
+  getGlobalLoading = () => {
+    if (this.type === sale) {
+      return this.props.salesLoading;
+    } else {
+      return this.props.shoppingLoading;
+    }
+  };
+
+  loadEarlier = () => {
+    if (this.type === sale) {
+      return this.props.salesLoadEarlier(
+        this.state.objectID,
+        this.state.chatID
+      );
+    } else {
+      return this.props.shoppingLoadEarlier(
+        this.state.objectID,
+        this.state.chatID
+      );
+    }
+  };
+
   render() {
     const { objectID, chatID } = this.state;
     const chatData = this.getChatData();
+    console.log(this.getGlobalLoading());
 
     return (
       <View style={{ flex: 1 }}>
@@ -130,10 +153,12 @@ export class Chat extends Component {
               objectID={objectID}
               chatID={chatID}
               data={chatData}
+              globalLoading={this.getGlobalLoading()}
               salesSend={this.sendMsg}
               salesSetComposer={this.setComposer}
               salesRead={this.readChat}
               type={this.type}
+              loadEarlier={this.loadEarlier}
             />
           )}
         </View>
@@ -148,7 +173,9 @@ export class Chat extends Component {
 
 const mapStateToProps = state => ({
   salesData: state.sales.data,
-  shoppingData: state.shopping.data
+  shoppingData: state.shopping.data,
+  salesLoading: state.sales.loading,
+  shoppingLoading: state.shopping.loading
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -172,7 +199,11 @@ const mapDispatchToProps = dispatch => ({
     dispatch(shoppingActions.shoppingRequestContact(subjectID, chatID)),
   shoppingSetChatFocus: chatID =>
     dispatch(shoppingActions.shoppingSetChatFocus(chatID)),
-  salesSetChatFocus: chatID => dispatch(salesActions.salesSetChatFocus(chatID))
+  salesSetChatFocus: chatID => dispatch(salesActions.salesSetChatFocus(chatID)),
+  shoppingLoadEarlier: (subjectID, chatID) =>
+    dispatch(shoppingActions.shoppingLoadEarlier(subjectID, chatID)),
+  salesLoadEarlier: (itemID, chatID) =>
+    dispatch(salesActions.salesLoadEarlier(itemID, chatID))
 });
 
 export default connect(

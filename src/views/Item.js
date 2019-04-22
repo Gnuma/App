@@ -10,10 +10,11 @@ import colors from "../styles/colors";
 import NavigatorService from "../navigator/NavigationService";
 import axios from "axios";
 import { ___GET_AD___ } from "../store/constants";
-import * as msgActions from "../store/actions/messaging";
+import * as shoppingActions from "../store/actions/shopping";
 import { notificationsViewItem } from "../store/actions/notifications";
 import protectedAction from "../utils/protectedAction";
 import NavigationService from "../navigator/NavigationService";
+import { mockContactItem } from "../mockData/Chat2";
 
 export class Item extends Component {
   state = {
@@ -48,6 +49,7 @@ export class Item extends Component {
         this.setState({
           data: this.formatData(res.data)
         });
+        console.log(this.formatData(res.data));
       })
       .catch(err => {
         console.log("ERROR", err);
@@ -152,10 +154,11 @@ export class Item extends Component {
         this.state.data.seller.user.username
       )
     );*/
-    protectedAction().then(() => {
+    /* protectedAction().then(() => {
       this.props.contactRedux();
-      NavigationService.navigate("CHAT");
-    });
+    });*/
+
+    this.props.contactRedux(mockContactItem);
   };
 
   _goToComment = () => {
@@ -172,8 +175,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    contactRedux: (itemID, toID, toUsername) =>
-      dispatch(msgActions.contact(itemID, toID, toUsername)),
+    contactRedux: item => dispatch(shoppingActions.shoppingContact(item)),
     notificationViewItemRedux: itemPK => dispatch(notificationsViewItem(itemPK))
   };
 };

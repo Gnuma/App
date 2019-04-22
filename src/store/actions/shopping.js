@@ -1,6 +1,10 @@
 import * as actionTypes from "./actionTypes";
 import uuid from "uuid";
 import NetInfo from "@react-native-community/netinfo";
+import { AppState } from "react-native";
+import { buyerChatList, loadMockNew } from "../../mockData/Chat2";
+import NavigationService from "../../navigator/NavigationService";
+import protectedAction from "../../utils/protectedAction";
 
 const init = data => ({
   type: actionTypes.SHOPPING_INIT,
@@ -15,6 +19,10 @@ export const shoppingStartAction = (subjectID, chatID) => ({
     subjectID,
     chatID
   }
+});
+
+export const shoppingStartGlobalAction = () => ({
+  type: actionTypes.SHOPPING_START_GLOBAL_ACTION
 });
 
 export const shoppingFail = error => ({
@@ -98,10 +106,39 @@ export const shoppingSetChatFocus = chatID => {
   };
 };
 
-connectionSubscription = null;
+export const shoppingRetrieveData = data => {
+  return {
+    type: actionTypes.SHOPPING_RETRIEVE_DATA,
+    payload: {
+      data
+    }
+  };
+};
+
+export const shoppingLoadEarlierData = (subjectID, chatID, data) => ({
+  type: actionTypes.SHOPPING_LOAD_EARLIER,
+  payload: {
+    subjectID,
+    chatID,
+    data
+  }
+});
+
+export const shoppingContactUser = (item, chatID) => ({
+  type: actionTypes.SHOPPING_CONTACT_USER,
+  payload: {
+    item,
+    chatID
+  }
+});
+
+shoppingConnectionSubscription = null;
+shoppingStateSubscription = null;
+shoppingLastAppState = null;
 export const shoppingInit = data => {
   return dispatch => {
-    connectionSubscription = NetInfo.isConnected.addEventListener(
+    //Connection Listener
+    shoppingConnectionSubscription = NetInfo.isConnected.addEventListener(
       "connectionChange",
       isConnected => {
         if (isConnected) {
@@ -109,6 +146,17 @@ export const shoppingInit = data => {
         }
       }
     );
+    //AppState Listener
+    shoppingStateSubscription = AppState.addEventListener(
+      "change",
+      appState => {
+        if (appState == "active" && shoppingLastAppState == "background") {
+          dispatch(shoppingRetrieve());
+        }
+        shoppingLastAppState = appState;
+      }
+    );
+
     dispatch(init(data));
   };
 };
@@ -165,7 +213,7 @@ export const shoppingRead = (subjectID, chatID) => {
   };
 };
 
-export const shoppingRequestContact = (subjectID, chatID) => {
+export const shoppingRequestContact = (subjectID, chatID, itemID) => {
   return dispatch => {
     dispatch(shoppingStartAction(subjectID, chatID));
     //API
@@ -214,5 +262,45 @@ export const onNewShoppingMsg = (subjectID, chatID, msg) => {
     if (getState().shopping.chatFocus === chatID) {
       //Send API for read
     }
+  };
+};
+
+export const shoppingRetrieve = () => {
+  return dispatch => {
+    dispatch(shoppingStartGlobalAction());
+    //API
+    setTimeout(() => {
+      dispatch(shoppingRetrieveData(buyerChatList));
+    }, 2000);
+  };
+};
+
+export const shoppingLoadEarlier = (subjectID, chatID) => {
+  return dispatch => {
+    dispatch(shoppingStartAction(subjectID, chatID));
+    //API
+    setTimeout(() => {
+      dispatch(shoppingLoadEarlierData(subjectID, chatID, loadMockNew()));
+    }, 2000);
+  };
+};
+
+export const shoppingContact = item => {
+  return dispatch => {
+    const chatID = uuid.v4();
+    /*protectedAction()
+      .then(() => {
+        dispatch(shoppingContactUser(item, chatID));
+        NavigationService.navigate("ShoppingChat", {
+          chatID,
+          subjectID: item.book.subject._id
+        });
+      })
+      .catch(() => null);*/
+    dispatch(shoppingContactUser(item, chatID));
+    /*NavigationService.navigate("ShoppingChat", {
+      chatID,
+      subjectID: item.book.subject._id
+    });*/
   };
 };

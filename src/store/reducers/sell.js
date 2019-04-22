@@ -152,6 +152,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SELL_SET_DESCRIPTION:
       return setDescription(state, action);
 
+      
     default:
       return state;
   }

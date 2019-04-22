@@ -6,44 +6,20 @@ import {
   getChatIndex,
   highlightItem
 } from "../../utils/chatUtility";
+import { shoppingLoadMockNew, sellerChatList } from "../../mockData/Chat2";
 
 const initialState = {
   data: null,
   orderedData: null,
   error: null,
   focus: null,
-  chatFocus: null
+  chatFocus: null,
+  loading: false
 };
 
 const shoppingInit = (state, action) => {
   const data = action.payload.data;
-  let orderedData = [];
-  for (subjectKey in data) {
-    let lastMsg = new Date(0, 0, 0);
-    const subject = data[subjectKey].chats;
-    let orderedChats = [];
-    for (chatKey in subject) {
-      orderedChats.push(chatKey); //TO-DO
-      const chat = subject[chatKey];
-      lastMsg =
-        chat.messages[0] && chat.messages[0].createdAt > lastMsg
-          ? chat.messages[0].createdAt
-          : lastMsg;
-      data[subjectKey].chats[chatKey] = {
-        ...data[subjectKey].chats[chatKey],
-        composer: "",
-        loading: false
-      };
-    }
-    orderedData.push({ subjectID: subjectKey, chats: orderedChats }); //TO-DO
-    data[subjectKey] = { ...data[subjectKey], lastMsg };
-  }
-
-  return updateObject(state, {
-    data,
-    orderedData,
-    focus: 0
-  });
+  return updateObject(state, formatData(data));
 };
 
 const shoppingStartAction = (state, action) => {
@@ -58,6 +34,12 @@ const shoppingStartAction = (state, action) => {
         }
       }
     }
+  });
+};
+
+const shoppingStartGlobalAction = (state, action) => {
+  return updateObject(state, {
+    loading: true
   });
 };
 
@@ -221,6 +203,73 @@ const shoppingSetChatFocus = (state, action) => {
   });
 };
 
+const shoppingRetrieveData = (state, action) => {
+  const { data } = action.payload;
+  return updateObject(state, formatData(data, state.focus));
+};
+
+const shoppingLoadEarlier = (state, action) => {
+  const { subjectID, chatID, data } = action.payload;
+  return update(state, {
+    data: {
+      [subjectID]: {
+        chats: {
+          [chatID]: {
+            messages: { $push: data },
+            loading: { $set: false }
+          }
+        }
+      }
+    }
+  });
+};
+
+const shoppingContactUser = (state, action) => {
+  const { item, chatID } = action.payload;
+  const subjectID = item.book.subject._id;
+  const chat = {
+    _id: chatID,
+    item: item,
+    UserTO: item.seller.user,
+    hasNews: false,
+    status: "local",
+    messages: []
+  };
+  const subject = {
+    _id: subjectID,
+    title: "AOOOOOOOO",
+    newsCount: 0,
+    chats: {}
+  };
+  const existingSubject = getSubjectIndex(subjectID, state);
+
+  return update(state, {
+    data: {
+      [subjectID]: subjectID =>
+        update(subjectID || subject, {
+          chats: { [chatID]: { $set: chat } }
+        })
+    },
+    orderedData:
+      existingSubject === -1
+        ? {
+            $push: [
+              {
+                subjectID: subjectID,
+                chats: [chatID]
+              }
+            ]
+          }
+        : {
+            [existingSubject]: {
+              chats: {
+                $push: [chatID]
+              }
+            }
+          }
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SHOPPING_INIT:
@@ -256,9 +305,52 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SHOPPING_SET_CHAT_FOCUS:
       return shoppingSetChatFocus(state, action);
 
+    case actionTypes.SHOPPING_RETRIEVE_DATA:
+      return shoppingRetrieveData(state, action);
+
+    case actionTypes.SHOPPING_START_GLOBAL_ACTION:
+      return shoppingStartGlobalAction(state, action);
+
+    case actionTypes.SHOPPING_LOAD_EARLIER:
+      return shoppingLoadEarlier(state, action);
+
+    case actionTypes.SHOPPING_CONTACT_USER:
+      return shoppingContactUser(state, action);
+
     default:
       return state;
   }
 };
 
 export default reducer;
+
+const formatData = (data, focus = 0) => {
+  let orderedData = [];
+  for (subjectKey in data) {
+    let lastMsg = new Date(0, 0, 0);
+    const subject = data[subjectKey].chats;
+    let orderedChats = [];
+    for (chatKey in subject) {
+      orderedChats.push(chatKey); //TO-DO
+      const chat = subject[chatKey];
+      lastMsg =
+        chat.messages[0] && chat.messages[0].createdAt > lastMsg
+          ? chat.messages[0].createdAt
+          : lastMsg;
+      data[subjectKey].chats[chatKey] = {
+        ...data[subjectKey].chats[chatKey],
+        composer: "",
+        loading: false
+      };
+    }
+    orderedData.push({ subjectID: subjectKey, chats: orderedChats }); //TO-DO
+    data[subjectKey] = { ...data[subjectKey], lastMsg };
+  }
+
+  return {
+    data,
+    orderedData,
+    focus,
+    loading: false
+  };
+};
