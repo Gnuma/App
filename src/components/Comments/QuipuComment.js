@@ -96,7 +96,7 @@ class QuipuComment extends Component {
   };
 
   _onAnswer = pk => {
-    //console.log(this.commentsPosition);
+    console.log("Position", this.commentsPosition, pk);
     if (this.commentsPosition[pk]) {
       this.setState({
         answeringComment: pk,

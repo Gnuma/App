@@ -10,9 +10,11 @@ import QuipuComment from "../Comments/QuipuComment";
 export class MainItem extends Component {
   componentDidMount() {
     //console.log(this.props.goToComment());
-    if (this.props.goToComment && this.props.goToComment()) {
+    const { commentIDList } = this.props;
+
+    if (commentIDList && commentIDList.length > 0) {
       InteractionManager.runAfterInteractions(() => {
-        this.comments._onAnswer(this.props.goToComment());
+        for (i in commentIDList) this.comments._onAnswer(commentIDList[i]);
       });
     }
   }

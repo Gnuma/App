@@ -21,6 +21,7 @@ export class Item extends Component {
     data: undefined,
     bookName: this.props.navigation.getParam("name", "Undesfineds"),
     bookAuthors: this.props.navigation.getParam("authors", "Undesfineds"),
+    commentIDList: this.props.navigation.getParam("commentIDList", null),
     keyboardOpen: false
   };
 
@@ -43,7 +44,7 @@ export class Item extends Component {
     const { navigation } = this.props;
     const id = navigation.getParam("itemID", "Undesfineds");
 
-    axios
+    /*axios
       .get(___GET_AD___ + `${id}/`)
       .then(res => {
         this.setState({
@@ -54,13 +55,14 @@ export class Item extends Component {
       .catch(err => {
         console.log("ERROR", err);
       });
-
-    //this.setState({
-    //  data: itemData
-    //});
+*/
+    this.setState({
+      data: this.formatData(itemData)
+    });
 
     //To be put in then
     this.props.notificationViewItemRedux(id);
+    console.log(this.state.commentIDList);
   }
 
   formatData = data => {
@@ -69,7 +71,6 @@ export class Item extends Component {
     for (let i = 0; i < comments.length; i++) {
       formattedComments.push(this.formatComment(comments[i]));
     }
-
     return {
       ...data,
       comment_ad: formattedComments
@@ -109,7 +110,7 @@ export class Item extends Component {
   setKeyboardOpen = value => () => this.setState({ keyboardOpen: value });
 
   render() {
-    const { data, bookName, bookAuthors } = this.state;
+    const { data, bookName, bookAuthors, commentIDList } = this.state;
     const { navigation } = this.props;
     const isLoading = data === undefined;
 
@@ -128,7 +129,7 @@ export class Item extends Component {
           <View style={{ flex: 1 }}>
             <MainItem
               data={data}
-              goToComment={this._goToComment}
+              commentIDList={commentIDList}
               user={this.props.user}
             />
             {!this.state.keyboardOpen ? (
@@ -159,10 +160,6 @@ export class Item extends Component {
     });*/
 
     this.props.contactRedux(mockContactItem);
-  };
-
-  _goToComment = () => {
-    return this.props.navigation.getParam("goToComment", null);
   };
 }
 

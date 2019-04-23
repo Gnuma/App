@@ -197,7 +197,10 @@ export const commentList = {
       title: "Matematica Verde 3",
       authors: "tu ca ri to ta"
     },
-    data: [{ pk: item1comment1ID, answers: [{ pk: uuid.v4() }] }]
+    data: [
+      { pk: 1, answers: [{ pk: uuid.v4() }] },
+      { pk: 4, answers: [{ pk: uuid.v4() }] }
+    ]
   },
   [item2ID]: {
     pk: item2ID,
@@ -206,9 +209,6 @@ export const commentList = {
       title: "Non matematica ajflksjgkljdflgjdfklgjldkfgjkldfjglkjdfkljgkldfg",
       authors: "tu ca ri to ta"
     },
-    data: [
-      { pk: item2comment1ID, answers: [] },
-      { pk: item2comment2ID, answer: [] }
-    ]
+    data: [{ pk: 1, answers: [] }, { pk: 2, answer: [] }]
   }
 };
