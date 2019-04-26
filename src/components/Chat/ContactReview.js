@@ -3,6 +3,7 @@ import { Text, View, ActivityIndicator } from "react-native";
 import colors from "../../styles/colors";
 import { Header3 } from "../Text";
 import SolidButton from "../SolidButton";
+import { ChatType } from "../../utils/constants";
 
 export default class ContactReview extends Component {
   _getBuyerContent = () => {
@@ -103,7 +104,9 @@ export default class ContactReview extends Component {
           marginBottom: 10
         }}
       >
-        {type === "sale" ? this._getSellerContent() : this._getBuyerContent()}
+        {type === ChatType.sales
+          ? this._getSellerContent()
+          : this._getBuyerContent()}
       </View>
     );
   }

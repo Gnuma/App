@@ -69,15 +69,7 @@ export class SingleChat extends Component {
 
 const mapStateToProps = (state, props) => {
   const navProps = props.navigation.getParam("data", "null");
-  return {
-    userID: state.auth.id,
-    userUsername: state.auth.username,
-    messages: state.messaging.messages[navProps.id],
-    status:
-      state.messaging[
-        navProps.userType === "buyer" ? "buyerChats" : "sellerChats"
-      ][navProps.id].status
-  };
+  return {};
 };
 
 const mapDispatchToProps = {};

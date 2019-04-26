@@ -106,6 +106,7 @@ export const newCommentsMulti = [
 
 export const comment = {
   type: "newComment",
+  for: "sales",
   comment: {
     pk: 1,
     item: {
@@ -119,7 +120,10 @@ export const comment = {
         level: "Free",
         adsCreated: 0
       },
-      book: null,
+      book: {
+        title: "Marte è bella",
+        authors: "tu ca ri to ta"
+      },
       image_ad: []
     },
     user: {

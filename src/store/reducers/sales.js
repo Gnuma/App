@@ -6,6 +6,7 @@ import {
   getChatIndex,
   highlightItem
 } from "../../utils/chatUtility";
+import { newChat } from "../../mockData/Chat2";
 
 const initialState = {
   data: null,
@@ -205,8 +206,25 @@ const salesSetChatFocus = (state, action) => {
 };
 
 const salesRetrieveData = (state, action) => {
-  const { data } = action.payload;
-  return updateObject(state, formatData(data, state.focus));
+  let { data } = action.payload;
+
+  const { orderedData: newOrder, ...retrievedData } = formatData(
+    data,
+    state.focus
+  );
+  const oldOrder = state.orderedData;
+  let orderedData = [];
+
+  for (let i = 0; i < oldOrder.length; i++) {
+    for (let f = 0; f < newOrder.length; f++) {
+      if (newOrder[f].itemID === oldOrder[i].itemID) {
+        orderedData.push(newOrder.splice(f, 1)[0]);
+        break;
+      }
+    }
+  }
+  newOrder.forEach(object => orderedData.push(object));
+  return updateObject(state, { orderedData, ...retrievedData });
 };
 
 const salesLoadEarlier = (state, action) => {
@@ -223,6 +241,60 @@ const salesLoadEarlier = (state, action) => {
       }
     }
   });
+};
+
+const salesNewChat = (state, action) => {
+  const { itemID, chatID, data } = action.payload;
+  const { pk, ...restItem } = data.item;
+  const item = {
+    _id: pk,
+    ...restItem,
+    chats: {
+      [chatID]: {
+        _id: chatID,
+        UserTO: {
+          _id: data.buyer.pk,
+          username: data.buyer.user.username
+        },
+        hasNews: true,
+        status: "pending",
+        messages: [],
+        loading: false,
+        composer: ""
+      }
+    },
+    newsCount: 1
+  };
+  const itemIndex = getItemIndex(itemID, state);
+
+  if (itemIndex != -1) {
+    return update(state, {
+      data: {
+        [itemID]: {
+          newsCount: { $apply: oldCount => oldCount + 1 },
+          chats: {
+            [chatID]: {
+              $set: item.chats[chatID]
+            }
+          }
+        }
+      },
+      orderedData: {
+        [itemIndex]: {
+          chats: { $unshift: [chatID] }
+        }
+      }
+    });
+  } else {
+    return update(state, {
+      data: {
+        [itemID]: { $set: item }
+      },
+      orderedData: {
+        $push: [{ itemID, chats: [chatID] }]
+      }
+    });
+  }
 };
 
 const reducer = (state = initialState, action) => {
@@ -269,6 +341,9 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SALES_LOAD_EARLIER:
       return salesLoadEarlier(state, action);
 
+    case actionTypes.SALES_NEW_CHAT:
+      return salesNewChat(state, action);
+
     default:
       return state;
   }
@@ -276,6 +351,7 @@ const reducer = (state = initialState, action) => {
 
 export default reducer;
 
+/*
 const formatData = (data, focus = 0) => {
   let orderedData = [];
   for (itemKey in data) {
@@ -298,6 +374,48 @@ const formatData = (data, focus = 0) => {
     }
     orderedData.push({ itemID: itemKey, chats: orderedChats }); //TO-DO
     data[itemKey] = { ...data[itemKey], lastMsg };
+  }
+
+  return {
+    data,
+    orderedData,
+    focus,
+    loading: false
+  };
+};
+*/
+
+const formatData = (arrayData, focus = 0) => {
+  let orderedData = [];
+  let data = {};
+  for (let i = 0; i < arrayData.length; i++) {
+    const { chats, _id: itemID, ...restItem } = arrayData[i];
+    let lastMsg = new Date(0, 0, 0);
+
+    data[itemID] = {
+      _id: itemID,
+      ...restItem,
+      chats: {}
+    };
+    let orderedChats = [];
+    for (let f = 0; f < chats.length; f++) {
+      const chat = chats[f];
+      orderedChats.push(chat._id);
+      lastMsg =
+        chat.messages[0] && chat.messages[0].createdAt > lastMsg
+          ? chat.messages[0].createdAt
+          : lastMsg;
+      data[itemID].chats[chat._id] = {
+        ...chat,
+        composer: "",
+        loading: false
+      };
+    }
+    orderedData.push({ itemID, chats: orderedChats });
+    data[itemID] = {
+      ...data[itemID],
+      lastMsg
+    };
   }
 
   return {

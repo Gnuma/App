@@ -10,10 +10,11 @@ export const init = data => ({
   }
 });
 
-export const commentsReceiveComment = comment => ({
+export const commentsReceiveComment = (comment, type) => ({
   type: actionTypes.COMMENTS_RECEIVE_COMMENT,
   payload: {
-    comment
+    comment,
+    type
   }
 });
 

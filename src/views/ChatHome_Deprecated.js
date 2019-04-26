@@ -33,10 +33,7 @@ export class ChatHome extends Component {
   };
 }
 
-const mapStateToProps = state => ({
-  sellerChats: state.messaging.sellerChats,
-  buyerChats: state.messaging.buyerChats
-});
+const mapStateToProps = state => ({});
 
 const mapDispatchToProps = {};
 

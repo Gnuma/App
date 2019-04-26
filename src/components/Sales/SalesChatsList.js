@@ -20,7 +20,7 @@ export default class SalesChatsList extends Component {
 
   render() {
     const { data, focus, orderedData } = this.props;
-    //console.log(orderedData);
+    console.log(orderedData[focus].chats);
     return (
       <FlatList
         data={orderedData[focus].chats}

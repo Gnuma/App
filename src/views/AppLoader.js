@@ -3,7 +3,6 @@ import { View } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import * as authActions from "../store/actions/auth";
-import * as msgActions from "../store/actions/messaging";
 import Button from "../components/Button";
 import { Header1 } from "../components/Text";
 

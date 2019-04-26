@@ -18,22 +18,8 @@ const item4Chat1ID = uuid.v4();
 const item4Chat1UserToID = uuid.v4();
 const item5ID = uuid.v4();
 
-export const newSellerMsg = {
-  msg: {
-    _id: uuid.v4(),
-    text: "Nuovo messaggio seller",
-    createdAt: new Date(),
-    user: {
-      _id: item1Chat2UserToID
-    },
-    isRead: false
-  },
-  chatID: item1Chat2ID,
-  itemID: item1ID
-};
-
-export const sellerChatList = {
-  [item1ID]: {
+export const sellerChatList = [
+  {
     _id: item1ID,
     book: {
       title: "Matematica Colore",
@@ -42,8 +28,8 @@ export const sellerChatList = {
     price: 14,
     conditions: 0,
     newsCount: 1,
-    chats: {
-      [item1Chat1ID]: {
+    chats: [
+      {
         _id: item1Chat1ID,
         UserTO: {
           _id: item1Chat1UserToID,
@@ -82,7 +68,7 @@ export const sellerChatList = {
           }
         ]
       },
-      [item1Chat2ID]: {
+      {
         _id: item1Chat2ID,
         UserTO: {
           _id: item1Chat2UserToID,
@@ -121,10 +107,9 @@ export const sellerChatList = {
           }
         ]
       }
-    }
+    ]
   },
-
-  [item2ID]: {
+  {
     _id: item2ID,
     book: {
       title: "Italiano Carrarar",
@@ -133,8 +118,8 @@ export const sellerChatList = {
     price: 20,
     conditions: 1,
     newsCount: 1,
-    chats: {
-      [item2Chat1ID]: {
+    chats: [
+      {
         _id: item2Chat1ID,
         UserTO: {
           _id: item2Chat1UserToID,
@@ -173,10 +158,9 @@ export const sellerChatList = {
           }
         ]
       }
-    }
+    ]
   },
-
-  [item3ID]: {
+  {
     _id: item3ID,
     book: {
       title: "Tre Carrarar",
@@ -185,8 +169,8 @@ export const sellerChatList = {
     price: 10,
     conditions: 1,
     newsCount: 0,
-    chats: {
-      [item3Chat1ID]: {
+    chats: [
+      {
         _id: item3Chat1ID,
         UserTO: {
           _id: item3Chat1UserToID,
@@ -197,9 +181,9 @@ export const sellerChatList = {
         status: "progress",
         messages: []
       }
-    }
+    ]
   },
-  [item4ID]: {
+  {
     _id: item4ID,
     book: {
       title: "Quatt Carrarar",
@@ -208,8 +192,8 @@ export const sellerChatList = {
     price: 12,
     conditions: 1,
     newsCount: 1,
-    chats: {
-      [item4Chat1ID]: {
+    chats: [
+      {
         _id: item4Chat1ID,
         UserTO: {
           _id: item4Chat1UserToID,
@@ -240,9 +224,9 @@ export const sellerChatList = {
           }
         ]
       }
-    }
+    ]
   },
-  [item5ID]: {
+  {
     _id: item5ID,
     book: {
       title: "Casd Carrarar",
@@ -251,9 +235,9 @@ export const sellerChatList = {
     price: 16,
     conditions: 2,
     newsCount: 0,
-    chats: {}
+    chats: []
   }
-};
+];
 
 export const single = {
   _id: item1Chat1ID,
@@ -316,27 +300,13 @@ const subject4Chat1ID = uuid.v4();
 const subject4Chat1UserToID = uuid.v4();
 const subject5ID = uuid.v4();
 
-export const newBuyerMsg = {
-  msg: {
-    _id: uuid.v4(),
-    text: "Nuovo messaggio Buyer",
-    createdAt: new Date(),
-    user: {
-      _id: subject1Chat3UserToID
-    },
-    isRead: false
-  },
-  chatID: subject1Chat3ID,
-  subjectID: subject1ID
-};
-
-export const buyerChatList = {
-  [subject1ID]: {
+export const buyerChatList = [
+  {
     _id: subject1ID,
     title: "Matematica",
     newsCount: 2,
-    chats: {
-      [subject1Chat1ID]: {
+    chats: [
+      {
         _id: subject1Chat1ID,
         item: {
           _id: item5ID,
@@ -385,7 +355,7 @@ export const buyerChatList = {
           }
         ]
       },
-      [subject1Chat2ID]: {
+      {
         _id: subject1Chat2ID,
         item: {
           _id: item5ID,
@@ -434,7 +404,7 @@ export const buyerChatList = {
           }
         ]
       },
-      [subject1Chat3ID]: {
+      {
         _id: subject1Chat3ID,
         item: {
           _id: item5ID,
@@ -474,14 +444,14 @@ export const buyerChatList = {
           }
         ]
       }
-    }
+    ]
   },
-  [subject2ID]: {
+  {
     _id: subject2ID,
     title: "Italiano",
     newsCount: 1,
-    chats: {
-      [subject2Chat1ID]: {
+    chats: [
+      {
         _id: subject2Chat1ID,
         item: {
           _id: item5ID,
@@ -530,14 +500,14 @@ export const buyerChatList = {
           }
         ]
       }
-    }
+    ]
   },
-  [subject3ID]: {
+  {
     _id: subject3ID,
     title: "Inglese",
     newsCount: 0,
-    chats: {
-      [subject3Chat1ID]: {
+    chats: [
+      {
         _id: subject3Chat1ID,
         item: {
           _id: item5ID,
@@ -558,15 +528,15 @@ export const buyerChatList = {
         status: "local",
         messages: []
       }
-    }
+    ]
   },
-  [subject4ID]: {
+  {
     _id: subject4ID,
     title: "Quarta Materia",
     newsCount: 0,
-    chats: {}
+    chats: []
   }
-};
+];
 
 export const loadMockNew = () => {
   return [
@@ -651,3 +621,349 @@ export const mockContactItem = {
     }
   }
 };
+
+export const newSellerMsg = {
+  type: "newMessage",
+  for: "sales",
+  msg: {
+    msg: {
+      _id: uuid.v4(),
+      text: "Nuovo messaggio seller",
+      createdAt: new Date(),
+      user: {
+        _id: item1Chat2UserToID
+      },
+      isRead: false
+    },
+    chatID: item1Chat2ID,
+    itemID: item1ID
+  }
+};
+
+export const newBuyerMsg = {
+  type: "newMessage",
+  for: "shopping",
+  msg: {
+    msg: {
+      _id: uuid.v4(),
+      text: "Nuovo messaggio Buyer",
+      createdAt: new Date(),
+      user: {
+        _id: subject1Chat3UserToID
+      },
+      isRead: false
+    },
+    chatID: subject1Chat3ID,
+    subjectID: subject1ID
+  }
+};
+
+export const newChat = {
+  type: "newChat",
+  chat: {
+    pk: uuid.v4(),
+    item: {
+      _id: item1ID,
+      seller: {
+        user: {
+          _id: myID,
+          username: "seller"
+        },
+        classM: null,
+        level: "Free",
+        adsCreated: 0
+      },
+      book: {
+        title: "Roba Nuova",
+        authors: "Massimo Massimi"
+      },
+      price: 14,
+      conditions: 0,
+      image_ad: []
+    },
+    buyer: {
+      pk: 2,
+      user: {
+        username: "buyer"
+      }
+    },
+    created: "2019-04-19T21:59:33.021565Z"
+  }
+};
+
+export const newChat2 = {
+  type: "newChat",
+  chat: {
+    pk: uuid.v4(),
+    item: {
+      _id: uuid.v4(),
+      seller: {
+        user: {
+          _id: myID,
+          username: "seller"
+        },
+        classM: null,
+        level: "Free",
+        adsCreated: 0
+      },
+      book: {
+        title: "Roba Nuova",
+        authors: "Massimo Massimi"
+      },
+      price: 14,
+      conditions: 0,
+      image_ad: []
+    },
+    buyer: {
+      pk: 2,
+      user: {
+        username: "buyer"
+      }
+    },
+    created: "2019-04-19T21:59:33.021565Z"
+  }
+};
+
+export const buyerChatList2 = [
+  {
+    _id: subject2ID,
+    title: "Italiano",
+    newsCount: 1,
+    chats: [
+      {
+        _id: subject2Chat1ID,
+        item: {
+          _id: item5ID,
+          book: {
+            title: "Casd Carrarar",
+            authors: "Massimo AAAA"
+          },
+          price: 16,
+          conditions: 2,
+          newsCount: 0
+        },
+        UserTO: {
+          _id: subject2Chat1UserToID,
+          username: "CapoCapo",
+          lastVisit: new Date(2019, 2, 4, 12, 0)
+        },
+        hasNews: true,
+        status: "progress",
+        messages: [
+          {
+            _id: uuid.v4(),
+            text: "Io no",
+            createdAt: new Date(2019, 2, 4, 12, 30),
+            user: {
+              _id: subject2Chat1UserToID
+            },
+            isRead: false
+          },
+          {
+            _id: uuid.v4(),
+            text: "Ero interessato",
+            createdAt: new Date(2019, 2, 4, 10, 30),
+            user: {
+              _id: myID
+            },
+            isRead: true
+          },
+          {
+            _id: uuid.v4(),
+            text: "Al tuo libro",
+            createdAt: new Date(2019, 2, 4, 9, 30),
+            user: {
+              _id: myID
+            },
+            isRead: true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    _id: subject1ID,
+    title: "Matematica",
+    newsCount: 2,
+    chats: [
+      {
+        _id: subject1Chat2ID,
+        item: {
+          _id: item5ID,
+          book: {
+            title: "Casd Carrarar",
+            authors: "Massimo AAAA"
+          },
+          price: 16,
+          conditions: 2,
+          newsCount: 0
+        },
+        UserTO: {
+          _id: subject1Chat2UserToID,
+          username: "Tristino",
+          lastVisit: new Date(2019, 2, 4, 12, 0)
+        },
+        hasNews: true,
+        status: "progress",
+        messages: [
+          {
+            _id: uuid.v4(),
+            text: "Ciao certo capo! ARARFHNASDFHHFUHSdf",
+            createdAt: new Date(2019, 2, 4, 11, 30),
+            user: {
+              _id: subject1Chat2UserToID
+            },
+            isRead: false
+          },
+          {
+            _id: uuid.v4(),
+            text: "Ero interessato al tuo libro",
+            createdAt: new Date(2019, 2, 4, 10, 30),
+            user: {
+              _id: myID
+            },
+            isRead: true
+          },
+          {
+            _id: uuid.v4(),
+            text: "Ciao capo!",
+            createdAt: new Date(2019, 2, 4, 9, 30),
+            user: {
+              _id: myID
+            },
+            isRead: true
+          }
+        ]
+      },
+      {
+        _id: subject1Chat1ID,
+        item: {
+          _id: item5ID,
+          book: {
+            title: "Casd Carrarar",
+            authors: "Massimo AAAA"
+          },
+          price: 16,
+          conditions: 2,
+          newsCount: 0
+        },
+        UserTO: {
+          _id: subject1Chat1UserToID,
+          username: "Geronimo",
+          lastVisit: new Date(2019, 2, 4, 12, 0)
+        },
+        hasNews: true,
+        status: "progress",
+        messages: [
+          {
+            _id: uuid.v4(),
+            text: "Ciao certo capo!",
+            createdAt: new Date(2019, 2, 4, 11, 30),
+            user: {
+              _id: subject1Chat1UserToID
+            },
+            isRead: false
+          },
+          {
+            _id: uuid.v4(),
+            text: "Ero interessato al tuo libro",
+            createdAt: new Date(2019, 2, 4, 10, 30),
+            user: {
+              _id: myID
+            },
+            isRead: true
+          },
+          {
+            _id: uuid.v4(),
+            text: "Ciao capo!",
+            createdAt: new Date(2019, 2, 4, 9, 30),
+            user: {
+              _id: myID
+            },
+            isRead: true
+          }
+        ]
+      },
+      {
+        _id: subject1Chat3ID,
+        item: {
+          _id: item5ID,
+          book: {
+            title: "Casd Carrarar",
+            authors: "Massimo AAAA"
+          },
+          price: 16,
+          conditions: 2,
+          newsCount: 0
+        },
+        UserTO: {
+          _id: subject1Chat3UserToID,
+          username: "NonRispondo",
+          lastVisit: new Date(2019, 2, 4, 12, 0)
+        },
+        hasNews: false,
+        status: "progress",
+        messages: [
+          {
+            _id: uuid.v4(),
+            text: "Ero interessato al tuo libro",
+            createdAt: new Date(2019, 2, 4, 10, 30),
+            user: {
+              _id: myID
+            },
+            isRead: true
+          },
+          {
+            _id: uuid.v4(),
+            text: "Ciao capo!",
+            createdAt: new Date(2019, 2, 4, 9, 30),
+            user: {
+              _id: myID
+            },
+            isRead: true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    _id: subject3ID,
+    title: "Inglese",
+    newsCount: 0,
+    chats: [
+      {
+        _id: subject3Chat1ID,
+        item: {
+          _id: item5ID,
+          book: {
+            title: "Casd Carrarar",
+            authors: "Massimo AAAA"
+          },
+          price: 16,
+          conditions: 2,
+          newsCount: 0
+        },
+        UserTO: {
+          _id: subject3Chat1UserToID,
+          username: "CapoCapo",
+          lastVisit: new Date(2019, 2, 4, 12, 0)
+        },
+        hasNews: false,
+        status: "local",
+        messages: []
+      }
+    ]
+  },
+  {
+    _id: subject4ID,
+    title: "Quarta Materia",
+    newsCount: 0,
+    chats: []
+  },
+  {
+    _id: subject5ID,
+    title: "Capirte",
+    newsCount: 0,
+    chats: []
+  }
+];

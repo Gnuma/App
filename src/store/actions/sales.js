@@ -5,7 +5,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { AppState } from "react-native";
 import { sellerChatList, loadMockNew } from "../../mockData/Chat2";
 
-const init = data => {
+export const salesInit = data => {
   return {
     type: actionTypes.SALES_INIT,
     payload: {
@@ -139,40 +139,14 @@ export const salesLoadEarlierData = (itemID, chatID, data) => ({
   }
 });
 
-salesConnectionSubscription = null;
-salesStateSubscription = null;
-salesLastAppState = null;
-export const salesInit = data => {
-  return dispatch => {
-    //Connection Listener
-    salesConnectionSubscription = NetInfo.isConnected.addEventListener(
-      "connectionChange",
-      isConnected => {
-        if (isConnected) {
-          dispatch(salesConnectionRestablished());
-        }
-      }
-    );
-    /*
-    ws.init();
-    ws.onMessage(msg => {
-      console.log(msg.data);
-    });
-    */
-    //AppState Listener
-    salesConnectionSubscription = AppState.addEventListener(
-      "change",
-      appState => {
-        if (appState == "active" && salesLastAppState == "background") {
-          dispatch(salesRetrieve());
-        }
-        salesLastAppState = appState;
-      }
-    );
-
-    dispatch(init(data));
-  };
-};
+export const salesNewChat = (itemID, chatID, data) => ({
+  type: actionTypes.SALES_NEW_CHAT,
+  payload: {
+    itemID,
+    chatID,
+    data
+  }
+});
 
 export const salesSend = (itemID, chatID) => {
   return (dispatch, getState) => {
@@ -252,25 +226,18 @@ const salesConnectionRestablished = () => {
   };
 };
 
-const salesRetrySend = () => {
+const salesRetrySend = ({ itemID, chatID, msg }) => {
   return dispatch => {
-    if (saleQueue.length === 0) {
-      isSaleResending = false;
-    } else {
-      const { itemID, chatID, msg } = saleQueue[0];
-      //API
-      setTimeout(() => {
-        dispatch(
-          salesConfirmMsg(itemID, chatID, msg._id, {
-            //Just for testing | replace with API results
-            isSending: false,
-            _id: uuid.v4()
-          })
-        );
-        saleQueue.splice(0, 1);
-        dispatch(salesRetrySend());
-      }, 1000);
-    }
+    //API
+    setTimeout(() => {
+      dispatch(
+        salesConfirmMsg(itemID, chatID, msg._id, {
+          //Just for testing | replace with API results
+          isSending: false,
+          _id: uuid.v4()
+        })
+      );
+    }, 1000);
   };
 };
 
@@ -299,6 +266,21 @@ export const salesLoadEarlier = (itemID, chatID) => {
     //API
     setTimeout(() => {
       dispatch(salesLoadEarlierData(itemID, chatID, loadMockNew()));
+    }, 2000);
+  };
+};
+
+export const salesRestart = data => {
+  return dispatch => {
+    while (saleQueue.length !== 0) {
+      const item = saleQueue.shift();
+      dispatch(salesRetrySend(item));
+    }
+
+    dispatch(salesStartGlobalAction());
+
+    setTimeout(() => {
+      dispatch(salesRetrieveData(data));
     }, 2000);
   };
 };

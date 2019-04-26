@@ -11,6 +11,7 @@ import memoize from "memoize-one";
 import SolidButton from "../SolidButton";
 import Button from "../Button";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { ChatType } from "../../utils/constants";
 
 export default class NotificationCenter extends Component {
   state = {
@@ -32,7 +33,7 @@ export default class NotificationCenter extends Component {
   _renderItem = ({ item, index }) => {
     const data = this.props.data[item];
     const number = data.data.length == 0 ? "a " : "e ";
-    const type = (data.type === "sales" ? "domand" : "rispost") + number;
+    const type = (data.type === ChatType.sales ? "domand" : "rispost") + number;
     let commentIDs = [];
     data.data.forEach(comment => commentIDs.push(comment.pk));
 

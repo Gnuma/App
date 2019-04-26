@@ -1,12 +1,9 @@
 import * as actionTypes from "./actionTypes";
 import uuid from "uuid";
 import NetInfo from "@react-native-community/netinfo";
-import { AppState } from "react-native";
 import { buyerChatList, loadMockNew } from "../../mockData/Chat2";
-import NavigationService from "../../navigator/NavigationService";
-import protectedAction from "../../utils/protectedAction";
 
-const init = data => ({
+export const shoppingInit = data => ({
   type: actionTypes.SHOPPING_INIT,
   payload: {
     data
@@ -132,35 +129,6 @@ export const shoppingContactUser = (item, chatID) => ({
   }
 });
 
-shoppingConnectionSubscription = null;
-shoppingStateSubscription = null;
-shoppingLastAppState = null;
-export const shoppingInit = data => {
-  return dispatch => {
-    //Connection Listener
-    shoppingConnectionSubscription = NetInfo.isConnected.addEventListener(
-      "connectionChange",
-      isConnected => {
-        if (isConnected) {
-          dispatch(shoppingConnectionRestablished());
-        }
-      }
-    );
-    //AppState Listener
-    shoppingStateSubscription = AppState.addEventListener(
-      "change",
-      appState => {
-        if (appState == "active" && shoppingLastAppState == "background") {
-          dispatch(shoppingRetrieve());
-        }
-        shoppingLastAppState = appState;
-      }
-    );
-
-    dispatch(init(data));
-  };
-};
-
 export const shoppingSend = (subjectID, chatID) => {
   return (dispatch, getState) => {
     const myID = 1; //TESTING
@@ -234,25 +202,20 @@ const shoppingConnectionRestablished = () => {
   };
 };
 
-const shoppingRetrySend = () => {
+const shoppingRetrySend = ({ subjectID, chatID, msg }) => {
   return dispatch => {
-    if (shoppingQueue.length === 0) {
-      isShoppingResending = false;
-    } else {
-      const { subjectID, chatID, msg } = shoppingQueue[0];
-      //API
-      setTimeout(() => {
-        dispatch(
-          shoppingConfirmMsg(subjectID, chatID, msg._id, {
-            //Just for testing | replace with API results
-            isSending: false,
-            _id: uuid.v4()
-          })
-        );
-        shoppingQueue.splice(0, 1);
-        dispatch(shoppingRetrySend());
-      }, 1000);
-    }
+    //API
+    setTimeout(() => {
+      dispatch(
+        shoppingConfirmMsg(subjectID, chatID, msg._id, {
+          //Just for testing | replace with API results
+          isSending: false,
+          _id: uuid.v4()
+        })
+      );
+      //shoppingQueue.splice(0, 1);
+      //dispatch(shoppingRetrySend());
+    }, 1000);
   };
 };
 
@@ -302,5 +265,20 @@ export const shoppingContact = item => {
       chatID,
       subjectID: item.book.subject._id
     });*/
+  };
+};
+
+export const shoppingRestart = data => {
+  return dispatch => {
+    while (shoppingQueue.length !== 0) {
+      const item = shoppingQueue.shift();
+      dispatch(shoppingRetrySend(item));
+    }
+
+    dispatch(shoppingStartGlobalAction());
+
+    setTimeout(() => {
+      dispatch(shoppingRetrieveData(data));
+    }, 2000);
   };
 };

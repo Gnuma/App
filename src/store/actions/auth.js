@@ -1,9 +1,7 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
-import { AppRegistry } from "react-native";
 import NavigatorService from "../../navigator/NavigationService";
-import { setItem, getItem, removeItem, multiGet } from "../utility";
-import { connect as msgConnect } from "./messaging";
+import { setItem, removeItem, multiGet } from "../utility";
 import {
   ___LOGIN_ENDPOINT___,
   ___WHOAMI_ENDPOINT___,
@@ -11,21 +9,8 @@ import {
   ___SIGNUP_ENDPOINT___,
   ___INITUSER_ENDPOINT___
 } from "../constants";
-import {
-  notificationsSubscribe,
-  notificationsUnsubscribe
-} from "./notifications";
-import { salesInit, onNewSalesMsg } from "./sales";
-import {
-  sellerChatList,
-  buyerChatList,
-  newBuyerMsg,
-  newSellerMsg
-} from "../../mockData/Chat2";
-import { shoppingInit, onNewShoppingMsg } from "./shopping";
-import TestTask from "../../service/TestTask";
-import { commentsInit } from "./comments";
-import { commentList } from "../../mockData/comments";
+import { notificationsUnsubscribe } from "./notifications";
+import WS from "../../utils/WebSocket";
 
 const isOffline = false;
 
@@ -121,26 +106,7 @@ export const autoLogin = () => {
   return dispatch => {
     dispatch(authStart());
 
-    dispatch(commentsInit(commentList)); //TAKE THIS OUT
-    dispatch(salesInit(sellerChatList)); // TAKE THIS OUT
-    dispatch(shoppingInit(buyerChatList)); //TAKE THIS OUT
-    setTimeout(() => {
-      ///TAKE THIS OUT
-      dispatch(
-        onNewShoppingMsg(
-          newBuyerMsg.subjectID,
-          newBuyerMsg.chatID,
-          newBuyerMsg.msg
-        )
-      );
-      dispatch(
-        onNewSalesMsg(
-          newSellerMsg.itemID,
-          newSellerMsg.chatID,
-          newSellerMsg.msg
-        )
-      );
-    }, 6000);
+    WS.init(); // TAKE OUT
 
     multiGet([tokenKey, officeKey]).then(userInfos => {
       //console.log(userInfos);
@@ -246,7 +212,7 @@ const login = ({ dispatch, resolve, token, data }) => {
     dispatch(loginSuccess(token));
   }
 
-  dispatch(salesInit(sellerChatList));
-  dispatch(notificationsSubscribe());
+  WS.init(token);
+
   resolve && resolve(token);
 };

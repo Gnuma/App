@@ -7,10 +7,9 @@ import ChatView from "../components/Chat/Chat";
 import { single } from "../mockData/Chat2";
 import * as salesActions from "../store/actions/sales";
 import * as shoppingActions from "../store/actions/shopping";
+import * as messagingAction from "../store/actions/messaging";
 import ContactReview from "../components/Chat/ContactReview";
-
-const sale = "sale";
-const shopping = "shopping";
+import { ChatType } from "../utils/constants";
 
 export class Chat extends Component {
   constructor(props) {
@@ -20,10 +19,10 @@ export class Chat extends Component {
     const subjectID = props.navigation.getParam("subjectID", null);
     const chatID = props.navigation.getParam("chatID", null);
 
-    this.type = itemID !== null ? sale : shopping;
+    this.type = itemID !== null ? ChatType.sales : ChatType.shopping;
 
     this.state = {
-      objectID: this.type === sale ? itemID : subjectID,
+      objectID: this.type === ChatType.sales ? itemID : subjectID,
       chatID
     };
   }
@@ -49,7 +48,7 @@ export class Chat extends Component {
 
   setChatFocus = isFocused => {
     const chatID = isFocused ? this.state.chatID : null;
-    if (this.type === sale) {
+    if (this.type === ChatType.sales) {
       this.props.salesSetChatFocus(chatID);
     } else {
       this.props.shoppingSetChatFocus(chatID);
@@ -57,7 +56,7 @@ export class Chat extends Component {
   };
 
   getData = () => {
-    if (this.type === sale) {
+    if (this.type === ChatType.sales) {
       return this.props.salesData;
     } else {
       return this.props.shoppingData;
@@ -69,7 +68,7 @@ export class Chat extends Component {
   };
 
   setComposer = (objectID, chatID, composerValue) => {
-    if (this.type === sale) {
+    if (this.type === ChatType.sales) {
       this.props.salesSetComposer(objectID, chatID, composerValue);
     } else {
       this.props.shoppingSetComposer(objectID, chatID, composerValue);
@@ -77,15 +76,16 @@ export class Chat extends Component {
   };
 
   sendMsg = (objectID, chatID) => {
-    if (this.type === sale) {
+    /*if (this.type === ChatType.sales) {
       this.props.salesSend(objectID, chatID);
     } else {
       this.props.shoppingSend(objectID, chatID);
-    }
+    }*/
+    this.props.sendMessage(this.type, objectID, chatID);
   };
 
   readChat = (objectID, chatID) => {
-    if (this.type === sale) {
+    if (this.type === ChatType.sales) {
       this.props.salesRead(objectID, chatID);
     } else {
       this.props.shoppingRead(objectID, chatID);
@@ -93,7 +93,7 @@ export class Chat extends Component {
   };
 
   getBook = () => {
-    if (this.type === sale) {
+    if (this.type === ChatType.sales) {
       return this.getData()[this.state.objectID].book;
     } else {
       return this.getData()[this.state.objectID].chats[this.state.chatID].item
@@ -102,7 +102,7 @@ export class Chat extends Component {
   };
 
   getGlobalLoading = () => {
-    if (this.type === sale) {
+    if (this.type === ChatType.sales) {
       return this.props.salesLoading;
     } else {
       return this.props.shoppingLoading;
@@ -110,7 +110,7 @@ export class Chat extends Component {
   };
 
   loadEarlier = () => {
-    if (this.type === sale) {
+    if (this.type === ChatType.sales) {
       return this.props.salesLoadEarlier(
         this.state.objectID,
         this.state.chatID
@@ -137,7 +137,7 @@ export class Chat extends Component {
         />
         <View style={{ flex: 1, marginTop: 120 }}>
           {chatData.status === "local" ||
-          (chatData.status === "pending" && this.type === sale) ? (
+          (chatData.status === "pending" && this.type === ChatType.sales) ? (
             <ContactReview
               objectID={objectID}
               chatID={chatID}
@@ -183,6 +183,9 @@ const mapDispatchToProps = dispatch => ({
     dispatch(salesActions.salesSend(itemID, chatID)),
   shoppingSend: (subjectID, chatID) =>
     dispatch(shoppingActions.shoppingSend(subjectID, chatID)),
+  sendMessage: (type, objectID, chatID) =>
+    dispatch(messagingAction.sendMessage(type, objectID, chatID)),
+
   salesSetComposer: (itemID, chatID, composerValue) =>
     dispatch(salesActions.salesSetComposer(itemID, chatID, composerValue)),
   shoppingSetComposer: (subjectID, chatID, composerValue) =>

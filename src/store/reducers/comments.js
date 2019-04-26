@@ -22,10 +22,38 @@ const commentsInit = (state, action) => {
   });
 };
 
+const commentsReceiveComment = (state, action) => {
+  const { comment, type } = action.payload;
+  const commentID = comment.pk;
+  const itemID = comment.item.pk;
+
+  const newItem = {
+    pk: itemID,
+    type,
+    book: comment.item.book,
+    data: []
+  };
+
+  const hasNewItem = state.data[itemID] === undefined;
+
+  return update(state, {
+    data: {
+      [itemID]: existingItem =>
+        update(existingItem || newItem, {
+          data: { $unshift: [{ pk: commentID, answers: [] }] }
+        })
+    },
+    orderedData: hasNewItem ? { $unshift: [itemID] } : { $push: [] }
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.COMMENTS_INIT:
       return commentsInit(state, action);
+    case actionTypes.COMMENTS_RECEIVE_COMMENT:
+      return commentsReceiveComment(state, action);
+
     default:
       return state;
   }

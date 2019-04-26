@@ -6,7 +6,13 @@ import {
   getChatIndex,
   highlightItem
 } from "../../utils/chatUtility";
-import { shoppingLoadMockNew, sellerChatList } from "../../mockData/Chat2";
+import {
+  shoppingLoadMockNew,
+  sellerChatList,
+  mockContactItem
+} from "../../mockData/Chat2";
+import _ from "lodash";
+import uuid from "uuid";
 
 const initialState = {
   data: null,
@@ -132,6 +138,7 @@ const shoppingSendMsg = (state, action) => {
 const shoppingConfirmMsg = (state, action) => {
   const { subjectID, chatID, msgID, data } = action.payload;
   try {
+    console.log(state);
     const chat = state.data[subjectID].chats[chatID].messages;
     console.log(data);
     for (let i = 0; i < chat.length; i++) {
@@ -205,7 +212,24 @@ const shoppingSetChatFocus = (state, action) => {
 
 const shoppingRetrieveData = (state, action) => {
   const { data } = action.payload;
-  return updateObject(state, formatData(data, state.focus));
+  console.log(data);
+  const { orderedData: newOrder, ...retrievedData } = formatData(
+    data,
+    state.focus
+  );
+  const oldOrder = state.orderedData;
+  let orderedData = [];
+
+  for (let i = 0; i < oldOrder.length; i++) {
+    for (let f = 0; f < newOrder.length; f++) {
+      if (newOrder[f].subjectID === oldOrder[i].subjectID) {
+        orderedData.push(newOrder.splice(f, 1)[0]);
+        break;
+      }
+    }
+  }
+  newOrder.forEach(object => orderedData.push(object));
+  return updateObject(state, { orderedData, ...retrievedData });
 };
 
 const shoppingLoadEarlier = (state, action) => {
@@ -245,8 +269,8 @@ const shoppingContactUser = (state, action) => {
 
   return update(state, {
     data: {
-      [subjectID]: subjectID =>
-        update(subjectID || subject, {
+      [subjectID]: existingSubject =>
+        update(existingSubject || subject, {
           chats: { [chatID]: { $set: chat } }
         })
     },
@@ -324,6 +348,7 @@ const reducer = (state = initialState, action) => {
 
 export default reducer;
 
+/*
 const formatData = (data, focus = 0) => {
   let orderedData = [];
   for (subjectKey in data) {
@@ -347,6 +372,48 @@ const formatData = (data, focus = 0) => {
     data[subjectKey] = { ...data[subjectKey], lastMsg };
   }
 
+  return {
+    data,
+    orderedData,
+    focus,
+    loading: false
+  };
+};
+*/
+
+const formatData = (arrayData, focus = 0) => {
+  let orderedData = [];
+  let data = {};
+  for (let i = 0; i < arrayData.length; i++) {
+    console.log(arrayData, chats);
+    const { chats, _id: subjectID, ...restItem } = arrayData[i];
+    let lastMsg = new Date(0, 0, 0);
+
+    data[subjectID] = {
+      _id: subjectID,
+      ...restItem,
+      chats: {}
+    };
+    let orderedChats = [];
+    for (let f = 0; f < chats.length; f++) {
+      const chat = chats[f];
+      orderedChats.push(chat._id);
+      lastMsg =
+        chat.messages[0] && chat.messages[0].createdAt > lastMsg
+          ? chat.messages[0].createdAt
+          : lastMsg;
+      data[subjectID].chats[chat._id] = {
+        ...chat,
+        composer: "",
+        loading: false
+      };
+    }
+    orderedData.push({ subjectID, chats: orderedChats });
+    data[subjectID] = {
+      ...data[subjectID],
+      lastMsg
+    };
+  }
   return {
     data,
     orderedData,
