@@ -1,4 +1,9 @@
-import { ___WS_ENDPOINT___, ___WS_TEST_ENDPOINT } from "../store/constants";
+import {
+  ___WS_ENDPOINT___,
+  ___WS_TEST_ENDPOINT,
+  ___RETRIEVE_CHATS___
+} from "../store/constants";
+import { ToastAndroid } from "react-native";
 //import "./MockWS";
 import store from "../store/store";
 import {
@@ -20,6 +25,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { AppState } from "react-native";
 import { ChatType } from "./constants";
 import { restart } from "../store/actions/messaging";
+import axios from "axios";
 
 class WS {
   ws = null;
@@ -30,13 +36,24 @@ class WS {
   lastAppState = null;
   lastConnectionState = null;
 
-  init(token) {
-    console.log("Initiating...");
+  init(token, resolve) {
+    console.log("Initiating WS...");
     this.token = token;
     //CALL API -> then:
-    //store.dispatch(shoppingInit(buyerChatList));
-    //store.dispatch(salesInit(sellerChatList));
-    this.startConnection();
+    axios
+      .get(___RETRIEVE_CHATS___)
+      .then(res => {
+        console.log(res);
+        store.dispatch(shoppingInit(res.data.shopping));
+        store.dispatch(salesInit(res.data.sales));
+        this.startConnection();
+
+        resolve && resolve(token);
+      })
+      .catch(err => {
+        console.log(err);
+        resolve && resolve(toke);
+      });
 
     this.connectionSubscription = NetInfo.isConnected.addEventListener(
       "connectionChange",
@@ -47,21 +64,15 @@ class WS {
       }
     );
 
-    this.stateSubscription = AppState.addEventListener("change", appState => {
-      console.log(appState);
-      if (appState == "active" && this.lastAppState == "background") {
-        NetInfo.isConnected
-          .fetch()
-          .then(isConnected => this.restart(isConnected));
-      } else if (appState == "background") {
-      }
-      this.lastAppState = appState;
-    });
+    this.stateSubscription = AppState.addEventListener(
+      "change",
+      this.stateChange
+    );
   }
 
   restart = isConnected => {
     if (!isConnected) return;
-    this.refresh().then(this.startConnection);
+    //this.refresh().then(this.startConnection);
   };
 
   refresh = () => {
@@ -78,18 +89,18 @@ class WS {
       switch (data.type) {
         case DataType.NEW_CHAT:
           return store.dispatch(
-            salesNewChat(data.chat.item._id, data.chat.pk, data.chat)
+            salesNewChat(data.chat.item.pk, data.chat._id, data.chat)
           );
 
         case DataType.NEW_MESSAGE:
-          const msg = formatMsg(data.msg);
-          if (data.for === ChatType.sales)
+          const msg = formatMsg(data.message);
+          if (data.for === "sale")
             return store.dispatch(
-              onNewSalesMsg(msg.itemID, msg.chatID, msg.msg)
+              onNewSalesMsg(data.objectID, data.chatID, msg)
             );
           else
             return store.dispatch(
-              onNewShoppingMsg(msg.subjectID, msg.chatID, msg.msg)
+              onNewShoppingMsg(data.objectID, data.chatID, msg)
             );
 
         case DataType.NEW_COMMENT:
@@ -107,13 +118,29 @@ class WS {
     console.log("Connecting to WS Server...");
     //this.ws = new WebSocket(___WS_TEST_ENDPOINT);
     try {
-      //this.ws = new WebSocket(___WS_ENDPOINT___ + "?token=" + this.token);
-      this.ws = new WebSocket(___WS_TEST_ENDPOINT);
+      this.ws = new WebSocket(___WS_ENDPOINT___ + "?token=" + this.token);
+      //this.ws = new WebSocket(___WS_TEST_ENDPOINT);
       this.ws.onopen = this.onOpen;
       this.ws.onclose = this.onClose;
       this.ws.onerror = this.onError;
       this.ws.onmessage = this.onMessage;
-    } catch (error) {}
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+
+  close = () => {
+    if (this.ws) {
+      console.log("Closing connection...");
+      try {
+        this.ws.close();
+        console.log(this.connectionSubscription, this.stateSubscription);
+        this.connectionSubscription.remove();
+        AppState.removeEventListener("change", this.stateChange);
+      } catch (error) {
+        console.warn(error);
+      }
+    }
   };
 
   sendMessage(message) {
@@ -122,14 +149,27 @@ class WS {
 
   onOpen = () => {
     console.log("Connected");
+    ToastAndroid.show("Connected", ToastAndroid.SHORT);
   };
 
   onClose = () => {
     console.log("Closing");
+    ToastAndroid.show("Disconnected", ToastAndroid.SHORT);
   };
 
   onError = err => {
     console.warn(err);
+  };
+
+  stateChange = appState => {
+    console.log(appState);
+    if (appState == "active" && this.lastAppState == "background") {
+      NetInfo.isConnected
+        .fetch()
+        .then(isConnected => this.restart(isConnected));
+    } else if (appState == "background") {
+    }
+    this.lastAppState = appState;
   };
 }
 
@@ -142,10 +182,8 @@ const DataType = {
 
 formatMsg = msg => {
   return update(msg, {
-    msg: {
-      createdAt: {
-        $apply: dateStr => new Date(dateStr)
-      }
+    createdAt: {
+      $apply: dateStr => new Date(dateStr)
     }
   });
 };

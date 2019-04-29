@@ -150,7 +150,7 @@ export const salesNewChat = (itemID, chatID, data) => ({
 
 export const salesSend = (itemID, chatID) => {
   return (dispatch, getState) => {
-    const myID = 1; //TESTING
+    const myID = getState().auth.id;
     const content = getState().sales.data[itemID].chats[chatID].composer;
     const msg = createMsg(content, myID);
     dispatch(salesSendMsg(itemID, chatID, msg));

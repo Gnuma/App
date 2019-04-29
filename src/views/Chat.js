@@ -159,6 +159,7 @@ export class Chat extends Component {
               salesRead={this.readChat}
               type={this.type}
               loadEarlier={this.loadEarlier}
+              userID={this.props.userID}
             />
           )}
         </View>
@@ -175,7 +176,8 @@ const mapStateToProps = state => ({
   salesData: state.sales.data,
   shoppingData: state.shopping.data,
   salesLoading: state.sales.loading,
-  shoppingLoading: state.shopping.loading
+  shoppingLoading: state.shopping.loading,
+  userID: state.auth.id
 });
 
 const mapDispatchToProps = dispatch => ({

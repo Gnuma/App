@@ -78,6 +78,7 @@ const shoppingComposer = (state, action) => {
 
 const shoppingReceiveMsg = (state, action) => {
   const { subjectID, chatID, msg } = action.payload;
+  console.log("Receiving...", { subjectID, chatID, msg });
   inChat = state.chatFocus === chatID; //TO-DO
   const subjectIndex = getSubjectIndex(subjectID, state);
   const chatIndex = getChatIndex(chatID, state.orderedData[subjectIndex]);
@@ -251,6 +252,7 @@ const shoppingLoadEarlier = (state, action) => {
 const shoppingContactUser = (state, action) => {
   const { item, chatID } = action.payload;
   const subjectID = item.book.subject._id;
+
   const chat = {
     _id: chatID,
     item: item,
@@ -261,11 +263,11 @@ const shoppingContactUser = (state, action) => {
   };
   const subject = {
     _id: subjectID,
-    title: "AOOOOOOOO",
+    title: item.book.subject.title,
     newsCount: 0,
     chats: {}
   };
-  const existingSubject = getSubjectIndex(subjectID, state);
+  const subjectIndex = getSubjectIndex(subjectID, state);
 
   return update(state, {
     data: {
@@ -275,7 +277,7 @@ const shoppingContactUser = (state, action) => {
         })
     },
     orderedData:
-      existingSubject === -1
+      subjectIndex === -1
         ? {
             $push: [
               {
@@ -285,7 +287,7 @@ const shoppingContactUser = (state, action) => {
             ]
           }
         : {
-            [existingSubject]: {
+            [subjectIndex]: {
               chats: {
                 $push: [chatID]
               }
@@ -385,34 +387,40 @@ const formatData = (arrayData, focus = 0) => {
   let orderedData = [];
   let data = {};
   for (let i = 0; i < arrayData.length; i++) {
-    console.log(arrayData, chats);
-    const { chats, _id: subjectID, ...restItem } = arrayData[i];
-    let lastMsg = new Date(0, 0, 0);
+    const { subject, items, ...restSubject } = arrayData[i];
 
-    data[subjectID] = {
-      _id: subjectID,
-      ...restItem,
+    data[subject._id] = {
+      _id: subject._id,
+      title: subject.title,
+      ...restSubject,
       chats: {}
     };
     let orderedChats = [];
-    for (let f = 0; f < chats.length; f++) {
-      const chat = chats[f];
+    for (let f = 0; f < items.length; f++) {
+      const { chats: chat, seller, ...restItem } = items[f];
       orderedChats.push(chat._id);
-      lastMsg =
-        chat.messages[0] && chat.messages[0].createdAt > lastMsg
-          ? chat.messages[0].createdAt
-          : lastMsg;
-      data[subjectID].chats[chat._id] = {
+
+      const UserTO = {
+        _id: seller._id,
+        ...seller.user
+      };
+      const item = {
+        condition: 0, //Da togliere
+        ...restItem
+      };
+
+      for (let m = 0; m < chat.messages.length; m++)
+        chat.messages[m].createdAt = new Date(chat.messages[m].createdAt);
+
+      data[subject._id].chats[chat._id] = {
+        UserTO,
+        item,
         ...chat,
         composer: "",
         loading: false
       };
     }
-    orderedData.push({ subjectID, chats: orderedChats });
-    data[subjectID] = {
-      ...data[subjectID],
-      lastMsg
-    };
+    orderedData.push({ subjectID: subject._id, chats: orderedChats });
   }
   return {
     data,

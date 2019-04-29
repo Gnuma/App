@@ -79,7 +79,7 @@ export default class Chat extends Component {
   };
 
   render() {
-    const { data, type, globalLoading } = this.props;
+    const { data, type, globalLoading, userID } = this.props;
 
     return (
       <View style={{ flex: 1 }}>
@@ -87,7 +87,7 @@ export default class Chat extends Component {
           messages={data.messages}
           renderAvatar={null}
           user={{
-            _id: 1 // sent messages should have same user._id
+            _id: userID
           }}
           renderBubble={this.renderBubble}
           renderTime={this.renderTime}

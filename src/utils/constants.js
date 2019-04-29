@@ -3,3 +3,8 @@ export const ChatType = {
   sales: "sales",
   shopping: "shopping"
 };
+export const AutoStart = {
+  logged: "logged",
+  anonymous: "anonymous",
+  firstTime: "firstTime"
+};

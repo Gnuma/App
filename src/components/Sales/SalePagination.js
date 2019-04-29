@@ -31,7 +31,7 @@ export default class SalePagination extends Component {
     );
   };
 
-  _keyExtractor = (item, index) => item.itemID;
+  _keyExtractor = (item, index) => item.itemID.toString();
 }
 
 class SaleTabDot extends Component {

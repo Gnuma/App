@@ -246,25 +246,28 @@ const salesLoadEarlier = (state, action) => {
 const salesNewChat = (state, action) => {
   const { itemID, chatID, data } = action.payload;
   const { pk, ...restItem } = data.item;
+
+  const chat = {
+    _id: chatID,
+    UserTO: {
+      _id: data.buyer.pk,
+      username: data.buyer.user.username
+    },
+    hasNews: true,
+    status: "pending",
+    messages: [],
+    loading: false,
+    composer: ""
+  };
   const item = {
-    _id: pk,
+    _id: itemID,
     ...restItem,
     chats: {
-      [chatID]: {
-        _id: chatID,
-        UserTO: {
-          _id: data.buyer.pk,
-          username: data.buyer.user.username
-        },
-        hasNews: true,
-        status: "pending",
-        messages: [],
-        loading: false,
-        composer: ""
-      }
+      [chatID]: chat
     },
     newsCount: 1
   };
+
   const itemIndex = getItemIndex(itemID, state);
 
   if (itemIndex != -1) {
@@ -274,7 +277,7 @@ const salesNewChat = (state, action) => {
           newsCount: { $apply: oldCount => oldCount + 1 },
           chats: {
             [chatID]: {
-              $set: item.chats[chatID]
+              $set: chat
             }
           }
         }
@@ -390,7 +393,6 @@ const formatData = (arrayData, focus = 0) => {
   let data = {};
   for (let i = 0; i < arrayData.length; i++) {
     const { chats, _id: itemID, ...restItem } = arrayData[i];
-    let lastMsg = new Date(0, 0, 0);
 
     data[itemID] = {
       _id: itemID,
@@ -401,11 +403,17 @@ const formatData = (arrayData, focus = 0) => {
     for (let f = 0; f < chats.length; f++) {
       const chat = chats[f];
       orderedChats.push(chat._id);
-      lastMsg =
-        chat.messages[0] && chat.messages[0].createdAt > lastMsg
-          ? chat.messages[0].createdAt
-          : lastMsg;
+
+      const UserTO = {
+        _id: chat.buyer._id,
+        ...chat.buyer.user
+      };
+
+      for (let m = 0; m < chat.messages.length; m++)
+        chat.messages[m].createdAt = new Date(chat.messages[m].createdAt);
+
       data[itemID].chats[chat._id] = {
+        UserTO,
         ...chat,
         composer: "",
         loading: false
@@ -413,8 +421,7 @@ const formatData = (arrayData, focus = 0) => {
     }
     orderedData.push({ itemID, chats: orderedChats });
     data[itemID] = {
-      ...data[itemID],
-      lastMsg
+      ...data[itemID]
     };
   }
 

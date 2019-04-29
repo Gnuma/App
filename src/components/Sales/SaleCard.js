@@ -42,14 +42,14 @@ export default class SaleCard extends Component {
             </Header2>
             <View style={{ flexDirection: "row" }}>
               <View style={{ flex: 1 }}>
-                <Header5 numberOfLines={1}>di {data.book.authors}</Header5>
+                <Header5 numberOfLines={1}>di {data.book.author}</Header5>
                 <View style={{ flex: 1, justifyContent: "center" }}>
                   <Header2 color="primary" style={{}}>
                     EUR {data.price}
                   </Header2>
                 </View>
               </View>
-              <ConditionCircle conditions={data.conditions} radius={35} />
+              <ConditionCircle conditions={data.condition} radius={35} />
             </View>
           </View>
         </View>

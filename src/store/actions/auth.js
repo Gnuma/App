@@ -11,6 +11,7 @@ import {
 } from "../constants";
 import { notificationsUnsubscribe } from "./notifications";
 import WS from "../../utils/WebSocket";
+import { AutoStart } from "../../utils/constants";
 
 const isOffline = false;
 
@@ -102,61 +103,64 @@ export const authLogin = (username, password, resolve) => {
   };
 };
 
-export const autoLogin = () => {
+export const autoLogin = (resolve, reject) => {
   return dispatch => {
     dispatch(authStart());
+    multiGet([tokenKey, officeKey])
+      .then(userInfos => {
+        //console.log(userInfos);
+        const token = userInfos[0][1];
+        const office = userInfos[1][1];
 
-    WS.init(); // TAKE OUT
-
-    multiGet([tokenKey, officeKey]).then(userInfos => {
-      //console.log(userInfos);
-      const token = userInfos[0][1];
-      const office = userInfos[1][1];
-
-      if (token !== null) {
-        axios
-          .get(___WHOAMI_ENDPOINT___, {
-            headers: {
-              Authorization: "Token " + token
-            }
-          })
-          .then(res => {
-            if (!res.data.gnuma_user) throw "Gnuma User not initialized";
-            login({ dispatch, resolve, token, data: res.data });
-            //dispatch(msgConnect(res.data.pk));
-          })
-          .catch(err => {
-            dispatch(authFail(err));
-          });
-        NavigatorService.navigate("Home");
-      } else {
-        dispatch(authFail("Token not found"));
-        if (office !== null) {
-          //Office Set but no login
-          dispatch(authAppInit(office, false));
-          NavigatorService.navigate("Home");
+        if (token !== null) {
+          axios
+            .get(___WHOAMI_ENDPOINT___, {
+              headers: {
+                Authorization: "Token " + token
+              }
+            })
+            .then(res => {
+              if (!res.data.gnuma_user) throw "Gnuma User not initialized";
+              login({ dispatch, token, resolve, data: res.data });
+            })
+            .catch(err => {
+              console.log("Error -> ", err);
+              dispatch(authFail(err));
+              reject(AutoStart.anonymous);
+            });
         } else {
-          //No Login And no Office: First time start
-          dispatch(authFail("Office not set"));
-          NavigatorService.navigate("InitProfile");
+          dispatch(authFail("Token not found"));
+          if (office !== null) {
+            //Office Set but no login
+            dispatch(authAppInit(office, false));
+            reject(AutoStart.anonymous);
+          } else {
+            //No Login And no Office: First time start
+            dispatch(authFail("Office not set"));
+            reject(AutoStart.firstTime);
+          }
         }
-      }
-    });
+      })
+      .catch(err => {
+        console.log("Error in storage: ", err);
+        dispatch(authFail(err));
+        reject(AutoStart.firstTime);
+      });
   };
 };
 
 export const authLogout = () => {
   return dispatch => {
-    //dispatch(authStart());
-    dispatch(logoutSuccess());
+    dispatch(authStart());
     axios
       .post(___LOGOUT_ENDPOINT___)
       .then(() => {
         dispatch(notificationsUnsubscribe());
+        WS.close();
         dispatch(logoutSuccess());
       })
       .catch(err => {
-        //dispatch(authFail(err));
+        dispatch(authFail(err));
       });
   };
 };
@@ -201,6 +205,7 @@ export const authSignup = (username, email, password1, password2, resolve) => {
 };
 
 const login = ({ dispatch, resolve, token, data }) => {
+  console.log("Logging in...", token);
   if (!token) {
     console.log("ERROR NOT SET IN LOGIN");
     throw "Error not set in login";
@@ -212,7 +217,5 @@ const login = ({ dispatch, resolve, token, data }) => {
     dispatch(loginSuccess(token));
   }
 
-  WS.init(token);
-
-  resolve && resolve(token);
+  WS.init(token, resolve);
 };

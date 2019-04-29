@@ -48,7 +48,7 @@ export default class ShoppingChatsList extends Component {
   };
 
   _keyExtractor = (item, index) => {
-    return item;
+    return item.toString();
   };
 }
 
@@ -96,10 +96,10 @@ export class ChatLink extends Component {
       return (
         <View>
           <Header3 numberOfLines={1} color="black">
-            Cloud
+            {data.item.book.title}
           </Header3>
           <Header3 numberOfLines={1} color="black">
-            EUR 20
+            EUR {data.item.price}
           </Header3>
           <View
             style={{
@@ -120,7 +120,8 @@ export class ChatLink extends Component {
           </View>
         </View>
       );
+    } else {
+      return null;
     }
-    return null;
   };
 }

@@ -1,5 +1,5 @@
-//export const ___SERVER_ENDPOINT___ = "http://192.168.178.104:8000/";
-export const ___SERVER_ENDPOINT___ = "http://17029.l.time4vps.cloud/";
+export const ___SERVER_ENDPOINT___ = "http://192.168.178.104:8000/";
+//export const ___SERVER_ENDPOINT___ = "http://17029.l.time4vps.cloud/";
 export const ___BASE_ENDPOINT___ = ___SERVER_ENDPOINT___ + "gnuma/v1/";
 
 export const ___WS_ENDPOINT___ = "ws://192.168.178.104:8000/" + "ws/chat/";
@@ -23,3 +23,7 @@ export const ___BASE_UPLOAD_PICTURE___ = ___BASE_ENDPOINT___ + "ads/upload/";
 export const ___GET_AD___ = ___BASE_ENDPOINT___ + "ads/";
 
 export const ___CREATE_COMMENT___ = ___BASE_ENDPOINT___ + "comments/";
+
+export const ___RETRIEVE_CHATS___ = ___BASE_ENDPOINT___ + "chat/operations/";
+export const ___SEND_MESSAGE___ = ___BASE_ENDPOINT___ + "chat/operations/";
+export const ___CONTACT_USER___ = ___BASE_ENDPOINT___ + "chat/";

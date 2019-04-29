@@ -14,12 +14,14 @@ import {
   salesStartGlobalAction
 } from "./sales";
 import { sellerChatList, buyerChatList2 } from "../../mockData/Chat2";
+import axios from "axios";
+import { ___SEND_MESSAGE___ } from "../constants";
 
 queue = [];
 
 export const sendMessage = (type, objectID, chatID) => {
   return (dispatch, getState) => {
-    const myID = 1; //TESTING
+    const myID = getState().auth.id;
     const content = getState()[type].data[objectID].chats[chatID].composer;
     const msg = createMsg(content, myID);
     dispatch(startSending(type, objectID, chatID, msg));
@@ -27,9 +29,18 @@ export const sendMessage = (type, objectID, chatID) => {
     NetInfo.isConnected.fetch().then(isConnected => {
       if (isConnected) {
         //API
-        setTimeout(() => {
-          dispatch(confirmMessage(type, objectID, chatID, msg));
-        }, 2000);
+        axios
+          .post(___SEND_MESSAGE___, {
+            chat: chatID,
+            content: content
+          })
+          .then(res => {
+            console.log(res);
+            dispatch(confirmMessage(type, objectID, chatID, msg));
+          })
+          .catch(err => {
+            console.log(err);
+          });
       } else {
         queue.push({
           type,

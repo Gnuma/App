@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import { Text, View, FlatList } from "react-native";
 import PropTypes from "prop-types";
-import { Header2, Header4, Header5 } from "../Text";
+import { Header2, Header4, Header5, Header3 } from "../Text";
 import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../../styles/colors";
 import Button from "../Button";
 import Divider from "../Divider";
 import BooleanButton from "../BooleanButton";
 import helper from "../../utils/helper";
+import _ from "lodash";
 
 export default class SalesChatsList extends Component {
   static propTypes = {
@@ -20,7 +21,9 @@ export default class SalesChatsList extends Component {
 
   render() {
     const { data, focus, orderedData } = this.props;
-    console.log(orderedData[focus].chats);
+    if (!orderedData[focus] || _.isEmpty(orderedData[focus].chats))
+      return this.renderEmpty();
+
     return (
       <FlatList
         data={orderedData[focus].chats}
@@ -33,6 +36,7 @@ export default class SalesChatsList extends Component {
 
   _renderItem = ({ item, index }) => {
     const { data, orderedData, focus } = this.props;
+
     return (
       <View>
         <ChatLink
@@ -48,7 +52,17 @@ export default class SalesChatsList extends Component {
   };
 
   _keyExtractor = (item, index) => {
-    return item;
+    return item.toString();
+  };
+
+  renderEmpty = () => {
+    return (
+      <View style={{ flex: 1, marginHorizontal: 20, marginTop: 5 }}>
+        <Header3 color="primary">
+          Non sei ancora stato contattato da nessuno su questo annuncio.
+        </Header3>
+      </View>
+    );
   };
 }
 

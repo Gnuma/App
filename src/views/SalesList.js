@@ -4,9 +4,13 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import SalesTab from "../components/Sales/SalesTab";
 import * as salesActions from "../store/actions/sales";
-import { Header3 } from "../components/Text";
+import { Header3, Header2 } from "../components/Text";
 import SalesChatsList from "../components/Sales/SalesChatsList";
 import SellButton from "../components/Sales/SellButton";
+import _ from "lodash";
+import Button from "../components/Button";
+import colors from "../styles/colors";
+import IconPlus from "../media/vectors/plus-icon";
 
 export class SalesList extends Component {
   static propTypes = {
@@ -25,6 +29,9 @@ export class SalesList extends Component {
       setSaleFocus,
       isAuthenticated
     } = this.props;
+
+    if (!data || _.isEmpty(data)) return this.renderEmpty();
+
     return (
       <View style={{ flex: 1 }}>
         <SalesTab
@@ -55,6 +62,32 @@ export class SalesList extends Component {
       itemID,
       chatID
     });
+  };
+
+  renderEmpty = () => {
+    return (
+      <View style={{ flex: 1, marginHorizontal: 20, marginVertical: 20 }}>
+        <Header3 color="black">
+          Sembra che tu non abbia ancora creato nessun annuncio...
+        </Header3>
+        <Button
+          style={{
+            backgroundColor: colors.white,
+            elevation: 2,
+            borderRadius: 8,
+            alignSelf: "center",
+            padding: 6,
+            marginTop: 30
+          }}
+          onPress={this.onGoSell}
+        >
+          <IconPlus />
+        </Button>
+        <Header2 color="primary" style={{ marginTop: 10, alignSelf: "center" }}>
+          Inizia ora
+        </Header2>
+      </View>
+    );
   };
 }
 

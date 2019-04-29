@@ -34,6 +34,7 @@ export class SalesTab extends Component {
 
   render() {
     const { orderedData, focus, data } = this.props;
+
     return (
       <View
         style={{

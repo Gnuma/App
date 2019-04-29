@@ -5,7 +5,10 @@ import { connect } from "react-redux";
 import { Header3 } from "../components/Text";
 import ShoppingTab from "../components/Shopping/ShoppingTab";
 import * as shoppingActions from "../store/actions/shopping";
+import * as searchActions from "../store/actions/search";
 import ShoppingChatsList from "../components/Shopping/ShoppingChatsList";
+import SearchLink from "../components/Home/SearchLink";
+import _ from "lodash";
 
 export class ShoppingList extends Component {
   static propTypes = {
@@ -24,6 +27,8 @@ export class ShoppingList extends Component {
       setShoppingFocus,
       isAuthenticated
     } = this.props;
+
+    if (!data || _.isEmpty(data)) return this.renderEmpty();
 
     return (
       <View style={{ flex: 1 }}>
@@ -51,6 +56,27 @@ export class ShoppingList extends Component {
       chatID
     });
   };
+
+  renderEmpty = () => {
+    return (
+      <View style={{ flex: 1, marginVertical: 20, marginHorizontal: 20 }}>
+        <Header3 color="black">
+          Sembra che tu non abbia ancora contattato nessun venditore
+        </Header3>
+        <View style={{ flex: 1 / 3, justifyContent: "center" }}>
+          <SearchLink
+            style={{ marginHorizontal: 10 }}
+            onPress={this.goSearch}
+          />
+        </View>
+      </View>
+    );
+  };
+
+  goSearch = () => {
+    this.props.navigation.navigate("Home");
+    this.props.setSearchActive(true);
+  };
 }
 
 const mapStateToProps = state => ({
@@ -61,7 +87,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  setShoppingFocus: focus => dispatch(shoppingActions.shoppingSetFocus(focus))
+  setShoppingFocus: focus => dispatch(shoppingActions.shoppingSetFocus(focus)),
+  setSearchActive: isActive => dispatch(searchActions.searchSetActive(isActive))
 });
 
 export default connect(

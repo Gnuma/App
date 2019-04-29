@@ -2,6 +2,10 @@ import * as actionTypes from "./actionTypes";
 import uuid from "uuid";
 import NetInfo from "@react-native-community/netinfo";
 import { buyerChatList, loadMockNew } from "../../mockData/Chat2";
+import axios from "axios";
+import protectedAction from "../../utils/protectedAction";
+import { ___CONTACT_USER___ } from "../constants";
+import NavigationService from "../../navigator/NavigationService";
 
 export const shoppingInit = data => ({
   type: actionTypes.SHOPPING_INIT,
@@ -131,7 +135,7 @@ export const shoppingContactUser = (item, chatID) => ({
 
 export const shoppingSend = (subjectID, chatID) => {
   return (dispatch, getState) => {
-    const myID = 1; //TESTING
+    const myID = getState().auth.id;
     const content = getState().shopping.data[subjectID].chats[chatID].composer;
     const msg = createMsg(content, myID);
     dispatch(shoppingSendMsg(subjectID, chatID, msg));
@@ -250,18 +254,28 @@ export const shoppingLoadEarlier = (subjectID, chatID) => {
 
 export const shoppingContact = item => {
   return dispatch => {
-    const chatID = uuid.v4();
-    /*protectedAction()
-      .then(() => {
-        dispatch(shoppingContactUser(item, chatID));
-        NavigationService.navigate("ShoppingChat", {
-          chatID,
-          subjectID: item.book.subject._id
-        });
+    protectedAction()
+      .then(token => {
+        axios
+          .post(___CONTACT_USER___, {
+            item: item.pk
+          })
+          .then(res => {
+            console.log(res);
+            dispatch(shoppingContactUser(res.data.item, res.data._id));
+            NavigationService.navigate("ShoppingChat", {
+              chatID: res.data._id,
+              subjectID: res.data.item.book.subject._id
+            });
+          })
+          .catch(err => {
+            console.log(err);
+          });
       })
-      .catch(() => null);*/
+      .catch(() => null);
+    /*
     dispatch(shoppingContactUser(item, chatID));
-    /*NavigationService.navigate("ShoppingChat", {
+    NavigationService.navigate("ShoppingChat", {
       chatID,
       subjectID: item.book.subject._id
     });*/

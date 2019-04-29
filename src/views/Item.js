@@ -44,7 +44,7 @@ export class Item extends Component {
     const { navigation } = this.props;
     const id = navigation.getParam("itemID", "Undesfineds");
 
-    /*axios
+    axios
       .get(___GET_AD___ + `${id}/`)
       .then(res => {
         this.setState({
@@ -55,13 +55,13 @@ export class Item extends Component {
       .catch(err => {
         console.log("ERROR", err);
       });
-*/
-    this.setState({
+
+    /*this.setState({
       data: this.formatData(itemData)
-    });
+    });*/
 
     //To be put in then
-    this.props.notificationViewItemRedux(id);
+    //this.props.notificationViewItemRedux(id);
     console.log(this.state.commentIDList);
   }
 
@@ -155,11 +155,10 @@ export class Item extends Component {
         this.state.data.seller.user.username
       )
     );*/
-    /* protectedAction().then(() => {
+    /*protectedAction().then(() => {
       this.props.contactRedux();
     });*/
-
-    this.props.contactRedux(mockContactItem);
+    this.props.contactRedux(this.state.data);
   };
 }
 

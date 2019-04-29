@@ -183,20 +183,13 @@ const ShoppingNavigator = createStackNavigator(
 );
 
 ShoppingNavigator.navigationOptions = ({ navigation }) => {
-  const { routes } = navigation.state.routes[navigation.state.index];
-  /*let routeName;
-  if (routes[1]) {
-    routeName = routes[1].routeName;
-  } else {
-    routeName = routes[0].routeName;
-  }
-  console.log(routeName);
-  */
+  const focus = navigation.state.routes[navigation.state.index];
+
   let navigationOptions = {};
-  //if (routeName === "Camera" || routeName === "SaleChat") {
-  //  navigationOptions.tabBarVisible = false;
-  //}
-  console.log(routes);
+  if (focus.routeName === "ShoppingChat") {
+    navigationOptions.tabBarVisible = false;
+  }
+
   return navigationOptions;
 };
 
