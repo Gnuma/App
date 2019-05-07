@@ -3,14 +3,17 @@ import { Text, View, ScrollView, TextInput } from "react-native";
 import { Header1, Header3 } from "../Text";
 import colors from "../../styles/colors";
 
-export default ({ style, ...rest }) => {
+export default ({ containerStyle, setRef, style, ...rest }) => {
   return (
     <View
-      style={{
-        flex: 0,
-        alignItems: "baseline",
-        flexDirection: "row"
-      }}
+      style={[
+        {
+          flex: 0,
+          alignItems: "baseline",
+          flexDirection: "row"
+        },
+        containerStyle
+      ]}
     >
       <Header1
         color={"primary"}
@@ -39,6 +42,7 @@ export default ({ style, ...rest }) => {
         blurOnSubmit={true}
         keyboardType="numeric"
         placeholder={"00"}
+        
       />
       <Header3
         style={{ alignSelf: "flex-start", paddingTop: 2, paddingLeft: 4 }}

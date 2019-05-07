@@ -55,6 +55,14 @@ export class Chat extends Component {
     }
   };
 
+  goBookOffert = () => {
+    this.props.navigation.navigate("BookOffert", {
+      objectID: this.state.objectID,
+      chatID: this.state.chatID,
+      type: this.type
+    });
+  };
+
   getData = () => {
     if (this.type === ChatType.sales) {
       return this.props.salesData;
@@ -134,6 +142,7 @@ export class Chat extends Component {
           data={chatData}
           book={this.getBook()}
           goBack={this._goBack}
+          goBookOffert={this.goBookOffert}
         />
         <View style={{ flex: 1, marginTop: 120 }}>
           {chatData.status === "local" ||

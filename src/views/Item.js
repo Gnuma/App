@@ -132,9 +132,6 @@ export class Item extends Component {
               commentIDList={commentIDList}
               user={this.props.user}
             />
-            {!this.state.keyboardOpen ? (
-              <ContactButton onContact={this._handleContact} />
-            ) : null}
           </View>
         )}
       </View>

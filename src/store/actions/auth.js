@@ -93,7 +93,7 @@ export const authLogin = (username, password, resolve) => {
         .then(res => {
           const token = res.data.key;
           login({ dispatch, resolve, token });
-          NavigatorService.navigate("App");
+          //NavigatorService.navigate("App");
         })
         .catch(err => {
           console.log(err);
@@ -189,7 +189,7 @@ export const authSignup = (username, email, password1, password2, resolve) => {
             })
             .then(res => {
               login({ dispatch, resolve, token });
-              NavigatorService.goBack(null);
+              //NavigatorService.goBack(null);
             })
             .catch(err => {
               dispatch(authFail(err));

@@ -23,6 +23,7 @@ import InitProfileScreen from "../views/InitProfile";
 import CreateBookScreen from "../views/CreateBook";
 import SalesListScreen from "../views/SalesList";
 import ChatScreen from "../views/Chat";
+import BookOffertScreen from "../views/BookOffert";
 import ShoppingListScreen from "../views/ShoppingList";
 
 import Header from "../Header/Header";
@@ -123,11 +124,23 @@ const VendiNavigator = {
   )
 };
 
+const ChatNavigator = createStackNavigator(
+  {
+    Chat: ChatScreen,
+    BookOffert: BookOffertScreen
+  },
+  {
+    defaultNavigationOptions: {
+      header: null
+    }
+  }
+);
+
 const SalesNavigator = createStackNavigator(
   {
     SalesList: SalesListScreen,
     SaleChat: {
-      screen: ChatScreen,
+      screen: ChatNavigator,
       path: "/sales/:chatID"
     }
   },
@@ -171,7 +184,7 @@ const ShoppingNavigator = createStackNavigator(
   {
     ShoppingList: ShoppingListScreen,
     ShoppingChat: {
-      screen: ChatScreen,
+      screen: ChatNavigator,
       path: "/shopping/:chatID"
     }
   },

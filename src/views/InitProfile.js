@@ -43,7 +43,7 @@ export class InitProfile extends Component {
           options: res.data.results
         });
       })
-      .catch(err => console.log(err));
+      .catch(err => console.log(err.response));
   };
 
   render() {

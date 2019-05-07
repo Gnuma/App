@@ -36,9 +36,12 @@ class WS {
   lastAppState = null;
   lastConnectionState = null;
 
+  retries = 0;
+
   init(token, resolve) {
     console.log("Initiating WS...");
     this.token = token;
+    this.retries = 5;
     //CALL API -> then:
     axios
       .get(___RETRIEVE_CHATS___)
@@ -116,22 +119,18 @@ class WS {
 
   startConnection = () => {
     console.log("Connecting to WS Server...");
+    this.ws = new WebSocket(___WS_ENDPOINT___ + "?token=" + this.token);
     //this.ws = new WebSocket(___WS_TEST_ENDPOINT);
-    try {
-      this.ws = new WebSocket(___WS_ENDPOINT___ + "?token=" + this.token);
-      //this.ws = new WebSocket(___WS_TEST_ENDPOINT);
-      this.ws.onopen = this.onOpen;
-      this.ws.onclose = this.onClose;
-      this.ws.onerror = this.onError;
-      this.ws.onmessage = this.onMessage;
-    } catch (error) {
-      console.warn(error);
-    }
+    this.ws.onopen = this.onOpen;
+    this.ws.onclose = this.onClose;
+    this.ws.onerror = this.onError;
+    this.ws.onmessage = this.onMessage;
   };
 
   close = () => {
     if (this.ws) {
       console.log("Closing connection...");
+      this.retries = 0;
       try {
         this.ws.close();
         console.log(this.connectionSubscription, this.stateSubscription);
@@ -148,17 +147,26 @@ class WS {
   }
 
   onOpen = () => {
+    this.retries = 5;
     console.log("Connected");
     ToastAndroid.show("Connected", ToastAndroid.SHORT);
   };
 
-  onClose = () => {
-    console.log("Closing");
-    ToastAndroid.show("Disconnected", ToastAndroid.SHORT);
+  onClose = code => {
+    console.log("Closing: ", code);
+    console.log(this.retries);
+    if (this.retries > 0) {
+      console.log("Restarting...");
+      this.retries--;
+      this.startConnection();
+    } else {
+      ToastAndroid.show("Disconnected", ToastAndroid.SHORT);
+    }
   };
 
   onError = err => {
     console.warn(err);
+    console.log(this.retries);
   };
 
   stateChange = appState => {

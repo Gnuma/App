@@ -1,13 +1,27 @@
 import React, { Component } from "react";
-import { View, StyleSheet, ScrollView, InteractionManager } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  InteractionManager,
+  Animated
+} from "react-native";
 import { MainItemStyles as styles } from "./styles";
 import { PrimaryInfo, DescriptionInfo, SecondaryInfo } from "./ItemInfos";
 import SellerInfo from "./SellerInfo";
 import ImageSlider from "./ImageSlider";
 import Divider from "../Divider";
 import QuipuComment from "../Comments/QuipuComment";
+import ContactButton from "./ContactButton";
 
 export class MainItem extends Component {
+  state = {
+    scrollY: new Animated.Value(1000),
+    viewHeight: 0,
+    contactButtonHeight: 0,
+    contactSnapY: 1000
+  };
+
   componentDidMount() {
     //console.log(this.props.goToComment());
     const { commentIDList } = this.props;
@@ -18,6 +32,19 @@ export class MainItem extends Component {
       });
     }
   }
+
+  scrollEvent = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
+    {
+      useNativeDriver: true
+    }
+  );
+
+  setContactButtonHeight = contactButtonHeight => {
+    this.setState({
+      contactButtonHeight
+    });
+  };
 
   render() {
     const { data, user } = this.props;
@@ -32,15 +59,31 @@ export class MainItem extends Component {
     };
 
     return (
-      <ScrollView
+      <Animated.ScrollView
         style={styles.scrollView}
         keyboardShouldPersistTaps={"handled"}
         ref={component => (this.scrollView = component)}
+        onScroll={this.scrollEvent}
+        onLayout={event =>
+          this.setState({
+            viewHeight: event.nativeEvent.layout.height
+          })
+        }
       >
         <ImageSlider style={styles.imageSlider} data={data.image_ad} />
         <View style={styles.content} onLayout={this._setContainerOffset}>
           <PrimaryInfo data={primaryData} />
           <SellerInfo data={sellerData} />
+          <View
+            style={{
+              height: this.state.contactButtonHeight,
+              marginVertical: 10
+            }}
+            onLayout={event => {
+              this.setState({ contactSnapY: event.nativeEvent.layout.y });
+              console.log(event.nativeEvent);
+            }}
+          />
           <Divider style={styles.bigDivider} />
           <DescriptionInfo data={data.description} />
           <Divider style={styles.smallDivider} />
@@ -57,7 +100,14 @@ export class MainItem extends Component {
             />
           ) : null}
         </View>
-      </ScrollView>
+        <ContactButton
+          onContact={this._handleContact}
+          scrollY={this.state.scrollY}
+          viewHeight={this.state.viewHeight}
+          setContactButtonHeight={this.setContactButtonHeight}
+          contactSnapY={this.containerOffset + this.state.contactSnapY}
+        />
+      </Animated.ScrollView>
     );
   }
 

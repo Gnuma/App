@@ -37,7 +37,7 @@ export class RightHeader extends Component {
     //  console.log("WORKING")
     //);
     protectedAction()
-      .then(() => console.log("Super Logged In"))
+      .then(() => NavigationService.navigate("App"))
       .catch(() => console.log("User went out"));
   };
 }

@@ -37,7 +37,6 @@ export const MainItemStyles = StyleSheet.create({
     paddingBottom: 80
   },
   bigDivider: {
-    marginTop: 25,
     marginBottom: 10
   },
   smallDivider: {
