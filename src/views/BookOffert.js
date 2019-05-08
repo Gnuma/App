@@ -88,6 +88,34 @@ const DecideOffert = ({ item, offert }) => {
   );
 };
 
+const EditOffert = ({item, offert}) => {
+  return (
+    <View style={{ flex: 1 }}>
+      <OffertInfo item={item}>
+        <Card>
+          <Header2 color="secondary">Offerta</Header2>
+          <Header1 color="primary">EUR {offert.value}</Header1>
+        </Card>
+      </OffertInfo>
+      <DecisionBox>
+        <FullButton
+          value="Rifiuta"
+          icon="times"
+          style={{ marginVertical: 4 }}
+          contentStyle={{ flex: 1, textAlign: "center" }}
+          color={"darkRed"}
+        />
+        <FullButton
+          value="Accetta"
+          icon="check"
+          style={{ marginBottom: 6 }}
+          contentStyle={{ flex: 1, textAlign: "center" }}
+        />
+      </DecisionBox>
+    </View>
+  );
+}
+
 const OffertInfo = ({ item, children }) => {
   return (
     <ScrollView style={{ flex: 1 }}>
@@ -117,6 +145,18 @@ export class BookOffert extends Component {
           ? props.salesData[objectID].price.toString()
           : props.shoppingData[objectID].chats[chatID].item.price.toString()
     };
+  }
+
+  offertExists;
+
+  componentDidUpdate(prevProps){
+    const { offert } = this.getData();
+
+    if(this.offertExists!=null && offert && !this.offertExists){
+      this.offertExists = true;
+    } else if(this.offertExists!=null && !offert && this.offertExists){
+      this.offertExists = false;
+    }
   }
 
   static propTypes = {
@@ -178,16 +218,24 @@ export class BookOffert extends Component {
   renderContent = () => {
     const data = this.getData();
     console.log(data);
-    return <DecideOffert {...data} />;
-    return (
-      <CreateOffert
-        {...data}
-        price={this.state.price}
-        setPrice={this.setPrice}
-        setPriceRef={this.setPriceRef}
-        focusPrice={this.focusPrice}
-      />
-    );
+    let type;
+    if(!!data.offert){
+      type="Create";
+      return (
+        <CreateOffert
+          {...data}
+          price={this.state.price}
+          setPrice={this.setPrice}
+          setPriceRef={this.setPriceRef}
+          focusPrice={this.focusPrice}
+        />
+      );
+      } else if(data.offert.creator.pk == this.props.user){
+      type="Edit";
+    } else {
+      type = "Decide";
+      return <DecideOffert {...data} />;
+    }
   };
 }
 
