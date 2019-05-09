@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import BasicHeader from "../components/BasicHeader";
@@ -12,8 +12,18 @@ import PriceInput from "../components/Sell/PriceInput";
 import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../styles/colors";
 import Button from "../components/Button";
+import * as salesActions from "../store/actions/sales";
+import * as shoppingActions from "../store/actions/shopping";
+import LoadingOverlay from "../components/LoadingOverlay";
 
-const CreateOffert = ({ item, price, setPrice, setPriceRef, focusPrice }) => {
+const CreateOffert = ({
+  item,
+  price,
+  setPrice,
+  setPriceRef,
+  focusPrice,
+  createOffert
+}) => {
   return (
     <View style={{ flex: 1 }}>
       <OffertInfo item={item}>
@@ -49,6 +59,7 @@ const CreateOffert = ({ item, price, setPrice, setPriceRef, focusPrice }) => {
       </OffertInfo>
       <DecisionBox>
         <FullButton
+          onPress={createOffert}
           value="Fai una offerta"
           icon="tags"
           style={{ marginBottom: 6 }}
@@ -59,19 +70,32 @@ const CreateOffert = ({ item, price, setPrice, setPriceRef, focusPrice }) => {
   );
 };
 
-const DecideOffert = ({ item, offert }) => {
+const DecideOffert = ({ item, offert, rejectOffert }) => {
   console.log(item, offert);
   return (
     <View style={{ flex: 1 }}>
       <OffertInfo item={item}>
+        <Card style={{ marginVertical: 10 }}>
+          <View style={{ flexDirection: "row", alignContent: "flex-end" }}>
+            <Header2 style={{ flex: 1, marginRight: 5 }} color="black">
+              {offert.creator.user.username}
+            </Header2>
+            <Header3 color="secondary">Offerta</Header3>
+          </View>
+          <Header1 color="primary" style={{ alignSelf: "center" }}>
+            EUR {offert.value}
+          </Header1>
+        </Card>
         <Card>
-          <Header2 color="secondary">Offerta</Header2>
-          <Header1 color="primary">EUR {offert.value}</Header1>
+          <View style={{ flexDirection: "row" }}>
+            <Header2 color="black">{offert.creator.user.username}</Header2>
+          </View>
         </Card>
       </OffertInfo>
       <DecisionBox>
         <FullButton
           value="Rifiuta"
+          onPress={rejectOffert}
           icon="times"
           style={{ marginVertical: 4 }}
           contentStyle={{ flex: 1, textAlign: "center" }}
@@ -88,33 +112,44 @@ const DecideOffert = ({ item, offert }) => {
   );
 };
 
-const EditOffert = ({item, offert}) => {
+const EditOffert = ({ item, offert, removeOffert }) => {
   return (
     <View style={{ flex: 1 }}>
       <OffertInfo item={item}>
         <Card>
-          <Header2 color="secondary">Offerta</Header2>
-          <Header1 color="primary">EUR {offert.value}</Header1>
+          <View
+            style={{
+              flexDirection: "row",
+              alignSelf: "center",
+              alignContent: "center"
+            }}
+          >
+            <Header2
+              color="secondary"
+              numberOfLines={1}
+              style={{ marginRight: 12, textAlignVertical: "center" }}
+            >
+              Offerta
+            </Header2>
+            <Header1 color="primary" style={{ alignSelf: "center" }}>
+              EUR {offert.value}
+            </Header1>
+          </View>
         </Card>
       </OffertInfo>
       <DecisionBox>
         <FullButton
-          value="Rifiuta"
+          onPress={removeOffert}
+          value="Rimuovi Offerta"
           icon="times"
           style={{ marginVertical: 4 }}
           contentStyle={{ flex: 1, textAlign: "center" }}
           color={"darkRed"}
         />
-        <FullButton
-          value="Accetta"
-          icon="check"
-          style={{ marginBottom: 6 }}
-          contentStyle={{ flex: 1, textAlign: "center" }}
-        />
       </DecisionBox>
     </View>
   );
-}
+};
 
 const OffertInfo = ({ item, children }) => {
   return (
@@ -147,20 +182,35 @@ export class BookOffert extends Component {
     };
   }
 
-  offertExists;
-
-  componentDidUpdate(prevProps){
-    const { offert } = this.getData();
-
-    if(this.offertExists!=null && offert && !this.offertExists){
-      this.offertExists = true;
-    } else if(this.offertExists!=null && !offert && this.offertExists){
-      this.offertExists = false;
-    }
-  }
-
   static propTypes = {
     //type: PropTypes.string,
+  };
+
+  createOffert = () => {
+    const { objectID, chatID, price } = this.state;
+    if (this.type == ChatType.sales) {
+      this.props.salesCreateOffert(objectID, chatID, price);
+    } else {
+      this.props.shoppingCreateOffert(objectID, chatID, price);
+    }
+  };
+
+  removeOffert = () => {
+    const { objectID, chatID } = this.state;
+    if (this.type == ChatType.sales) {
+      this.props.salesRemoveOffert(objectID, chatID);
+    } else {
+      this.props.shoppingRemoveOffert(objectID, chatID);
+    }
+  };
+
+  rejectOffert = () => {
+    const { objectID, chatID } = this.state;
+    if (this.type == ChatType.sales) {
+      this.props.salesRejectOffert(objectID, chatID);
+    } else {
+      this.props.shoppingRejectOffert(objectID, chatID);
+    }
   };
 
   setPrice = price => this.setState({ price });
@@ -172,25 +222,24 @@ export class BookOffert extends Component {
 
   focusPrice = () => this.priceInput.focus();
 
-  getData = () => {
+  getData = (props = this.props) => {
     const { objectID, chatID } = this.state;
 
     if (this.type == ChatType.sales) {
-      const { chats, newsCount, offert, ...item } = this.props.salesData[
-        objectID
-      ];
+      const { chats, newsCount, ...item } = props.salesData[objectID];
+      const { offert, statusLoading } = chats[chatID];
       return {
         item: {
           ...item,
           seller: mockData.item.seller //TEST
         },
-        //offert
-        offert: mockData.offert //mock
+        offert,
+        loading: statusLoading
       };
     } else {
-      const { UserTO, item, offert } = this.props.shoppingData[objectID].chats[
-        chatID
-      ];
+      const { UserTO, item, offert, statusLoading } = props.shoppingData[
+        objectID
+      ].chats[chatID];
       return {
         item: {
           ...item,
@@ -200,51 +249,88 @@ export class BookOffert extends Component {
           ...item,
           seller: UserTO
         },*/
-        //offert
-        offert: mockData.offert //mock
+        offert,
+        loading: statusLoading
       };
     }
   };
 
   render() {
+    const data = this.getData();
+    const item = {};
+    let type;
+    let title;
+    if (!data.offert) {
+      type = OffertType.CREATE;
+      title = "Fai una offerta";
+    } else if (data.offert.creator.pk == this.props.userID) {
+      type = OffertType.EDIT;
+      title = "La tua offerta";
+    } else {
+      type = OffertType.DECIDE;
+      title = "L'offerta dell'altro";
+    }
+    console.log(this.props.userID);
+
     return (
       <View style={{ flex: 1 }}>
-        <BasicHeader title="Fai una offerta" />
-        {this.renderContent()}
+        <BasicHeader title={title} />
+        <View style={{ flex: 1 }}>
+          {this.renderContent(type, data)}
+          {data.loading ? <LoadingOverlay /> : null}
+        </View>
       </View>
     );
   }
 
-  renderContent = () => {
-    const data = this.getData();
-    console.log(data);
-    let type;
-    if(!!data.offert){
-      type="Create";
-      return (
-        <CreateOffert
-          {...data}
-          price={this.state.price}
-          setPrice={this.setPrice}
-          setPriceRef={this.setPriceRef}
-          focusPrice={this.focusPrice}
-        />
-      );
-      } else if(data.offert.creator.pk == this.props.user){
-      type="Edit";
-    } else {
-      type = "Decide";
-      return <DecideOffert {...data} />;
+  renderContent = (type, data) => {
+    console.log(!data.offert, data.offert);
+    switch (type) {
+      case OffertType.CREATE:
+        return (
+          <CreateOffert
+            {...data}
+            price={this.state.price}
+            setPrice={this.setPrice}
+            setPriceRef={this.setPriceRef}
+            focusPrice={this.focusPrice}
+            createOffert={this.createOffert}
+          />
+        );
+
+      case OffertType.EDIT:
+        return <EditOffert {...data} removeOffert={this.removeOffert} />;
+
+      case OffertType.DECIDE:
+        return <DecideOffert {...data} rejectOffert={this.rejectOffert} />;
+
+      default:
+        return null;
     }
   };
 }
 
 const mapStateToProps = state => ({
   salesData: state.sales.data,
-  shoppingData: state.shopping.data
+  shoppingData: state.shopping.data,
+  userID: state.auth.id
 });
 
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  salesCreateOffert: (itemID, chatID, price) =>
+    dispatch(salesActions.salesCreateOffert(itemID, chatID, price)),
+  salesRemoveOffert: (itemID, chatID) =>
+    dispatch(salesActions.salesRemoveOffert(itemID, chatID)),
+  salesRejectOffert: (itemID, chatID) =>
+    dispatch(salesActions.salesRejectOffert(itemID, chatID)),
+
+  shoppingCreateOffert: (subjectID, chatID, price) =>
+    dispatch(shoppingActions.shoppingCreateOffert(subjectID, chatID, price)),
+  shoppingRemoveOffert: (subjectID, chatID) =>
+    dispatch(shoppingActions.shoppingRemoveOffert(subjectID, chatID)),
+  shoppingRejectOffert: (subjectID, chatID) =>
+    dispatch(shoppingActions.shoppingRejectOffert(subjectID, chatID))
+});
 
 export default connect(
   mapStateToProps,
@@ -291,4 +377,10 @@ const mockData = {
     value: 15,
     status: "pending"
   }
+};
+
+OffertType = {
+  CREATE: "CREATE",
+  EDIT: "EDIT",
+  DECIDE: "DECIDE"
 };

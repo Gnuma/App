@@ -21,3 +21,10 @@ export const getChatIndex = (chatID, item) => {
 
 export const highlightItem = (array, index) =>
   array.splice(index, 1).concat(array);
+
+export const createOffert = (user, price) => ({
+  creator: user,
+  createdAt: new Date(),
+  value: price,
+  status: "pending"
+});

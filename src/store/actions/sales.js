@@ -148,6 +148,22 @@ export const salesNewChat = (itemID, chatID, data) => ({
   }
 });
 
+export const salesStartStatusAction = (itemID, chatID) => ({
+  type: actionTypes.SALES_START_STATUS_ACTION,
+  payload: {
+    itemID,
+    chatID
+  }
+});
+
+export const salesDeleteOffert = (itemID, chatID) => ({
+  type: actionTypes.SALES_REMOVE_OFFERT,
+  payload: {
+    itemID,
+    chatID
+  }
+});
+
 export const salesSend = (itemID, chatID) => {
   return (dispatch, getState) => {
     const myID = getState().auth.id;
@@ -281,6 +297,53 @@ export const salesRestart = data => {
 
     setTimeout(() => {
       dispatch(salesRetrieveData(data));
+    }, 2000);
+  };
+};
+
+export const salesCreateOffert = (itemID, chatID, price) => {
+  return (dispatch, getState) => {
+    dispatch(salesStartStatusAction(itemID, chatID));
+
+    //API
+    setTimeout(() => {
+      const { username, id } = getState().auth;
+      dispatch({
+        type: actionTypes.SALES_CREATE_OFFERT,
+        payload: {
+          price,
+          itemID,
+          chatID,
+          user: {
+            pk: id,
+            user: {
+              username
+            }
+          }
+        }
+      });
+    }, 2000);
+  };
+};
+
+export const salesRemoveOffert = (itemID, chatID) => {
+  return dispatch => {
+    dispatch(salesStartStatusAction(itemID, chatID));
+
+    //API
+    setTimeout(() => {
+      dispatch(salesDeleteOffert(itemID, chatID));
+    }, 2000);
+  };
+};
+
+export const salesRejectOffert = (itemID, chatID) => {
+  return dispatch => {
+    dispatch(salesStartStatusAction(itemID, chatID));
+
+    //API
+    setTimeout(() => {
+      dispatch(salesDeleteOffert(itemID, chatID));
     }, 2000);
   };
 };

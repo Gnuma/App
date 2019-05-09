@@ -67,10 +67,10 @@ class WS {
       }
     );
 
-    this.stateSubscription = AppState.addEventListener(
-      "change",
-      this.stateChange
-    );
+    //this.stateSubscription = AppState.addEventListener(
+    //  "change",
+    //  this.stateChange
+    //);
   }
 
   restart = isConnected => {

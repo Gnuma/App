@@ -4,7 +4,8 @@ import update from "immutability-helper";
 import {
   getItemIndex,
   getChatIndex,
-  highlightItem
+  highlightItem,
+  createOffert
 } from "../../utils/chatUtility";
 import { newChat } from "../../mockData/Chat2";
 
@@ -300,6 +301,53 @@ const salesNewChat = (state, action) => {
   }
 };
 
+const salesStartStatusAction = (state, action) => {
+  const { itemID, chatID } = action.payload;
+  return update(state, {
+    data: {
+      [itemID]: {
+        chats: {
+          [chatID]: {
+            statusLoading: { $set: true }
+          }
+        }
+      }
+    }
+  });
+};
+
+const salesCreateOffert = (state, action) => {
+  const { price, itemID, chatID, user } = action.payload;
+  return update(state, {
+    data: {
+      [itemID]: {
+        chats: {
+          [chatID]: {
+            statusLoading: { $set: false },
+            offert: { $set: createOffert(user, price) }
+          }
+        }
+      }
+    }
+  });
+};
+
+const salesDeleteOffert = (state, action) => {
+  const { itemID, chatID } = action.payload;
+  return update(state, {
+    data: {
+      [itemID]: {
+        chats: {
+          [chatID]: {
+            statusLoading: { $set: false },
+            offert: { $set: null }
+          }
+        }
+      }
+    }
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SALES_INIT:
@@ -346,6 +394,15 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SALES_NEW_CHAT:
       return salesNewChat(state, action);
+
+    case actionTypes.SALES_START_STATUS_ACTION:
+      return salesStartStatusAction(state, action);
+
+    case actionTypes.SALES_CREATE_OFFERT:
+      return salesCreateOffert(state, action);
+
+    case actionTypes.SALES_REMOVE_OFFERT:
+      return salesDeleteOffert(state, action);
 
     default:
       return state;

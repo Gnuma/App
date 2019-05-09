@@ -1,22 +1,58 @@
 import React, { Component } from "react";
-import { Text, View, StyleSheet, TouchableWithoutFeedback } from "react-native";
-import Button from "./Button";
-import Icon from "react-native-vector-icons/FontAwesome";
+import {
+  View,
+  ActivityIndicator,
+  StyleSheet,
+  TouchableWithoutFeedback
+} from "react-native";
+import colors from "../styles/colors";
+//import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
-export default ({ active, children, ...rest }) => {
-  return (
-    <View {...rest}>
-      {children}
-      {active ? (
-        <TouchableWithoutFeedback>
+export default class LoadingOverlay extends Component {
+  render() {
+    const { style, opacity = 0.2 } = this.props;
+    return (
+      <View style={{ ...StyleSheet.absoluteFill }}>
+        <TouchableWithoutFeedback
+          style={{
+            flex: 1
+          }}
+        >
           <View
-            style={[
-              StyleSheet.absoluteFill,
-              { backgroundColor: "rgba(196, 196, 196, 0.2)", zIndex: 100 }
-            ]}
-          />
+            style={{
+              flex: 1,
+              justifyContent: "center"
+            }}
+          >
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { opacity, backgroundColor: colors.black },
+                style
+              ]}
+            />
+            <ActivityIndicator style={styles.indicator} size="large" />
+          </View>
         </TouchableWithoutFeedback>
-      ) : null}
-    </View>
-  );
-};
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  indicator: {
+    alignSelf: "center",
+    zIndex: 1
+  }
+});
+
+/*
+
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            { opacity, backgroundColor: colors.black },
+            style
+          ]}
+        />
+        */

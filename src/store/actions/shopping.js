@@ -133,6 +133,22 @@ export const shoppingContactUser = (item, chatID) => ({
   }
 });
 
+export const shoppingStartStatusAction = (subjectID, chatID) => ({
+  type: actionTypes.SHOPPING_START_STATUS_ACTION,
+  payload: {
+    subjectID,
+    chatID
+  }
+});
+
+export const shoppingDeleteOffert = (subjectID, chatID) => ({
+  type: actionTypes.SHOPPING_REMOVE_OFFERT,
+  payload: {
+    subjectID,
+    chatID
+  }
+});
+
 export const shoppingSend = (subjectID, chatID) => {
   return (dispatch, getState) => {
     const myID = getState().auth.id;
@@ -293,6 +309,53 @@ export const shoppingRestart = data => {
 
     setTimeout(() => {
       dispatch(shoppingRetrieveData(data));
+    }, 2000);
+  };
+};
+
+export const shoppingCreateOffert = (subjectID, chatID, price) => {
+  return (dispatch, getState) => {
+    dispatch(shoppingStartStatusAction(subjectID, chatID));
+
+    //API
+    setTimeout(() => {
+      const { username, id } = getState().auth;
+      dispatch({
+        type: actionTypes.SHOPPING_CREATE_OFFERT,
+        payload: {
+          price,
+          subjectID,
+          chatID,
+          user: {
+            pk: id,
+            user: {
+              username
+            }
+          }
+        }
+      });
+    }, 2000);
+  };
+};
+
+export const shoppingRemoveOffert = (subjectID, chatID) => {
+  return dispatch => {
+    dispatch(shoppingStartStatusAction(subjectID, chatID));
+
+    //API
+    setTimeout(() => {
+      dispatch(shoppingDeleteOffert(subjectID, chatID));
+    }, 2000);
+  };
+};
+
+export const shoppingRejectOffert = (subjectID, chatID) => {
+  return dispatch => {
+    dispatch(shoppingStartStatusAction(subjectID, chatID));
+
+    //API
+    setTimeout(() => {
+      dispatch(shoppingDeleteOffert(subjectID, chatID));
     }, 2000);
   };
 };

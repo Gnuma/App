@@ -4,7 +4,8 @@ import update from "immutability-helper";
 import {
   getSubjectIndex,
   getChatIndex,
-  highlightItem
+  highlightItem,
+  createOffert
 } from "../../utils/chatUtility";
 import {
   shoppingLoadMockNew,
@@ -296,6 +297,53 @@ const shoppingContactUser = (state, action) => {
   });
 };
 
+const shoppingStartStatusAction = (state, action) => {
+  const { subjectID, chatID } = action.payload;
+  return update(state, {
+    data: {
+      [subjectID]: {
+        chats: {
+          [chatID]: {
+            statusLoading: { $set: true }
+          }
+        }
+      }
+    }
+  });
+};
+
+const shoppingCreateOffert = (state, action) => {
+  const { price, subjectID, chatID, user } = action.payload;
+  return update(state, {
+    data: {
+      [subjectID]: {
+        chats: {
+          [chatID]: {
+            statusLoading: { $set: false },
+            offert: { $set: createOffert(user, price) }
+          }
+        }
+      }
+    }
+  });
+};
+
+const shoppingDeleteOffert = (state, action) => {
+  const { subjectID, chatID } = action.payload;
+  return update(state, {
+    data: {
+      [subjectID]: {
+        chats: {
+          [chatID]: {
+            statusLoading: { $set: false },
+            offert: { $set: null }
+          }
+        }
+      }
+    }
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SHOPPING_INIT:
@@ -342,6 +390,15 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SHOPPING_CONTACT_USER:
       return shoppingContactUser(state, action);
+
+    case actionTypes.SHOPPING_START_STATUS_ACTION:
+      return shoppingStartStatusAction(state, action);
+
+    case actionTypes.SHOPPING_CREATE_OFFERT:
+      return shoppingCreateOffert(state, action);
+
+    case actionTypes.SHOPPING_REMOVE_OFFERT:
+      return shoppingDeleteOffert(state, action);
 
     default:
       return state;
@@ -405,9 +462,20 @@ const formatData = (arrayData, focus = 0) => {
         ...seller.user
       };
       const item = {
-        condition: 0, //Da togliere
         ...restItem
       };
+
+      //Da togliere
+      const offert = {
+        creator: {
+          pk: 1,
+          username: "Alberto"
+        },
+        createdAt: "06/05/2019-12:02:14",
+        value: 15,
+        status: "pending"
+      };
+      //---
 
       for (let m = 0; m < chat.messages.length; m++)
         chat.messages[m].createdAt = new Date(chat.messages[m].createdAt);
@@ -418,6 +486,7 @@ const formatData = (arrayData, focus = 0) => {
         ...chat,
         composer: "",
         loading: false
+        //offert
       };
     }
     orderedData.push({ subjectID: subject._id, chats: orderedChats });

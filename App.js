@@ -9,7 +9,6 @@ import WS from "./src/utils/WebSocket";
 class App extends Component {
   componentWillUnmount() {
     console.log("App Has unmounted");
-    WS.close();
   }
 
   render() {
