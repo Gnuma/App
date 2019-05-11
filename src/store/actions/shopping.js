@@ -359,3 +359,20 @@ export const shoppingRejectOffert = (subjectID, chatID) => {
     }, 2000);
   };
 };
+
+export const shoppingAcceptOffert = (subjectID, chatID) => {
+  return dispatch => {
+    dispatch(shoppingStartStatusAction(subjectID, chatID));
+
+    //API
+    setTimeout(() => {
+      dispatch({
+        type: actionTypes.SHOPPING_ACCEPT_OFFERT,
+        payload: {
+          subjectID,
+          chatID
+        }
+      });
+    }, 2000);
+  };
+};

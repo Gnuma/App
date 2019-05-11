@@ -344,6 +344,22 @@ const shoppingDeleteOffert = (state, action) => {
   });
 };
 
+const shoppingAcceptOffert = (state, action) => {
+  const { subjectID, chatID } = action.payload;
+  return update(state, {
+    data: {
+      [subjectID]: {
+        chats: {
+          [chatID]: {
+            offert: { $merge: { status: "accepted" } },
+            statusLoading: { $set: false }
+          }
+        }
+      }
+    }
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SHOPPING_INIT:
@@ -399,6 +415,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SHOPPING_REMOVE_OFFERT:
       return shoppingDeleteOffert(state, action);
+
+    case actionTypes.SHOPPING_ACCEPT_OFFERT:
+      return shoppingAcceptOffert(state, action);
 
     default:
       return state;

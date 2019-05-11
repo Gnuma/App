@@ -18,6 +18,7 @@ import {
 import colors from "../../styles/colors";
 import Button from "../Button";
 import Composer from "./Composer";
+import Offert from "./Offert";
 
 export default class Chat extends Component {
   onSend = () => {
@@ -48,6 +49,16 @@ export default class Chat extends Component {
         }}
       />
     );
+  };
+
+  renderOffert = () => {
+    const { data, item, goBookOffert } = this.props;
+    console.log(data);
+    if (!data.offert) return null;
+    else
+      return (
+        <Offert offert={data.offert} item={item} goBookOffert={goBookOffert} />
+      );
   };
 
   renderTime = props => {
@@ -98,6 +109,7 @@ export default class Chat extends Component {
           listViewProps={this.listViewProps}
           loadEarlier={data.loading}
           extraData={{ loading: data.loading }}
+          renderFooter={this.renderOffert}
           renderLoadEarlier={() => {
             return (
               <ActivityIndicator

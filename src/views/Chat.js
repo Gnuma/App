@@ -100,12 +100,11 @@ export class Chat extends Component {
     }
   };
 
-  getBook = () => {
+  getItem = () => {
     if (this.type === ChatType.sales) {
-      return this.getData()[this.state.objectID].book;
+      return this.getData()[this.state.objectID];
     } else {
-      return this.getData()[this.state.objectID].chats[this.state.chatID].item
-        .book;
+      return this.getData()[this.state.objectID].chats[this.state.chatID].item;
     }
   };
 
@@ -134,13 +133,14 @@ export class Chat extends Component {
   render() {
     const { objectID, chatID } = this.state;
     const chatData = this.getChatData();
+    const item = this.getItem();
     console.log(this.getGlobalLoading());
 
     return (
       <View style={{ flex: 1 }}>
         <ChatHeader
           data={chatData}
-          book={this.getBook()}
+          book={item.book}
           goBack={this._goBack}
           goBookOffert={this.goBookOffert}
         />
@@ -169,6 +169,8 @@ export class Chat extends Component {
               type={this.type}
               loadEarlier={this.loadEarlier}
               userID={this.props.userID}
+              item={item}
+              goBookOffert={this.goBookOffert}
             />
           )}
         </View>

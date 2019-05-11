@@ -347,3 +347,20 @@ export const salesRejectOffert = (itemID, chatID) => {
     }, 2000);
   };
 };
+
+export const salesAcceptOffert = (itemID, chatID) => {
+  return dispatch => {
+    dispatch(salesStartStatusAction(itemID, chatID));
+
+    //API
+    setTimeout(() => {
+      dispatch({
+        type: actionTypes.SALES_ACCEPT_OFFERT,
+        payload: {
+          itemID,
+          chatID
+        }
+      });
+    }, 2000);
+  };
+};

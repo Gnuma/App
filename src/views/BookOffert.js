@@ -70,7 +70,7 @@ const CreateOffert = ({
   );
 };
 
-const DecideOffert = ({ item, offert, rejectOffert }) => {
+const DecideOffert = ({ item, offert, rejectOffert, acceptOffert }) => {
   console.log(item, offert);
   return (
     <View style={{ flex: 1 }}>
@@ -103,6 +103,7 @@ const DecideOffert = ({ item, offert, rejectOffert }) => {
         />
         <FullButton
           value="Accetta"
+          onPress={acceptOffert}
           icon="check"
           style={{ marginBottom: 6 }}
           contentStyle={{ flex: 1, textAlign: "center" }}
@@ -213,6 +214,15 @@ export class BookOffert extends Component {
     }
   };
 
+  acceptOffert = () => {
+    const { objectID, chatID } = this.state;
+    if (this.type == ChatType.sales) {
+      this.props.salesAcceptOffert(objectID, chatID);
+    } else {
+      this.props.shoppingAcceptOffert(objectID, chatID);
+    }
+  };
+
   setPrice = price => this.setState({ price });
 
   setPriceRef = ref => {
@@ -263,6 +273,9 @@ export class BookOffert extends Component {
     if (!data.offert) {
       type = OffertType.CREATE;
       title = "Fai una offerta";
+    } else if (data.offert.status == "accepted") {
+      type = OffertType.ACCEPTED;
+      title = "Offerta Accettata";
     } else if (data.offert.creator.pk == this.props.userID) {
       type = OffertType.EDIT;
       title = "La tua offerta";
@@ -302,7 +315,13 @@ export class BookOffert extends Component {
         return <EditOffert {...data} removeOffert={this.removeOffert} />;
 
       case OffertType.DECIDE:
-        return <DecideOffert {...data} rejectOffert={this.rejectOffert} />;
+        return (
+          <DecideOffert
+            {...data}
+            rejectOffert={this.rejectOffert}
+            acceptOffert={this.acceptOffert}
+          />
+        );
 
       default:
         return null;
@@ -323,13 +342,17 @@ const mapDispatchToProps = dispatch => ({
     dispatch(salesActions.salesRemoveOffert(itemID, chatID)),
   salesRejectOffert: (itemID, chatID) =>
     dispatch(salesActions.salesRejectOffert(itemID, chatID)),
+  salesAcceptOffert: (itemID, chatID) =>
+    dispatch(salesActions.salesAcceptOffert(itemID, chatID)),
 
   shoppingCreateOffert: (subjectID, chatID, price) =>
     dispatch(shoppingActions.shoppingCreateOffert(subjectID, chatID, price)),
   shoppingRemoveOffert: (subjectID, chatID) =>
     dispatch(shoppingActions.shoppingRemoveOffert(subjectID, chatID)),
   shoppingRejectOffert: (subjectID, chatID) =>
-    dispatch(shoppingActions.shoppingRejectOffert(subjectID, chatID))
+    dispatch(shoppingActions.shoppingRejectOffert(subjectID, chatID)),
+  shoppingAcceptOffert: (subjectID, chatID) =>
+    dispatch(shoppingActions.shoppingAcceptOffert(subjectID, chatID))
 });
 
 export default connect(
@@ -382,5 +405,6 @@ const mockData = {
 OffertType = {
   CREATE: "CREATE",
   EDIT: "EDIT",
-  DECIDE: "DECIDE"
+  DECIDE: "DECIDE",
+  ACCEPTED: "ACCEPTED"
 };
