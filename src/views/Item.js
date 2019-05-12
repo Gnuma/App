@@ -42,7 +42,7 @@ export class Item extends Component {
     ];
 
     const { navigation } = this.props;
-    const id = navigation.getParam("itemID", "Undesfineds");
+    const id = navigation.getParam("itemID", "Undefined");
 
     axios
       .get(___GET_AD___ + `${id}/`)
@@ -50,6 +50,7 @@ export class Item extends Component {
         this.setState({
           data: this.formatData(res.data)
         });
+        console.log(res.data);
         console.log(this.formatData(res.data));
       })
       .catch(err => {
@@ -60,13 +61,13 @@ export class Item extends Component {
       data: this.formatData(itemData)
     });*/
 
-    //To be put in then
-    //this.props.notificationViewItemRedux(id);
     console.log(this.state.commentIDList);
   }
 
   formatData = data => {
     let comments = data.comment_ad;
+
+    console.log("NativeComments", comments);
     let formattedComments = [];
     for (let i = 0; i < comments.length; i++) {
       formattedComments.push(this.formatComment(comments[i]));
@@ -79,8 +80,8 @@ export class Item extends Component {
 
   formatComment = comment => {
     formattedComment = {
-      content: comment.content,
-      created_at: comment.created,
+      content: comment.text,
+      created_at: comment.createdAt,
       pk: comment.pk,
       user: comment.user.user,
       answers: []
@@ -88,8 +89,8 @@ export class Item extends Component {
     for (let i = 0; i < comment.parent_child.length; i++) {
       const answer = comment.parent_child[i];
       formattedComment.answers.push({
-        content: answer.content,
-        created_at: answer.created,
+        content: answer.text,
+        created_at: answer.createdAt,
         pk: answer.id,
         user: answer.user.user
       });

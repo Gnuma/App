@@ -20,7 +20,10 @@ import {
   buyerChatList,
   buyerChatList_DEPRECATED
 } from "../mockData/Chat2";
-import { commentsReceiveComment } from "../store/actions/comments";
+import {
+  commentsReceiveComment,
+  commentsInit
+} from "../store/actions/comments";
 import NetInfo from "@react-native-community/netinfo";
 import { AppState } from "react-native";
 import { ChatType } from "./constants";
@@ -109,8 +112,10 @@ class WS {
         case DataType.NEW_COMMENT:
           return store.dispatch(commentsReceiveComment(data.comment, data.for));
 
+        //default:
+        // throw `Type ${data.type} not valid`;
         default:
-          throw `Type ${data.type} not valid`;
+          return store.dispatch(commentsInit(data.notifications));
       }
     } catch (error) {
       console.warn(error);

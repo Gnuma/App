@@ -30,3 +30,14 @@ export const commentsInit = data => {
     dispatch(init(data));
   };
 };
+
+export const commentsRead = itemID => {
+  return dispatch => {
+    //API
+
+    dispatch({
+      type: actionTypes.COMMENTS_RECEIVE_ANSWER,
+      payload: { itemID }
+    });
+  };
+};

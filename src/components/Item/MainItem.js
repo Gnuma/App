@@ -57,6 +57,7 @@ export class MainItem extends Component {
     const secondaryData = {
       book: data.book
     };
+    console.log(data.seller);
 
     return (
       <Animated.ScrollView
@@ -92,7 +93,7 @@ export class MainItem extends Component {
           {/*data.comments*/ true ? (
             <QuipuComment
               data={data.comment_ad}
-              sellerPK={data.seller.user.pk}
+              sellerPK={data.seller.user.id}
               scrollTo={this._scrollTo}
               ref={comments => (this.comments = comments)}
               user={user}
@@ -115,7 +116,7 @@ export class MainItem extends Component {
     //console.log(y);
     console.log(y);
     y += this.containerOffset;
-    this.scrollView.scrollTo({ x: 0, y, animated: true });
+    this.scrollView.getNode().scrollTo({ x: 0, y, animated: true });
   };
 
   _setContainerOffset = event => {

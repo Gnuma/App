@@ -4,28 +4,12 @@ import { newCommentsSingle, newCommentsMulti } from "../../mockData/comments";
 import { localNotification } from "../../service/pushNotification";
 import { ___CREATE_COMMENT___ } from "../constants";
 
-export const notificationsUpdate = notifications => {
+export const notificationsUpdate = data => {
   return {
     type: actionTypes.NOTIFICATIONS_UPDATE,
     payload: {
-      notifications
+      data
     }
-  };
-};
-
-export const notificationsSetSubscription = idSubscription => {
-  return {
-    type: actionTypes.NOTIFICATIONS_SUBSCRIBE,
-    payload: {
-      idSubscription
-    }
-  };
-};
-
-export const notificationsSubscribe = () => {
-  return dispatch => {
-    //const idSubscription = setInterval(() => dispatch(update()), 10000);
-    //dispatch(notificationsSetSubscription(idSubscription));
   };
 };
 
@@ -44,22 +28,15 @@ export const notificationsViewItem = itemPK => {
   };
 };
 
-let debugCounter = 0;
-
-export const update = () => {
+export const update = data => {
   return dispatch => {
-    //axios
-    let data;
-    if (debugCounter === 0) data = newCommentsMulti;
-    else data = newCommentsSingle;
-    debugCounter++;
     dispatch(notificationsUpdate(formatComments(data)));
-    //localNotification();
   };
 };
 
 formatComments = data => {
   let formattedData = {};
+  let orderedData = [];
   for (let i = 0; i < data.length; i++) {
     const itemPK = data[i].itemPK;
     const fatherPK =

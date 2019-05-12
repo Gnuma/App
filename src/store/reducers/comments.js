@@ -11,13 +11,31 @@ const initialState = {
 
 const commentsInit = (state, action) => {
   const { data } = action.payload;
+
   let orderedData = [];
-  for (itemID in data) {
-    //TO-DO
-    orderedData.push(itemID);
+  let formattedData = {};
+
+  for (let i = 0; i < data.length; i++) {
+    let itemID = data[i].comment.item.pk;
+    const type = data[i].type;
+    if (!formattedData[itemID]) orderedData.push(itemID);
+    formattedData = update(formattedData, {
+      [itemID]: item =>
+        update(
+          item || {
+            commentsList: [],
+            item: data[i].comment.item
+          },
+          {
+            commentsList: { $push: [data[i].comment.pk] },
+            [type]: { $set: true }
+          }
+        )
+    });
   }
+
   return update(state, {
-    data: { $set: data },
+    data: { $set: formattedData },
     orderedData: { $set: orderedData }
   });
 };
@@ -47,13 +65,18 @@ const commentsReceiveComment = (state, action) => {
   });
 };
 
+const commentsRead = (state, action) => {
+  return state;
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.COMMENTS_INIT:
       return commentsInit(state, action);
     case actionTypes.COMMENTS_RECEIVE_COMMENT:
       return commentsReceiveComment(state, action);
-
+    case actionTypes.COMMENTS_READ:
+      return commentsRead(state, action);
     default:
       return state;
   }

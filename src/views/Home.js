@@ -14,6 +14,7 @@ import Button from "../components/Button";
 import protectedAction from "../utils/protectedAction";
 import NotificationCenter from "../components/Home/NotificationCenter";
 import _ from "lodash";
+import MainHome from "../components/Home/MainHome";
 
 export class Home extends Component {
   static propTypes = {
@@ -50,38 +51,20 @@ export class Home extends Component {
       );
     } else {
       return (
-        <TouchableWithoutFeedback onPress={() => console.log("SEnti un po")}>
-          <View style={{ justifyContent: "center", flex: 1 }}>
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                paddingVertical: 25
-              }}
-            >
-              <SearchLink onPress={this._openSearchBar} />
-            </View>
-            <View style={{ flex: 1 }}>
-              {this.props.commentsOrder &&
-              !_.isEmpty(this.props.commentsOrder) ? (
-                <NotificationCenter
-                  data={this.props.commentsData}
-                  orderedData={this.props.commentsOrder}
-                  commentHandler={this._onCommentNotificationPress}
-                />
-              ) : null}
-              <BookShelf onPress={this._searchOption} />
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
+        <MainHome
+          openSearchBar={this._openSearchBar}
+          commentsOrdered={this.props.commentsOrder}
+          commentsData={this.props.commentsData}
+          goComment={this._onCommentNotificationPress}
+          searchOption={this._searchOption}
+        />
       );
     }
   };
 
-  _onCommentNotificationPress = (itemPK, book, commentIDList) => {
+  _onCommentNotificationPress = (itemPK, book) => {
     this.props.navigation.navigate("Item", {
       itemID: itemPK,
-      commentIDList: commentIDList,
       name: book.title,
       authors: book.authors
     });

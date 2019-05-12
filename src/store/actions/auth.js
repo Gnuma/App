@@ -92,6 +92,7 @@ export const authLogin = (username, password, resolve) => {
         })
         .then(res => {
           const token = res.data.key;
+          console.log(res);
           login({ dispatch, resolve, token });
           //NavigatorService.navigate("App");
         })

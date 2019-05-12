@@ -3,7 +3,8 @@ import {
   View,
   Dimensions,
   FlatList,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  StyleSheet
 } from "react-native";
 import colors from "../../styles/colors";
 import { Header2, Header3, Header4 } from "../Text";
@@ -12,18 +13,9 @@ import SolidButton from "../SolidButton";
 import Button from "../Button";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { ChatType } from "../../utils/constants";
+import { TouchableNativeFeedback } from "react-native-gesture-handler";
 
 export default class NotificationCenter extends Component {
-  state = {
-    isActive: false
-  };
-
-  setActive = () => {
-    this.setState(prevState => ({
-      isActive: !prevState.isActive
-    }));
-  };
-
   filter = memoize(data => this.formatNotifications(data));
 
   _keyExtractor = item => {
@@ -32,13 +24,9 @@ export default class NotificationCenter extends Component {
 
   _renderItem = ({ item, index }) => {
     const data = this.props.data[item];
-    const number = data.data.length == 0 ? "a " : "e ";
-    const type = (data.type === ChatType.sales ? "domand" : "rispost") + number;
-    let commentIDs = [];
-    data.data.forEach(comment => commentIDs.push(comment.pk));
 
-    const text = "Nuov" + number + type + "su ";
-    const bookTitle = data.book.title;
+    const text = "Hai dei nuovi commenti su ";
+    const bookTitle = data.item.book.title;
     return (
       <SolidButton
         style={{
@@ -50,9 +38,7 @@ export default class NotificationCenter extends Component {
         iconStyle={{
           color: colors.secondary
         }}
-        onPress={() =>
-          this.props.commentHandler(data.pk, data.book, commentIDs)
-        }
+        onPress={() => this.props.commentHandler(data.item.pk, data.item.book)}
       >
         <Header3 color="black" style={{ fontSize: 17 }} numberOfLines={1}>
           {text}
@@ -63,74 +49,39 @@ export default class NotificationCenter extends Component {
   };
 
   render() {
-    const data = this.props.data;
-    const orderedData = this.props.orderedData;
+    const { data, orderedData, isActive, show } = this.props;
+
     return (
-      <View
-        style={{
-          height: 46
-        }}
-      >
-        <View
+      <View style={{ alignItems: "center" }}>
+        <Button
           style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            zIndex: 1,
-            backgroundColor: colors.white
+            padding: 10,
+            borderRadius: 6,
+            borderBottom: 0,
+            backgroundColor: colors.white,
+            elevation: 2
           }}
+          onPress={show}
         >
-          <Button
-            style={{
-              alignSelf: "center",
-              padding: 10,
+          <Icon name={"bell"} size={24} style={{ color: colors.darkRed }} />
+        </Button>
+        {isActive ? (
+          <FlatList
+            contentContainerStyle={{
+              paddingVertical: 3,
+              marginHorizontal: 20,
+              backgroundColor: colors.white,
               borderRadius: 6,
-              elevation: this.state.isActive ? 0 : 2,
-              backgroundColor: colors.white
+              elevation: 2
             }}
-            onPress={this.setActive}
-          >
-            <Icon name={"bell"} size={24} style={{ color: colors.darkRed }} />
-          </Button>
-          {this.state.isActive ? (
-            <FlatList
-              contentContainerStyle={{
-                backgroundColor: colors.white,
-                overflow: "visible",
-                borderRadius: 6,
-                borderWidth: 1,
-                flex: 1,
-                marginHorizontal: 20,
-                paddingVertical: 5
-              }}
-              renderItem={this._renderItem}
-              data={orderedData}
-              extraData={data}
-              keyExtractor={this._keyExtractor}
-              onStartShouldSetResponderCapture={() => true}
-            />
-          ) : null}
-        </View>
+            renderItem={this._renderItem}
+            data={orderedData}
+            extraData={data}
+            keyExtractor={this._keyExtractor}
+            onStartShouldSetResponderCapture={() => true}
+          />
+        ) : null}
       </View>
     );
   }
 }
-
-/*
-    console.log(batch);
-    let data = {};
-    for (let i = 0; i < batch.length; i++) {
-      const fatherPK =
-        batch[i].fatherPK !== undefined ? batch[i].fatherPK : batch[i].pk;
-      //data[fatherPK][batch[i].pk] = batch[i];
-
-      if (data[fatherPK]) {
-        data[fatherPK][batch[i].pk] = batch[i];
-      } else {
-        data[fatherPK] = {};
-        data[fatherPK][batch[i].pk] = batch[i];
-      }
-    }
-    console.log(data);
-    return data;
-    */

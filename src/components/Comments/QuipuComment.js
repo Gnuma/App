@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Keyboard } from "react-native";
+import { View, Keyboard, ToastAndroid } from "react-native";
 import PropTypes from "prop-types";
 import CommentComposer from "./CommentComposer";
 import { Header2 } from "../Text";
@@ -11,6 +11,7 @@ import uuid from "uuid";
 import axios from "axios";
 import { ___CREATE_COMMENT___ } from "../../store/constants";
 import protectedAction from "../../utils/protectedAction";
+import NetInfo from "@react-native-community/netinfo";
 
 class QuipuComment extends Component {
   static propTypes = {
@@ -42,9 +43,8 @@ class QuipuComment extends Component {
         <CommentComposer
           value={value}
           onTextChange={this._handleComposing}
-          onSend={this._onSend}
+          onSend={() => this.send("question")}
         />
-
         <View>{this.state.data.map(this._renderMainComment)}</View>
       </View>
     );
@@ -78,12 +78,13 @@ class QuipuComment extends Component {
           isFather
           sellerPK={this.props.sellerPK}
           onAnswer={this._onAnswer}
+          userID={this.props.user.id}
         />
         {isFocused ? (
           <CommentComposer
             value={this.state.answeringValue}
             onTextChange={this._handleAnswereComposing}
-            onSend={this._onSendAnswer}
+            onSend={() => this.send("answer")}
           />
         ) : null}
         {index !== this.state.data.length - 1 ? (
@@ -93,6 +94,28 @@ class QuipuComment extends Component {
         ) : null}
       </View>
     );
+  };
+
+  send = type => {
+    NetInfo.isConnected
+      .fetch()
+      .then(isConnected => {
+        if (isConnected) {
+          if (type === "question") this._onSend();
+          else this._onSendAnswer();
+        } else {
+          ToastAndroid.show(
+            "Nessuna connessione ad internet... Riporva più tardi",
+            ToastAndroid.SHORT
+          );
+        }
+      })
+      .catch(err => {
+        ToastAndroid.show(
+          "Nessuna connessione ad internet... Riporva più tardi",
+          ToastAndroid.SHORT
+        );
+      });
   };
 
   _onAnswer = pk => {
@@ -197,7 +220,11 @@ class QuipuComment extends Component {
           }),
           () => {
             //send validation
-
+            console.log("Creating Comment: ", {
+              type: "comment",
+              item: this.props.itemPK,
+              content: content
+            });
             axios
               .post(___CREATE_COMMENT___, {
                 type: "comment",
