@@ -60,8 +60,6 @@ export class Item extends Component {
     /*this.setState({
       data: this.formatData(itemData)
     });*/
-
-    console.log(this.state.commentIDList);
   }
 
   formatData = data => {
@@ -163,7 +161,8 @@ export class Item extends Component {
 const mapStateToProps = state => ({
   user: {
     username: state.auth.username,
-    id: state.auth.id
+    id: state.auth.id,
+    commentsData: state.comments.data
   }
 });
 

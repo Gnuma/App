@@ -45,62 +45,38 @@ export default class MainHome extends Component {
     } = this.props;
 
     return (
-      <View style={{ justifyContent: "center", flex: 1 }}>
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            paddingVertical: 25
-          }}
-        >
-          <SearchLink onPress={openSearchBar} />
-        </View>
-        <View style={{ flex: 1 }} onLayout={this.onNCPlaceholderLayout}>
+      <TouchableWithoutFeedback
+        style={StyleSheet.absoluteFill}
+        onPress={this.hideNC}
+      >
+        <View style={{ justifyContent: "center", flex: 1 }}>
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              paddingVertical: 25
+            }}
+          >
+            <SearchLink onPress={openSearchBar} />
+          </View>
           {commentsOrdered && !_.isEmpty(commentsOrdered) ? (
-            <Animated.View
-              style={{
-                width: 1,
-                height: this.state.NCAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, 44]
-                }),
-                backgroundColor: colors.darkRed
-              }}
+            <NotificationCenter
+              data={commentsData}
+              orderedData={commentsOrdered}
+              commentHandler={goComment}
+              isActive={this.state.NCActive}
+              show={this.showNC}
+              animation={this.state.NCAnimation}
             />
           ) : null}
-          <View style={{ flex: 1, justifyContent: "center" }}>
+          <View
+            style={{ flex: 1, justifyContent: "center" }}
+            pointerEvents={this.state.NCActive ? "none" : "auto"}
+          >
             <BookShelf onPress={searchOption} />
           </View>
         </View>
-        {commentsOrdered &&
-        !_.isEmpty(commentsOrdered) &&
-        this.state.NCLayout ? (
-          <View
-            style={{
-              ...StyleSheet.absoluteFill,
-              elevation: 5
-            }}
-          >
-            <View style={{ flex: 1 }}>
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: this.state.NCLayout.y
-                }}
-              >
-                <NotificationCenter
-                  data={commentsData}
-                  orderedData={commentsOrdered}
-                  commentHandler={goComment}
-                  isActive={this.state.NCActive}
-                  show={this.showNC}
-                  animation={this.state.NCAnimation}
-                />
-              </View>
-            </View>
-          </View>
-        ) : null}
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 

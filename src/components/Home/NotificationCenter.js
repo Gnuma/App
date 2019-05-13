@@ -52,34 +52,52 @@ export default class NotificationCenter extends Component {
     const { data, orderedData, isActive, show } = this.props;
 
     return (
-      <View style={{ alignItems: "center" }}>
-        <Button
-          style={{
-            padding: 10,
-            borderRadius: 6,
-            borderBottom: 0,
-            backgroundColor: colors.white,
-            elevation: 2
-          }}
-          onPress={show}
-        >
-          <Icon name={"bell"} size={24} style={{ color: colors.darkRed }} />
-        </Button>
-        {isActive ? (
-          <FlatList
-            contentContainerStyle={{
-              paddingVertical: 3,
-              marginHorizontal: 20,
-              backgroundColor: colors.white,
+      <View>
+        <View style={{ alignItems: "center" }}>
+          <Button
+            style={{
+              padding: 10,
               borderRadius: 6,
+              borderBottom: 0,
+              backgroundColor: colors.white,
               elevation: 2
             }}
-            renderItem={this._renderItem}
-            data={orderedData}
-            extraData={data}
-            keyExtractor={this._keyExtractor}
-            onStartShouldSetResponderCapture={() => true}
-          />
+            onPress={show}
+          >
+            <Icon name={"bell"} size={24} style={{ color: colors.darkRed }} />
+          </Button>
+        </View>
+        {isActive ? (
+          <View>
+            <View
+              style={{
+                position: "absolute",
+                marginTop: -10
+              }}
+            >
+              <View
+                style={{
+                  elevation: 2,
+                  paddingVertical: 3,
+                  marginHorizontal: 20,
+                  marginVertical: 4,
+                  backgroundColor: colors.white,
+                  borderRadius: 6,
+                  maxHeight: 300
+                }}
+              >
+                <TouchableWithoutFeedback style={StyleSheet.absoluteFill}>
+                  <FlatList
+                    renderItem={this._renderItem}
+                    data={orderedData}
+                    extraData={data}
+                    keyExtractor={this._keyExtractor}
+                    onStartShouldSetResponderCapture={() => true}
+                  />
+                </TouchableWithoutFeedback>
+              </View>
+            </View>
+          </View>
         ) : null}
       </View>
     );
