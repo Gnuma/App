@@ -17,7 +17,6 @@ export default class Comment extends Component {
 
   render() {
     const { isFather, answers, userID, sellerPK } = this.props;
-    console.log(userID, sellerPK);
     //console.log(this.props);
     return (
       <View>
@@ -63,7 +62,7 @@ export default class Comment extends Component {
         }}
       >
         <Header3
-          color={sellerPK === user.id ? "secondary" : "black"}
+          color={sellerPK === user._id ? "secondary" : "black"}
           style={{ fontSize: 20, maxWidth: 100 }}
           numberOfLines={1}
         >
@@ -72,7 +71,7 @@ export default class Comment extends Component {
         <Divider style={{ width: 20, height: 1, marginHorizontal: 4 }} />
         <Header5>{isPending ? "Inviando..." : created_at}</Header5>
         {isFather &&
-        (user.id != userID /*Change to === */ || userID == sellerPK) &&
+        (user._id == userID || userID == sellerPK) &&
         !isPending ? (
           <Button
             style={{

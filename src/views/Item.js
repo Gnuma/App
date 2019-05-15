@@ -11,19 +11,33 @@ import NavigatorService from "../navigator/NavigationService";
 import axios from "axios";
 import { ___GET_AD___ } from "../store/constants";
 import * as shoppingActions from "../store/actions/shopping";
+import * as commentActions from "../store/actions/comments";
 import { notificationsViewItem } from "../store/actions/notifications";
 import protectedAction from "../utils/protectedAction";
 import NavigationService from "../navigator/NavigationService";
 import { mockContactItem } from "../mockData/Chat2";
 
 export class Item extends Component {
-  state = {
-    data: undefined,
-    bookName: this.props.navigation.getParam("name", "Undesfineds"),
-    bookAuthors: this.props.navigation.getParam("authors", "Undesfineds"),
-    commentIDList: this.props.navigation.getParam("commentIDList", null),
-    keyboardOpen: false
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: undefined,
+      bookName: props.navigation.getParam("name", "Undesfineds"),
+      bookAuthors: props.navigation.getParam("authors", "Undesfineds"),
+      keyboardOpen: false
+    };
+
+    this.newComments =
+      props.commentsData[props.navigation.getParam("itemID", "Undefined")];
+    if (this.newComments) {
+      this.newComments = this.newComments.commentsList;
+      this.hasNewComments = true;
+    } else {
+      this.newComments = {};
+      this.hasNewComments = false;
+    }
+  }
 
   componentDidMount() {
     console.log("Mounted");
@@ -52,6 +66,7 @@ export class Item extends Component {
         });
         console.log(res.data);
         console.log(this.formatData(res.data));
+        this.props.readComments(id);
       })
       .catch(err => {
         console.log("ERROR", err);
@@ -81,7 +96,7 @@ export class Item extends Component {
       content: comment.text,
       created_at: comment.createdAt,
       pk: comment.pk,
-      user: comment.user.user,
+      user: { _id: comment.user._id, ...comment.user.user },
       answers: []
     };
     for (let i = 0; i < comment.parent_child.length; i++) {
@@ -90,7 +105,7 @@ export class Item extends Component {
         content: answer.text,
         created_at: answer.createdAt,
         pk: answer.id,
-        user: answer.user.user
+        user: { _id: answer.user._id, ...answer.user.user }
       });
     }
     return formattedComment;
@@ -109,7 +124,7 @@ export class Item extends Component {
   setKeyboardOpen = value => () => this.setState({ keyboardOpen: value });
 
   render() {
-    const { data, bookName, bookAuthors, commentIDList } = this.state;
+    const { data, bookName, bookAuthors } = this.state;
     const { navigation } = this.props;
     const isLoading = data === undefined;
 
@@ -119,6 +134,7 @@ export class Item extends Component {
           handleGoBack={this._handleGoBack}
           title={bookName}
           authors={bookAuthors}
+          hasNewComments={this.hasNewComments}
         />
         {isLoading ? (
           <View style={styles.container}>
@@ -128,8 +144,9 @@ export class Item extends Component {
           <View style={{ flex: 1 }}>
             <MainItem
               data={data}
-              commentIDList={commentIDList}
               user={this.props.user}
+              newComments={this.newComments}
+              onContact={this._handleContact}
             />
           </View>
         )}
@@ -161,15 +178,17 @@ export class Item extends Component {
 const mapStateToProps = state => ({
   user: {
     username: state.auth.username,
-    id: state.auth.id,
-    commentsData: state.comments.data
-  }
+    id: state.auth.id
+  },
+  commentsData: state.comments.data
 });
 
 const mapDispatchToProps = dispatch => {
   return {
     contactRedux: item => dispatch(shoppingActions.shoppingContact(item)),
-    notificationViewItemRedux: itemPK => dispatch(notificationsViewItem(itemPK))
+    notificationViewItemRedux: itemPK =>
+      dispatch(notificationsViewItem(itemPK)),
+    readComments: item => dispatch(commentActions.commentsRead(item))
   };
 };
 

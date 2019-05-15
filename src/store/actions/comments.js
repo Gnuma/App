@@ -10,11 +10,10 @@ export const init = data => ({
   }
 });
 
-export const commentsReceiveComment = (comment, type) => ({
+export const commentsReceiveComment = comment => ({
   type: actionTypes.COMMENTS_RECEIVE_COMMENT,
   payload: {
-    comment,
-    type
+    comment
   }
 });
 
@@ -36,7 +35,7 @@ export const commentsRead = itemID => {
     //API
 
     dispatch({
-      type: actionTypes.COMMENTS_RECEIVE_ANSWER,
+      type: actionTypes.COMMENTS_READ,
       payload: { itemID }
     });
   };

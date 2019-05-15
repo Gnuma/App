@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Keyboard, ToastAndroid } from "react-native";
+import { View, Keyboard, ToastAndroid, StyleSheet } from "react-native";
 import PropTypes from "prop-types";
 import CommentComposer from "./CommentComposer";
 import { Header2 } from "../Text";
@@ -17,7 +17,8 @@ class QuipuComment extends Component {
   static propTypes = {
     data: PropTypes.array,
     sellerPK: PropTypes.number,
-    scrollTo: PropTypes.func
+    scrollTo: PropTypes.func,
+    newComments: PropTypes.object
   };
 
   constructor(props) {
@@ -51,7 +52,14 @@ class QuipuComment extends Component {
   }
 
   _renderMainComment = (mainComment, index) => {
+    const hasNews = this.props.newComments[mainComment.pk];
     const isFocused = this.state.answeringComment === mainComment.pk;
+    let style = {};
+    if (isFocused) {
+      style = styles.focusedComment;
+    } else if (hasNews) {
+      style = styles.newComment;
+    }
     return (
       <View
         key={mainComment.pk}
@@ -62,16 +70,7 @@ class QuipuComment extends Component {
             isFocused && this.state.moveTo
           )
         }
-        style={
-          isFocused
-            ? {
-                borderColor: colors.secondary,
-                borderWidth: 2,
-                padding: 4,
-                borderRadius: 6
-              }
-            : null
-        }
+        style={style}
       >
         <Comment
           {...mainComment}
@@ -303,3 +302,17 @@ class QuipuComment extends Component {
 }
 
 export default QuipuComment;
+
+const styles = StyleSheet.create({
+  focusedComment: {
+    borderColor: colors.secondary,
+    borderWidth: 2,
+    padding: 4,
+    borderRadius: 6
+  },
+  newComment: {
+    borderColor: colors.darkRed,
+    borderLeftWidth: 2,
+    padding: 2
+  }
+});

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Text, View, Animated } from "react-native";
 import Button from "../Button";
 import { Header2 } from "../Text";
+import colors from "../../styles/colors";
 
 export class ContactButton extends Component {
   height = 0;
@@ -18,13 +19,13 @@ export class ContactButton extends Component {
       <Animated.View
         style={{
           position: "absolute",
+          flexDirection: "row",
           top: viewHeight - this.height,
-          alignSelf: "center",
           transform: [
             {
               translateY: scrollY.interpolate({
-                inputRange: [0, contactSnapY - viewHeight + this.height + 5],
-                outputRange: [0, contactSnapY - viewHeight + this.height + 5],
+                inputRange: [0, contactSnapY - viewHeight + this.height],
+                outputRange: [0, contactSnapY - viewHeight + this.height],
                 extrapolate: "clamp"
               })
             }
@@ -35,20 +36,30 @@ export class ContactButton extends Component {
           setContactButtonHeight(this.height);
         }}
       >
-        <Button
+        <View
           style={{
-            backgroundColor: "white",
-            elevation: 4,
-            flexDirection: "row",
-            padding: 10,
-            justifyContent: "center",
-            borderRadius: 8,
-            marginBottom: 10
+            flex: 1,
+            paddingVertical: 10,
+            paddingHorizontal: 30,
+            backgroundColor: colors.white
           }}
-          onPress={this.props.onContact}
         >
-          <Header2 color={"secondary"}>Contatta Ora</Header2>
-        </Button>
+          <Button
+            style={{
+              flex: 1,
+              backgroundColor: colors.secondary,
+              elevation: 1,
+              flexDirection: "row",
+              padding: 8,
+              justifyContent: "center",
+              borderRadius: 6
+              //marginBottom: 10
+            }}
+            onPress={this.props.onContact}
+          >
+            <Header2 color={"white"}>Contatta Ora</Header2>
+          </Button>
+        </View>
       </Animated.View>
     );
   }

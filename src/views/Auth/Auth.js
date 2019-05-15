@@ -5,7 +5,9 @@ import {
   Platform,
   ScrollView,
   Keyboard,
-  Animated
+  Animated,
+  StyleSheet,
+  KeyboardAvoidingView
 } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
@@ -16,6 +18,7 @@ import Button from "../../components/Button";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 import * as authActions from "../../store/actions/auth";
+import LoadingOverlay from "../../components/LoadingOverlay";
 
 export class Auth extends Component {
   constructor(props) {
@@ -39,14 +42,16 @@ export class Auth extends Component {
 
   componentDidMount() {
     this.keyboardEventListeners = [
-      Keyboard.addListener("keyboardDidShow", () =>
-        this.setState({ showFooter: false })
-      ),
-      Keyboard.addListener("keyboardDidHide", () =>
-        this.setState({ showFooter: true })
-      )
+      Keyboard.addListener("keyboardDidShow", () => {
+        this.setState({ showFooter: false });
+      }),
+      Keyboard.addListener("keyboardDidHide", () => {
+        this.setState({ showFooter: true });
+      })
     ];
   }
+
+  hideFooter = () => this.setState({ showFooter: false });
 
   componentWillUnmount() {
     this.keyboardEventListeners &&
@@ -81,49 +86,70 @@ export class Auth extends Component {
     }));
 
   render() {
-    const { signupRedux, loading, loginRedux } = this.props;
+    const { signupRedux, isLoading, loginRedux, serverError } = this.props;
     const { authType } = this.state;
 
     return (
-      <AndroidBackHandler onBackPress={this._goBack}>
+      <AndroidBackHandler
+        onBackPress={this._goBack}
+        style={StyleSheet.absoluteFill}
+      >
+        {isLoading ? <LoadingOverlay /> : null}
         <View style={{ flex: 1, marginHorizontal: 20 }}>
-          {loading ? <Header3>LOADING</Header3> : null}
-          <Button
-            style={{ position: "absolute", left: -16, top: 4, borderRadius: 6 }}
-            onPress={this._goBack}
-          >
-            <Icon
-              name={this.state.status > 0 ? "chevron-left" : "times"}
-              size={32}
-              style={{ color: "black", padding: 10, borderRadius: 4 }}
-            />
-          </Button>
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              height: 150
-            }}
-          >
-            <Header1 style={{ fontSize: 50 }} color={"primary"}>
-              Quipu
-            </Header1>
+          <View style={{ marginBottom: 10, flex: 1 }}>
+            <View
+              style={{
+                marginLeft: -10,
+                marginTop: 10,
+                flexDirection: "row",
+                alignItems: "center"
+              }}
+            >
+              <Button
+                style={{
+                  borderRadius: 6
+                }}
+                onPress={this._goBack}
+              >
+                <Icon
+                  name={this.state.status > 0 ? "chevron-left" : "times"}
+                  size={32}
+                  style={{ color: "black", padding: 10, borderRadius: 4 }}
+                />
+              </Button>
+              <Header1 color="primary">Accedi</Header1>
+            </View>
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <Header1
+                style={{ fontSize: 50, textAlign: "center" }}
+                color={"primary"}
+              >
+                Quipu
+              </Header1>
+            </View>
+            {authType === "signup" ? (
+              <Signup
+                signup={signupRedux}
+                status={this.state.status}
+                goNext={this._goNext}
+                resolve={this._resolve}
+                hideFooter={this.hideFooter}
+              />
+            ) : (
+              <Login
+                login={loginRedux}
+                status={this.state.status}
+                goNext={this._goNext}
+                resolve={this._resolve}
+                hideFooter={this.hideFooter}
+              />
+            )}
           </View>
-          {authType === "signup" ? (
-            <Signup
-              signup={signupRedux}
-              status={this.state.status}
-              goNext={this._goNext}
-              resolve={this._resolve}
-            />
-          ) : (
-            <Login
-              login={loginRedux}
-              status={this.state.status}
-              goNext={this._goNext}
-              resolve={this._resolve}
-            />
-          )}
           {this._renderFooter()}
         </View>
       </AndroidBackHandler>
@@ -131,12 +157,12 @@ export class Auth extends Component {
   }
 
   _renderFooter = () => {
-    if (!this.state.showFooter) return <View style={{ height: 10 }} />;
+    if (!this.state.showFooter) return null;
 
     return (
       <View
         style={{
-          height: 200,
+          flex: 1 / 2,
           alignItems: "center",
           justifyContent: "center"
         }}

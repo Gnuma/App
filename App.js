@@ -5,6 +5,7 @@ import store from "./src/store/store";
 import Navigator from "./src/navigator/Navigator";
 import NavigationService from "./src/navigator/NavigationService";
 import WS from "./src/utils/WebSocket";
+import axios from "axios";
 
 class App extends Component {
   componentWillUnmount() {
@@ -25,3 +26,6 @@ class App extends Component {
 }
 
 export default App;
+
+axios.defaults.xsrfCookieName = "csrftoken";
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";

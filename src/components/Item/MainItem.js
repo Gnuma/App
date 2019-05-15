@@ -4,7 +4,8 @@ import {
   StyleSheet,
   ScrollView,
   InteractionManager,
-  Animated
+  Animated,
+  Dimensions
 } from "react-native";
 import { MainItemStyles as styles } from "./styles";
 import { PrimaryInfo, DescriptionInfo, SecondaryInfo } from "./ItemInfos";
@@ -16,22 +17,11 @@ import ContactButton from "./ContactButton";
 
 export class MainItem extends Component {
   state = {
-    scrollY: new Animated.Value(1000),
+    scrollY: new Animated.Value(0),
     viewHeight: 0,
-    contactButtonHeight: 0,
-    contactSnapY: 1000
+    contactButtonHeight: 50,
+    contactSnapY: 1500
   };
-
-  componentDidMount() {
-    //console.log(this.props.goToComment());
-    const { commentIDList } = this.props;
-
-    if (commentIDList && commentIDList.length > 0) {
-      InteractionManager.runAfterInteractions(() => {
-        for (i in commentIDList) this.comments._onAnswer(commentIDList[i]);
-      });
-    }
-  }
 
   scrollEvent = Animated.event(
     [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
@@ -47,7 +37,7 @@ export class MainItem extends Component {
   };
 
   render() {
-    const { data, user } = this.props;
+    const { data, user, newComments } = this.props;
     const primaryData = {
       price: data.price,
       conditions: data.condition,
@@ -70,6 +60,7 @@ export class MainItem extends Component {
             viewHeight: event.nativeEvent.layout.height
           })
         }
+        scrollEventThrottle={1}
       >
         <ImageSlider style={styles.imageSlider} data={data.image_ad} />
         <View style={styles.content} onLayout={this._setContainerOffset}>
@@ -93,16 +84,17 @@ export class MainItem extends Component {
           {/*data.comments*/ true ? (
             <QuipuComment
               data={data.comment_ad}
-              sellerPK={data.seller.user.id}
+              sellerPK={data.seller._id}
               scrollTo={this._scrollTo}
               ref={comments => (this.comments = comments)}
               user={user}
               itemPK={data.pk}
+              newComments={newComments}
             />
           ) : null}
         </View>
         <ContactButton
-          onContact={this._handleContact}
+          onContact={this.props.onContact}
           scrollY={this.state.scrollY}
           viewHeight={this.state.viewHeight}
           setContactButtonHeight={this.setContactButtonHeight}

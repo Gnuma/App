@@ -56,13 +56,23 @@ export const HeaderStyles = StyleSheet.create({
   goBack: {
     padding: 10
   },
-  content: {
+  contentContainer: {
     flex: 1,
     marginLeft: 10,
+    flexDirection: "row"
+  },
+  content: {
+    flex: 1,
     justifyContent: "center"
   },
   authors: {
     marginLeft: 10
+  },
+  notificationButton: {
+    padding: 10,
+    marginHorizontal: 5,
+    alignSelf: "center",
+    borderRadius: 6
   }
 });
 

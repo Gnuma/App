@@ -4,6 +4,7 @@ import { Header1, Header3 } from "../../components/Text";
 import SolidButton from "../../components/SolidButton";
 import OutlinedInput from "../../components/Form/OutlinedInput";
 import { submit, isEmpty, fieldCheck } from "../../utils/validator.js";
+import ErrorMessage from "../../components/Form/ErrorMessage";
 
 export default class Login extends Component {
   state = {
@@ -18,7 +19,8 @@ export default class Login extends Component {
           errorMessage: ""
         }
       }
-    }
+    },
+    error: ""
   };
 
   continue = () => {
@@ -28,6 +30,7 @@ export default class Login extends Component {
 
     const result = submit(stateFields, stateValidators);
     if (result === true) {
+      this.setState({ error: "" });
       if (status !== 0) {
         this.props.goNext();
       } else {
@@ -51,11 +54,14 @@ export default class Login extends Component {
           }
         }
       }
+      /*
       ToastAndroid.showWithGravity(
         errorList,
         ToastAndroid.LONG,
         ToastAndroid.CENTER
       );
+      */
+      this.setState({ error: errorList });
     }
   };
 
@@ -91,15 +97,13 @@ export default class Login extends Component {
   };
 
   _renderLogin = () => (
-    <View
-      style={{ flex: 1, justifyContent: "flex-start", alignItems: "center" }}
-    >
+    <View style={{ alignItems: "center" }}>
       <OutlinedInput
         placeholder="Username o Email"
         value={this.state.fields[0].uid.value}
         onTextChange={text => this.handleChange("uid", text)}
         onSubmitEditing={() => this.checkField("uid")}
-        autoFocus
+        onFocus={this.props.hideFooter}
       />
       <OutlinedInput
         placeholder="Password"
@@ -108,6 +112,7 @@ export default class Login extends Component {
         onTextChange={text => this.handleChange("pwd", text)}
         onSubmitEditing={() => this.checkField("pwd", true)}
         secureTextEntry={true}
+        onFocus={this.props.hideFooter}
       />
     </View>
   );
@@ -123,22 +128,24 @@ export default class Login extends Component {
 
   render() {
     const { status } = this.props;
+    const error = this.state.error;
+
     return (
       <View style={{ flex: 1 }}>
         <View
           style={{
             flex: 1,
-            justifyContent: "center",
             alignItems: "center"
           }}
         >
-          <Header1 color="primary" style={{ marginBottom: 15 }}>
-            Accedi
-          </Header1>
           {this._getContent()}
+          {!!error && <ErrorMessage message={error} />}
           <View style={{ flex: 1, justifyContent: "flex-end" }}>
-            <SolidButton onPress={this.continue} style={{ width: 180 }}>
-              <Header3 color={"primary"} style={{ textAlign: "center" }}>
+            <SolidButton onPress={this.continue} style={{ width: 180 }} center>
+              <Header3
+                color={"primary"}
+                style={{ textAlign: "center", flex: 1 }}
+              >
                 {status === 0 ? "Accedi" : "Continua"}
               </Header3>
             </SolidButton>
@@ -153,11 +160,11 @@ const validators = {
   0: {
     uid: {
       functions: [isEmpty],
-      warnings: ["Inserisci il nome."]
+      warnings: ["Inserisci il nome"]
     },
     pwd: {
       functions: [isEmpty],
-      warnings: ["Inserisci la password."]
+      warnings: ["Inserisci la password"]
     }
   }
 };

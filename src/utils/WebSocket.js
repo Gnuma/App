@@ -22,7 +22,8 @@ import {
 } from "../mockData/Chat2";
 import {
   commentsReceiveComment,
-  commentsInit
+  commentsInit,
+  commentsReceiveAnswer
 } from "../store/actions/comments";
 import NetInfo from "@react-native-community/netinfo";
 import { AppState } from "react-native";
@@ -90,8 +91,10 @@ class WS {
 
   onMessage = msg => {
     try {
-      const data = JSON.parse(msg.data);
+      let data = JSON.parse(msg.data);
       console.log(data);
+      //if (data.notifications) data.type = DataType.RETRIEVE_NOTIFICATIONS;
+
       switch (data.type) {
         case DataType.NEW_CHAT:
           return store.dispatch(
@@ -110,12 +113,16 @@ class WS {
             );
 
         case DataType.NEW_COMMENT:
-          return store.dispatch(commentsReceiveComment(data.comment, data.for));
+          return store.dispatch(commentsReceiveComment(data.comment));
 
-        //default:
-        // throw `Type ${data.type} not valid`;
-        default:
+        case DataType.NEW_ANSWER:
+          return store.dispatch(commentsReceiveAnswer(data.answer));
+
+        case DataType.RETRIEVE_NOTIFICATIONS:
           return store.dispatch(commentsInit(data.notifications));
+
+        default:
+          throw `Type ${data.type} not valid`;
       }
     } catch (error) {
       console.warn(error);
@@ -190,7 +197,8 @@ const DataType = {
   NEW_MESSAGE: "newMessage",
   NEW_CHAT: "newChat",
   NEW_COMMENT: "newComment",
-  NEW_ANSWER: "newAnswer"
+  NEW_ANSWER: "newAnswer",
+  RETRIEVE_NOTIFICATIONS: "retrieveNotifications"
 };
 
 formatMsg = msg => {

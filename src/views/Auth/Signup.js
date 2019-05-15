@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, ToastAndroid } from "react-native";
+import { View, ToastAndroid, StyleSheet } from "react-native";
 import OutlinedInput from "../../components/Form/OutlinedInput";
 import {
   submit,
@@ -10,11 +10,15 @@ import {
 import Button from "../../components/Button";
 import { Header3, Header2, Header1 } from "../../components/Text";
 import SolidButton from "../../components/SolidButton";
+import colors from "../../styles/colors";
+import ErrorMessage from "../../components/Form/ErrorMessage";
+
 export default class Signup extends Component {
   constructor(props) {
     super(props);
 
     validators[2].confirmPwd.functions.push(this.isDifferentPwd);
+    this.pwdValue = "";
   }
 
   state = {
@@ -41,7 +45,8 @@ export default class Signup extends Component {
           errorMessage: ""
         }
       }
-    }
+    },
+    error: ""
   };
 
   continue = () => {
@@ -51,6 +56,7 @@ export default class Signup extends Component {
 
     const result = submit(stateFields, stateValidators);
     if (result === true) {
+      this.setState({ error: "" });
       if (status !== 2) {
         this.props.goNext();
       } else {
@@ -76,16 +82,18 @@ export default class Signup extends Component {
           }
         }
       }
-      ToastAndroid.showWithGravity(
+      /*ToastAndroid.showWithGravity(
         errorList,
         ToastAndroid.LONG,
         ToastAndroid.CENTER
-      );
+      );*/
+      this.setState({ error: errorList });
     }
   };
 
   handleChange = (key, value) => {
     this.updateField(key, { value, errorMessage: "" });
+    if (key == "pwd") this.pwdValue = value;
   };
 
   checkField = (key, goNext) => {
@@ -122,6 +130,7 @@ export default class Signup extends Component {
       value={this.state.fields[0].uid.value}
       onTextChange={text => this.handleChange("uid", text)}
       onSubmitEditing={() => this.checkField("uid", true)}
+      onFocus={this.props.hideFooter}
     />
   );
   _renderEmail = () => (
@@ -132,6 +141,7 @@ export default class Signup extends Component {
       onTextChange={text => this.handleChange("email", text)}
       onSubmitEditing={() => this.checkField("email", true)}
       autoFocus
+      onFocus={this.props.hideFooter}
     />
   );
   _renderPwd = () => (
@@ -146,6 +156,7 @@ export default class Signup extends Component {
         onSubmitEditing={() => this.checkField("pwd")}
         secureTextEntry={true}
         autoFocus
+        onFocus={this.props.hideFooter}
       />
       <OutlinedInput
         placeholder="Conferma Password"
@@ -153,6 +164,7 @@ export default class Signup extends Component {
         onTextChange={text => this.handleChange("confirmPwd", text)}
         onSubmitEditing={() => this.checkField("confirmPwd", true)}
         secureTextEntry={true}
+        onFocus={this.props.hideFooter}
       />
     </View>
   );
@@ -172,8 +184,11 @@ export default class Signup extends Component {
 
   render() {
     const { status } = this.props;
+    const error = this.state.error;
+
     return (
       <View style={{ flex: 1 }}>
+        <StatusBar status={status} />
         <View
           style={{
             flex: 1,
@@ -181,13 +196,14 @@ export default class Signup extends Component {
             alignItems: "center"
           }}
         >
-          <Header1 color="primary" style={{ marginBottom: 15 }}>
-            Registrati
-          </Header1>
           {this._getContent()}
+          {!!error && <ErrorMessage message={error} />}
           <View style={{ flex: 1, justifyContent: "flex-end" }}>
             <SolidButton onPress={this.continue} style={{ width: 180 }}>
-              <Header3 color={"primary"} style={{ textAlign: "center" }}>
+              <Header3
+                color={"primary"}
+                style={{ textAlign: "center", flex: 1 }}
+              >
                 {status === 2 ? "Registrati" : "Continua"}
               </Header3>
             </SolidButton>
@@ -198,10 +214,8 @@ export default class Signup extends Component {
   }
 
   isDifferentPwd = confirmPwd => {
-    const pwd =
-      this.state.fields[2].pwd !== undefined
-        ? this.state.fields[2].pwd.value
-        : "";
+    console.log(confirmPwd, "+", this.state.fields[2].pwd);
+    const pwd = this.state.fields[2].pwd.value;
     console.log(pwd, confirmPwd);
     return pwd !== confirmPwd;
   };
@@ -211,23 +225,78 @@ const validators = {
   0: {
     uid: {
       functions: [isEmpty],
-      warnings: ["Inserisci il nome."]
+      warnings: ["Inserisci il nome"]
     }
   },
   1: {
     email: {
       functions: [isEmpty, isInvalidEmail],
-      warnings: ["Inserisci l'email.", "L'email non è valida."]
+      warnings: ["Inserisci l'email", "L'email non è valida"]
     }
   },
   2: {
     pwd: {
       functions: [isEmpty],
-      warnings: ["Inserisci la password."]
+      warnings: ["Inserisci la password"]
     },
     confirmPwd: {
       functions: [isEmpty],
-      warnings: ["Reinserisci la password.", "Le due password non coincidono."]
+      warnings: ["Reinserisci la password", "Le due password non coincidono"]
     }
   }
 };
+
+const StatusBar = ({ status }) => {
+  let statusText;
+  switch (status) {
+    case 0:
+      statusText = "Username";
+      break;
+
+    case 1:
+      statusText = "Email";
+      break;
+
+    case 2:
+      statusText = "Password";
+      break;
+
+    default:
+      statusText = "Errore";
+      break;
+  }
+
+  return (
+    <View style={{ marginVertical: 10, alignItems: "center" }}>
+      <Header2 color={"primary"} style={{ marginBottom: 8 }}>
+        {statusText}
+      </Header2>
+      <View style={{ flexDirection: "row" }}>
+        <View
+          style={status >= 0 ? styles.activeStatus : styles.inactiveStatus}
+        />
+        <View
+          style={status >= 1 ? styles.activeStatus : styles.inactiveStatus}
+        />
+        <View
+          style={status >= 2 ? styles.activeStatus : styles.inactiveStatus}
+        />
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  activeStatus: {
+    flex: 1 / 3,
+    borderBottomWidth: 1,
+    borderColor: colors.secondary,
+    margin: 5
+  },
+  inactiveStatus: {
+    flex: 1 / 3,
+    borderBottomWidth: 1,
+    borderColor: colors.grey,
+    margin: 5
+  }
+});

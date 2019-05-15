@@ -3,7 +3,15 @@ import { Text, View, StyleSheet } from "react-native";
 import Button from "./Button";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-export default ({ children, style, icon, iconSize, iconStyle, ...rest }) => {
+export default ({
+  children,
+  style,
+  icon,
+  iconSize,
+  iconStyle,
+  center,
+  ...rest
+}) => {
   return (
     <Button style={[styles.container, style]} {...rest}>
       {children}

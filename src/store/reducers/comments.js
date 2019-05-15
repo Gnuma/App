@@ -16,22 +16,29 @@ const commentsInit = (state, action) => {
   let formattedData = {};
 
   for (let i = 0; i < data.length; i++) {
-    let itemID = data[i].comment.item.pk;
     const type = data[i].type;
-    if (!formattedData[itemID]) orderedData.push(itemID);
-    formattedData = update(formattedData, {
-      [itemID]: item =>
-        update(
-          item || {
-            commentsList: [],
-            item: data[i].comment.item
-          },
-          {
-            commentsList: { $push: [data[i].comment.pk] },
+
+    if (type == "newComment") {
+      let itemID = data[i].comment.item.pk;
+      if (!formattedData[itemID]) orderedData.push(itemID);
+      formattedData = update(formattedData, {
+        [itemID]: item =>
+          update(item || getEmptyItem(data[i].comment), {
+            commentsList: { [data[i].comment.pk]: { $set: true } },
             [type]: { $set: true }
-          }
-        )
-    });
+          })
+      });
+    } else {
+      let itemID = data[i].answer.parent.item.pk;
+      if (!formattedData[itemID]) orderedData.push(itemID);
+      formattedData = update(formattedData, {
+        [itemID]: item =>
+          update(item || getEmptyItem(data[i].answer.parent), {
+            commentsList: { [data[i].answer.parent.pk]: { $set: true } },
+            [type]: { $set: true }
+          })
+      });
+    }
   }
 
   return update(state, {
@@ -41,32 +48,56 @@ const commentsInit = (state, action) => {
 };
 
 const commentsReceiveComment = (state, action) => {
-  const { comment, type } = action.payload;
-  const commentID = comment.pk;
+  const comment = action.payload.comment;
   const itemID = comment.item.pk;
-
-  const newItem = {
-    pk: itemID,
-    type,
-    book: comment.item.book,
-    data: []
-  };
-
-  const hasNewItem = state.data[itemID] === undefined;
+  const newItems = !state.data[itemID] ? [itemID] : [];
 
   return update(state, {
     data: {
-      [itemID]: existingItem =>
-        update(existingItem || newItem, {
-          data: { $unshift: [{ pk: commentID, answers: [] }] }
-        })
+      [itemID]: item => {
+        console.log(item);
+        return update(item || getEmptyItem(comment), {
+          commentsList: { [comment.pk]: { $set: true } },
+          newComment: { $set: true }
+        });
+      }
     },
-    orderedData: hasNewItem ? { $unshift: [itemID] } : { $push: [] }
+    orderedData: { $unshift: newItems }
+  });
+};
+
+const commentsReceiveAnswer = (state, action) => {
+  const comment = action.payload.answer.parent;
+  const itemID = comment.item.pk;
+  const newItems = !state.data[itemID] ? [itemID] : [];
+
+  return update(state, {
+    data: {
+      [itemID]: item => {
+        console.log(item);
+        return update(item || getEmptyItem(comment), {
+          commentsList: { [comment.pk]: { $set: true } },
+          newAnswer: { $set: true }
+        });
+      }
+    },
+    orderedData: { $unshift: newItems }
   });
 };
 
 const commentsRead = (state, action) => {
-  return state;
+  const { itemID } = action.payload;
+
+  for (var i = 0; i < state.orderedData.length; i++) {
+    if (itemID == state.orderedData[i]) break;
+  }
+
+  return update(state, {
+    data: {
+      $unset: [itemID]
+    },
+    orderedData: { $splice: [[i, 1]] }
+  });
 };
 
 const reducer = (state = initialState, action) => {
@@ -75,6 +106,8 @@ const reducer = (state = initialState, action) => {
       return commentsInit(state, action);
     case actionTypes.COMMENTS_RECEIVE_COMMENT:
       return commentsReceiveComment(state, action);
+    case actionTypes.COMMENTS_RECEIVE_ANSWER:
+      return commentsReceiveAnswer(state, action);
     case actionTypes.COMMENTS_READ:
       return commentsRead(state, action);
     default:
@@ -83,3 +116,10 @@ const reducer = (state = initialState, action) => {
 };
 
 export default reducer;
+
+const getEmptyItem = comment => {
+  return {
+    commentsList: {},
+    item: comment.item
+  };
+};
