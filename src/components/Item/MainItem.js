@@ -18,7 +18,7 @@ import ContactButton from "./ContactButton";
 export class MainItem extends Component {
   state = {
     scrollY: new Animated.Value(0),
-    viewHeight: 0,
+    viewHeight: this.props.viewHeight,
     contactButtonHeight: 50,
     contactSnapY: 1500
   };

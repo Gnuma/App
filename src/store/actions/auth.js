@@ -34,6 +34,12 @@ export const authStart = () => {
   };
 };
 
+export const authCompleted = () => {
+  return {
+    type: actionTypes.AUTH_COMPLETED
+  };
+};
+
 export const loginSuccess = (
   token,
   username = "NotSet",
@@ -70,21 +76,10 @@ export const authFail = error => {
   };
 };
 
-export const authLogin = (username, password, resolve) => {
-  return dispatch => {
-    dispatch(authStart());
-    if (isOffline) {
-      //Offline
-      if (username === "Test" && password === "testuserpwd") {
-        const token = "tokenTest";
-        dispatch(loginSuccess(token));
-        resolve ? resolve(token) : null;
-        NavigatorService.goBack(null);
-      } else {
-        dispatch(authFail("Invalid authentication"));
-      }
-    } else {
-      //Online
+export const authLogin = (username, password) => {
+  return (dispatch, getState) => {
+    return new Promise(function(resolve, reject) {
+      dispatch(authStart());
       axios
         .post(___LOGIN_ENDPOINT___, {
           username,
@@ -92,28 +87,6 @@ export const authLogin = (username, password, resolve) => {
         })
         .then(res => {
           const token = res.data.key;
-          console.log(res);
-          login({ dispatch, resolve, token });
-          //NavigatorService.navigate("App");
-        })
-        .catch(err => {
-          console.log(err);
-          dispatch(authFail(err));
-        });
-    }
-  };
-};
-
-export const autoLogin = (resolve, reject) => {
-  return dispatch => {
-    dispatch(authStart());
-    multiGet([tokenKey, officeKey])
-      .then(userInfos => {
-        //console.log(userInfos);
-        const token = userInfos[0][1];
-        const office = userInfos[1][1];
-
-        if (token !== null) {
           axios
             .get(___WHOAMI_ENDPOINT___, {
               headers: {
@@ -129,24 +102,61 @@ export const autoLogin = (resolve, reject) => {
               dispatch(authFail(err));
               reject(AutoStart.anonymous);
             });
-        } else {
-          dispatch(authFail("Token not found"));
-          if (office !== null) {
-            //Office Set but no login
-            dispatch(authAppInit(office, false));
-            reject(AutoStart.anonymous);
+        })
+        .catch(err => {
+          console.log(err);
+          dispatch(authFail(err));
+        });
+    });
+  };
+};
+
+export const autoLogin = () => {
+  return (dispatch, getState) => {
+    return new Promise(function(resolve, reject) {
+      //if (getState().auth.loading) return reject(AutoStart.busy);
+      dispatch(authStart());
+      multiGet([tokenKey, officeKey])
+        .then(userInfos => {
+          //console.log(userInfos);
+          const token = userInfos[0][1];
+          const office = userInfos[1][1];
+
+          if (token !== null) {
+            axios
+              .get(___WHOAMI_ENDPOINT___, {
+                headers: {
+                  Authorization: "Token " + token
+                }
+              })
+              .then(res => {
+                if (!res.data.gnuma_user) throw "Gnuma User not initialized";
+                login({ dispatch, token, resolve, data: res.data });
+              })
+              .catch(err => {
+                console.log("Error -> ", err);
+                dispatch(authFail(err));
+                reject(AutoStart.anonymous);
+              });
           } else {
-            //No Login And no Office: First time start
-            dispatch(authFail("Office not set"));
-            reject(AutoStart.firstTime);
+            dispatch(authFail("Token not found"));
+            if (office !== null) {
+              //Office Set but no login
+              dispatch(authAppInit(office, false));
+              reject(AutoStart.anonymous);
+            } else {
+              //No Login And no Office: First time start
+              dispatch(authFail("Office not set"));
+              reject(AutoStart.firstTime);
+            }
           }
-        }
-      })
-      .catch(err => {
-        console.log("Error in storage: ", err);
-        dispatch(authFail(err));
-        reject(AutoStart.firstTime);
-      });
+        })
+        .catch(err => {
+          console.log("Error in storage: ", err);
+          dispatch(authFail(err));
+          reject(AutoStart.firstTime);
+        });
+    });
   };
 };
 
@@ -166,42 +176,44 @@ export const authLogout = () => {
   };
 };
 
-export const authSignup = (username, email, password1, password2, resolve) => {
+export const authSignup = (username, email, password1, password2) => {
   return dispatch => {
-    dispatch(authStart());
-    console.log("INIZIO");
-    if (isOffline) {
-      console.log(username, email, password1, password2);
-    } else {
-      axios
-        .post(___SIGNUP_ENDPOINT___, {
-          username: username,
-          email: email,
-          password1: password1,
-          password2: password2
-        })
-        .then(res => {
-          const token = res.data.key;
-          axios
-            .post(___INITUSER_ENDPOINT___, {
-              key: token,
-              classM: "5B",
-              office: "J. Von Neumann"
-            })
-            .then(res => {
-              login({ dispatch, resolve, token });
-              //NavigatorService.goBack(null);
-            })
-            .catch(err => {
-              dispatch(authFail(err));
-              console.log("DENTRO");
-            });
-        })
-        .catch(err => {
-          dispatch(authFail(err));
-          console.log("FUORI");
-        });
-    }
+    return new Promise(function(resolve, reject) {
+      dispatch(authStart());
+      console.log("INIZIO");
+      if (isOffline) {
+        console.log(username, email, password1, password2);
+      } else {
+        axios
+          .post(___SIGNUP_ENDPOINT___, {
+            username: username,
+            email: email,
+            password1: password1,
+            password2: password2
+          })
+          .then(res => {
+            const token = res.data.key;
+            axios
+              .post(___INITUSER_ENDPOINT___, {
+                key: token,
+                classM: "5B",
+                office: "J. Von Neumann"
+              })
+              .then(res => {
+                login({ dispatch, resolve, token });
+                //NavigatorService.goBack(null);
+              })
+              .catch(err => {
+                dispatch(authFail(err));
+                console.log("DENTRO");
+              });
+          })
+          .catch(err => {
+            dispatch(authFail(err));
+            console.log("FUORI");
+          });
+      }
+    });
   };
 };
 

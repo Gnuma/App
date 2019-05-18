@@ -21,9 +21,10 @@ import {
   PanGestureHandler,
   State
 } from "react-native-gesture-handler";
+import NavigationService from "../../navigator/NavigationService";
 
 const minHeight = 120;
-const maxHeight = 280;
+const maxHeight = 250;
 const deltaY = maxHeight - minHeight;
 
 export default class ChatHeader extends Component {
@@ -54,9 +55,17 @@ export default class ChatHeader extends Component {
     return deltaY * value;
   };
 
+  goItem = () => {
+    NavigationService.navigate("Item", {
+      itemID: this.props.item._id,
+      name: this.props.item.book.title,
+      authors: this.props.item.book.author
+    });
+  };
+
   render() {
     const { scrollY } = this.state;
-    const { book, data, goBookOffert } = this.props;
+    const { item, data, goBookOffert } = this.props;
     return (
       <PanGestureHandler
         onHandlerStateChange={this.onHandlerStateChange}
@@ -117,22 +126,44 @@ export default class ChatHeader extends Component {
             />
           </View>
           <View style={{ marginHorizontal: contentMargin }}>
-            <Animated.View
+            <View
               style={{
                 position: "absolute",
-                transform: [
-                  {
-                    translateX: scrollY.interpolate({
-                      inputRange: [deltaY / 3, deltaY],
-                      outputRange: [imgMinWidth + 10, 0],
-                      extrapolate: "clamp"
-                    })
-                  }
-                ]
+                flexDirection: "row",
+                alignItems: "center"
               }}
             >
-              <Header2 color="primary">{book.title}</Header2>
-            </Animated.View>
+              <Animated.View
+                style={{
+                  flex: 1,
+                  transform: [
+                    {
+                      translateX: scrollY.interpolate({
+                        inputRange: [deltaY / 3, deltaY],
+                        outputRange: [imgMinWidth + 10, 0],
+                        extrapolate: "clamp"
+                      })
+                    }
+                  ]
+                }}
+              >
+                <Header2 color="primary">{item.book.title}</Header2>
+              </Animated.View>
+              <Button
+                style={{
+                  padding: 6,
+                  marginLeft: 5,
+                  borderRadius: 6
+                }}
+                onPress={this.goItem}
+              >
+                <Icon
+                  name="chevron-right"
+                  size={20}
+                  style={{ color: colors.black }}
+                />
+              </Button>
+            </View>
             <Animated.View
               style={{ flexDirection: "row", top: bookTitleHeight }}
             >
@@ -168,7 +199,7 @@ export default class ChatHeader extends Component {
                 <CachedImage
                   style={{ flex: 1 }}
                   resizeMode="cover"
-                  source={require("../../media/imgs/thumbnail-test.png")}
+                  source={{ uri: item.image_ad[0] }}
                 />
               </Animated.View>
               <Animated.View
@@ -186,16 +217,16 @@ export default class ChatHeader extends Component {
               >
                 <View style={{ flexDirection: "row" }}>
                   <View style={{ flex: 1, marginRight: 5 }}>
-                    <Header2 color="primary">EUR 15</Header2>
+                    <Header2 color="primary">EUR {item.price}</Header2>
                     <Header3 color="secondary" numberOfLines={1}>
-                      J Von Neumann
+                      FAKE J Von Neumann
                     </Header3>
                     <Header4 color="secondary" numberOfLines={2}>
-                      Via Pollenza 1441
+                      FAKE Via Pollenza 1441
                     </Header4>
                   </View>
                   <View>
-                    <ConditionCircle conditions={0} radius={40} />
+                    <ConditionCircle conditions={item.condition} radius={40} />
                   </View>
                 </View>
                 <View>
@@ -206,7 +237,7 @@ export default class ChatHeader extends Component {
               </Animated.View>
             </Animated.View>
           </View>
-          <BottomShadow />
+          <BottomShadow scrollY={this.state.scrollY} />
         </Animated.View>
       </PanGestureHandler>
     );
@@ -224,19 +255,37 @@ const imgRatio = 4 / 3;
 
 const BottomShadow = props => {
   return (
-    <Svg
-      height={50}
-      width={viewportWidth + 2}
-      style={{ position: "absolute", bottom: 0, zIndex: 1 }}
-      pointerEvents={"none"}
+    <Animated.View
+      style={{
+        position: "absolute",
+        elevation: 5,
+        bottom: 0,
+        transform: [
+          {
+            translateY: props.scrollY.interpolate({
+              inputRange: [0, deltaY],
+              outputRange: [0, 50],
+              extrapolate: "clamp"
+            })
+          }
+        ]
+      }}
     >
-      <Defs>
-        <LinearGradient id="grad" x1="0" y1="0" x2="0" y2={50}>
-          <Stop offset="0" stopColor="rgb(255,255,0)" stopOpacity="0" />
-          <Stop offset="1" stopColor="rgba(0, 0, 0)" stopOpacity="0.4" />
-        </LinearGradient>
-      </Defs>
-      <Rect x="-1" y="1" width={viewportWidth} height={50} fill="url(#grad)" />
-    </Svg>
+      <Svg height={50} width={viewportWidth + 2}>
+        <Defs>
+          <LinearGradient id="grad" x1="0" y1="0" x2="0" y2={50}>
+            <Stop offset="0" stopColor="rgb(255,255,0)" stopOpacity="0" />
+            <Stop offset="1" stopColor="rgba(0, 0, 0)" stopOpacity="0.4" />
+          </LinearGradient>
+        </Defs>
+        <Rect
+          x="-1"
+          y="1"
+          width={viewportWidth}
+          height={50}
+          fill="url(#grad)"
+        />
+      </Svg>
+    </Animated.View>
   );
 };

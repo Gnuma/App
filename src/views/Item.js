@@ -37,6 +37,8 @@ export class Item extends Component {
       this.newComments = {};
       this.hasNewComments = false;
     }
+
+    this.viewHeight = 1000;
   }
 
   componentDidMount() {
@@ -137,18 +139,22 @@ export class Item extends Component {
           hasNewComments={this.hasNewComments}
         />
         {isLoading ? (
-          <View style={styles.container}>
+          <View
+            style={styles.container}
+            onLayout={event =>
+              (this.viewHeight = event.nativeEvent.layout.height)
+            }
+          >
             <ActivityIndicator size="large" color={colors.secondary} />
           </View>
         ) : (
-          <View style={{ flex: 1 }}>
-            <MainItem
-              data={data}
-              user={this.props.user}
-              newComments={this.newComments}
-              onContact={this._handleContact}
-            />
-          </View>
+          <MainItem
+            data={data}
+            user={this.props.user}
+            newComments={this.newComments}
+            onContact={this._handleContact}
+            viewHeight={this.viewHeight}
+          />
         )}
       </View>
     );

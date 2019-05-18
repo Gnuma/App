@@ -17,6 +17,10 @@ function navigate(routeName, params, key) {
   );
 }
 
+function dispatch(action) {
+  _navigator.dispatch(action);
+}
+
 function goBack(key) {
   if (!key) _navigator.dispatch(NavigationActions.back());
   else _navigator.dispatch(NavigationActions.back(key));
@@ -49,5 +53,6 @@ export default {
   navigate,
   setTopLevelNavigator,
   protectedNavigation,
-  goBack
+  goBack,
+  dispatch
 };

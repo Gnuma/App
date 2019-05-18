@@ -6,5 +6,6 @@ export const ChatType = {
 export const AutoStart = {
   logged: "logged",
   anonymous: "anonymous",
-  firstTime: "firstTime"
+  firstTime: "firstTime",
+  busy: "busy"
 };

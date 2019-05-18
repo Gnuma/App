@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, ToastAndroid, StyleSheet } from "react-native";
+import { View, ToastAndroid, StyleSheet, Keyboard } from "react-native";
 import OutlinedInput from "../../components/Form/OutlinedInput";
 import {
   submit,
@@ -60,13 +60,18 @@ export default class Signup extends Component {
       if (status !== 2) {
         this.props.goNext();
       } else {
+        Keyboard.dismiss();
+
         const { fields } = this.state;
         const uid = fields[0].uid.value;
         const email = fields[1].email.value;
         const pwd = fields[2].pwd.value;
         const confirmPwd = fields[2].confirmPwd.value;
 
-        this.props.signup(uid, email, pwd, confirmPwd, this.props.resolve);
+        this.props
+          .signup(uid, email, pwd, confirmPwd)
+          .then(token => this.props.resolve(token))
+          .catch(err => console.log(err));
       }
     } else {
       this.setState(prevState => ({

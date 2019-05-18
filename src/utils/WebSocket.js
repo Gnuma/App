@@ -13,6 +13,7 @@ import {
   salesNewChat
 } from "../store/actions/sales";
 import { onNewShoppingMsg, shoppingInit } from "../store/actions/shopping";
+import { authCompleted, authFail } from "../store/actions/auth";
 import update from "immutability-helper";
 import { commentList } from "../mockData/comments";
 import {
@@ -46,20 +47,21 @@ class WS {
     console.log("Initiating WS...");
     this.token = token;
     this.retries = 5;
-    //CALL API -> then:
+
     axios
       .get(___RETRIEVE_CHATS___)
       .then(res => {
         console.log(res);
         store.dispatch(shoppingInit(res.data.shopping));
         store.dispatch(salesInit(res.data.sales));
+        store.dispatch(authCompleted());
         this.startConnection();
 
-        resolve && resolve(token);
+        resolve(token);
       })
       .catch(err => {
-        console.log(err);
-        resolve && resolve(toke);
+        store.dispatch(authFail(err));
+        resolve(token);
       });
 
     this.connectionSubscription = NetInfo.isConnected.addEventListener(

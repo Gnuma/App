@@ -163,33 +163,34 @@ export class Camera extends Component {
   render() {
     const isReviewing = !_.isEmpty(this.state.checking);
     const { flashMode } = this.state;
-    //if (!this.state.focusedScreen) return <Header2>Booo</Header2>;
     return (
       <View style={{ flex: 1 }}>
-        <RNCamera
-          style={{ flex: 1 }}
-          type={RNCamera.Constants.Type.back}
-          flashMode={flashMode}
-          permissionDialogTitle={"Can I use your camera por favor?"}
-          permissionDialogMessage={"PLIZZZZ"}
-          captureAudio={false}
-          autoFocusPointOfInterest={{ x: 0.5, y: 0.5 }}
-          ref={camera => {
-            if (camera) {
-              if (!this.camera)
-                this.setState({
-                  cameraStatus: camera.getStatus()
-                });
+        {this.props.navigation.isFocused() && (
+          <RNCamera
+            style={{ flex: 1 }}
+            type={RNCamera.Constants.Type.back}
+            flashMode={flashMode}
+            //permissionDialogTitle={"Can I use your camera por favor?"}
+            //permissionDialogMessage={"PLIZZZZ"}
+            captureAudio={false}
+            autoFocusPointOfInterest={{ x: 0.5, y: 0.5 }}
+            ref={camera => {
+              if (camera) {
+                if (!this.camera)
+                  this.setState({
+                    cameraStatus: camera.getStatus()
+                  });
 
-              this.camera = camera;
-            }
-          }}
-          onStatusChange={({ cameraStatus }) => {
-            this.setState({
-              cameraStatus
-            });
-          }}
-        />
+                this.camera = camera;
+              }
+            }}
+            onStatusChange={({ cameraStatus }) => {
+              this.setState({
+                cameraStatus
+              });
+            }}
+          />
+        )}
         {isReviewing ? (
           <ImageReviewer
             data={this.state.checking}

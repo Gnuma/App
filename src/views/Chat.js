@@ -140,7 +140,7 @@ export class Chat extends Component {
       <View style={{ flex: 1 }}>
         <ChatHeader
           data={chatData}
-          book={item.book}
+          item={item}
           goBack={this._goBack}
           goBookOffert={this.goBookOffert}
         />

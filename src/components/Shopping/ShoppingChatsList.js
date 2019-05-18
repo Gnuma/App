@@ -69,7 +69,7 @@ export class ChatLink extends Component {
         <View style={{ flex: 1 / 4 }}>
           <Image
             style={{ flex: 1, borderRadius: 6 }}
-            source={require("../../media/imgs/mockHomeBook.png")}
+            source={{ uri: data.item.image_ad[0] }}
             resizeMode={"cover"}
           />
         </View>

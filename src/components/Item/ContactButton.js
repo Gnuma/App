@@ -24,8 +24,14 @@ export class ContactButton extends Component {
           transform: [
             {
               translateY: scrollY.interpolate({
-                inputRange: [0, contactSnapY - viewHeight + this.height],
-                outputRange: [0, contactSnapY - viewHeight + this.height],
+                inputRange: [
+                  0,
+                  Math.abs(contactSnapY - viewHeight + this.height)
+                ],
+                outputRange: [
+                  0,
+                  Math.abs(contactSnapY - viewHeight + this.height)
+                ],
                 extrapolate: "clamp"
               })
             }

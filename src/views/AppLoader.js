@@ -10,24 +10,17 @@ import NavigatorService from "../navigator/NavigationService";
 
 export class AppLoader extends Component {
   componentDidMount() {
-    this.autoLogin()
+    this.props
+      .autoLoginRedux()
       .then(() => NavigatorService.navigate("Home"))
       .catch(err => {
-        console.log(err);
         if (err === AutoStart.anonymous) {
           NavigatorService.navigate("Home");
-        } else {
+        } else if (err === AutoStart.firstTime) {
           NavigatorService.navigate("InitProfile");
         }
       });
   }
-
-  autoLogin = () => {
-    const { autoLoginRedux } = this.props;
-    return new Promise(function(resolve, reject) {
-      autoLoginRedux(resolve, reject);
-    });
-  };
 
   render() {
     return (

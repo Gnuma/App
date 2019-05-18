@@ -106,58 +106,62 @@ export const setDescription = description => {
 
 export const submit = () => {
   return (dispatch, getState) => {
-    dispatch(sellStart());
-    const {
-      previews,
-      previewsOrder,
-      book,
-      price,
-      conditions,
-      description,
-      isbn,
-      title
-    } = getState().sell;
-    const { token } = getState().auth;
-    let data = new FormData();
-    let counter = 0;
-    for (let i = 0; i < previewsOrder.length; i++) {
-      if (previews[previewsOrder[i]] !== null) {
-        data.append(counter.toString(), previews[previewsOrder[i]].base64);
-        counter++;
+    return new Promise(function(resolve, reject) {
+      const {
+        previews,
+        previewsOrder,
+        book,
+        price,
+        conditions,
+        description,
+        isbn,
+        title,
+        loading
+      } = getState().sell;
+      if (loading) return reject("Running already");
+      dispatch(sellStart());
+      let data = new FormData();
+      let counter = 0;
+      for (let i = 0; i < previewsOrder.length; i++) {
+        if (previews[previewsOrder[i]] !== null) {
+          data.append(counter.toString(), previews[previewsOrder[i]].base64);
+          counter++;
+        }
       }
-    }
 
-    if (book) {
-      data.append("isbn", book);
-    } else {
-      data.append("isbn", isbn);
-      data.append("title", title);
-    }
-    data.append("price", price);
-    data.append("condition", conditions);
-    data.append("description", description);
+      if (book) {
+        data.append("isbn", book);
+      } else {
+        data.append("isbn", isbn);
+        data.append("title", title);
+      }
+      data.append("price", price);
+      data.append("condition", conditions);
+      data.append("description", description);
 
-    if (counter > 0) {
-      axios
-        .post(___CREATE_AD___, data, {
-          headers: {
-            accept: "application/json",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Content-Type": `multipart/form-data`
-          }
-        })
-        .then(res => {
-          console.log(res);
-          dispatch(sellSuccess());
-          NavigatorService.navigate("Home");
-        })
-        .catch(err => {
-          console.warn("Something went wrongato", "Error in creation");
-          dispatch(sellFail(err));
-          //NavigatorService.navigate("Home");
-        });
-    } else {
-      dispatch(sellFail("No images selected"));
-    }
+      if (counter > 0) {
+        axios
+          .post(___CREATE_AD___, data, {
+            headers: {
+              accept: "application/json",
+              "Accept-Language": "en-US,en;q=0.8",
+              "Content-Type": `multipart/form-data`
+            }
+          })
+          .then(res => {
+            console.log(res);
+            dispatch(sellSuccess());
+            resolve();
+          })
+          .catch(err => {
+            console.warn("Something went wrongato", "Error in creation");
+            dispatch(sellFail(err));
+            reject(err);
+          });
+      } else {
+        dispatch(sellFail("No images selected"));
+        reject("No images selected");
+      }
+    });
   };
 };

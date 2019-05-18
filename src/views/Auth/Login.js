@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, ToastAndroid } from "react-native";
+import { View, ToastAndroid, Keyboard } from "react-native";
 import { Header1, Header3 } from "../../components/Text";
 import SolidButton from "../../components/SolidButton";
 import OutlinedInput from "../../components/Form/OutlinedInput";
@@ -34,11 +34,16 @@ export default class Login extends Component {
       if (status !== 0) {
         this.props.goNext();
       } else {
+        Keyboard.dismiss();
+
         const { fields } = this.state;
         const uid = fields[0].uid.value;
         const pwd = fields[0].pwd.value;
 
-        this.props.login(uid, pwd, this.props.resolve);
+        this.props
+          .login(uid, pwd)
+          .then(token => this.props.resolve(token))
+          .catch(err => console.log(err));
       }
     } else {
       this.setState(prevState => ({

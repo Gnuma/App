@@ -7,6 +7,8 @@ import MainSell from "../components/Sell/MainSell";
 import * as sellActions from "../store/actions/sell";
 import { Header2 } from "../components/Text";
 import colors from "../styles/colors";
+import { Actions } from "react-navigation";
+import NavigationService from "../navigator/NavigationService";
 
 export class VendiInfos extends Component {
   state = {
@@ -62,8 +64,24 @@ export class VendiInfos extends Component {
   };
 
   _handleComplete = () => {
-    if (this.props.price && this.props.description && this.props.conditions !== undefined) {
-      this.props.submitRedux();
+    if (
+      this.props.price &&
+      this.props.description &&
+      this.props.conditions !== undefined
+    ) {
+      this.props
+        .submitRedux()
+        .then(() => {
+          //this.props.navigation.dispatch(StackActions.popToTop());
+          //console.log(SwitchActions.jumpTo({ routeName: "SalesList" }));
+          //this.props.navigation.dispatch(
+          //  SwitchActions.jumpTo({ routeName: "SalesList" })
+          //);
+          //this.props.navigation.navigate("Home");
+        })
+        .catch(err => {
+          console.log("Nope.", err);
+        });
     }
   };
 }
