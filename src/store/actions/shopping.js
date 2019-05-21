@@ -4,8 +4,14 @@ import NetInfo from "@react-native-community/netinfo";
 import { buyerChatList, loadMockNew } from "../../mockData/Chat2";
 import axios from "axios";
 import protectedAction from "../../utils/protectedAction";
-import { ___CONTACT_USER___ } from "../constants";
+import {
+  ___CONTACT_USER___,
+  ___CREATE_OFFERT___,
+  ___ACCEPT_OFFERT___,
+  ___REJECT_OFFERT___
+} from "../constants";
 import NavigationService from "../../navigator/NavigationService";
+import { sendReadNotification } from "../../utils/chatUtility";
 
 export const shoppingInit = data => ({
   type: actionTypes.SHOPPING_INIT,
@@ -149,6 +155,31 @@ export const shoppingDeleteOffert = (subjectID, chatID) => ({
   }
 });
 
+export const shoppingOffertFail = (subjectID, chatID) => ({
+  type: actionTypes.SHOPPING_OFFERT_FAIL,
+  payload: {
+    subjectID,
+    chatID
+  }
+});
+
+export const shoppingNewOffert = (
+  subjectID,
+  chatID,
+  offertID,
+  price,
+  user
+) => ({
+  type: actionTypes.SHOPPING_CREATE_OFFERT,
+  payload: {
+    price,
+    subjectID,
+    chatID,
+    pk: offertID,
+    user
+  }
+});
+
 export const shoppingSend = (subjectID, chatID) => {
   return (dispatch, getState) => {
     const myID = getState().auth.id;
@@ -195,9 +226,20 @@ const createMsg = (content, userID) => {
 };
 
 export const shoppingRead = (subjectID, chatID) => {
-  return dispatch => {
+  return (dispatch, getState) => {
     //API TO SET READ
+    const chat = getState().shopping.data[subjectID].chats[chatID];
+    const hasNews = chat.hasNews;
+
+    if (!hasNews) {
+      return console.log("No News ", hasNews);
+    }
+    const from = chat.messages[hasNews - 1]._id;
+    const to = chat.messages[0]._id;
+    console.log("CHAT FROM / TO", from, to);
+
     dispatch(shoppingReadChat(subjectID, chatID));
+    sendReadNotification(chatID, from, to);
   };
 };
 
@@ -241,10 +283,15 @@ const shoppingRetrySend = ({ subjectID, chatID, msg }) => {
 
 export const onNewShoppingMsg = (subjectID, chatID, msg) => {
   return (dispatch, getState) => {
-    dispatch(shoppingReceiveMsg(subjectID, chatID, msg));
-    if (getState().shopping.chatFocus === chatID) {
-      //Send API for read
+    const state = getState().shopping;
+    if (state.chatFocus === chatID) {
+      const chat = state.data[subjectID].chats[chatID];
+      const from = chat.messages[chat.hasNews]._id;
+      const to = msg._id;
+      console.log("CHAT FROM / TO", from, to);
+      sendReadNotification(chatID, from, to);
     }
+    dispatch(shoppingReceiveMsg(subjectID, chatID, msg));
   };
 };
 
@@ -318,23 +365,27 @@ export const shoppingCreateOffert = (subjectID, chatID, price) => {
     dispatch(shoppingStartStatusAction(subjectID, chatID));
 
     //API
-    setTimeout(() => {
-      const { username, id } = getState().auth;
-      dispatch({
-        type: actionTypes.SHOPPING_CREATE_OFFERT,
-        payload: {
-          price,
-          subjectID,
-          chatID,
-          user: {
-            pk: id,
+    axios
+      .post(___CREATE_OFFERT___, {
+        offert: price,
+        chat: chatID
+      })
+      .then(res => {
+        console.log(res);
+        const { username, id } = getState().auth;
+        dispatch(
+          shoppingNewOffert(subjectID, chatID, res.data.pk, price, {
+            _id: id,
             user: {
               username
             }
-          }
-        }
+          })
+        );
+      })
+      .catch(err => {
+        console.log({ err });
+        dispatch(shoppingOffertFail(subjectID, chatID));
       });
-    }, 2000);
   };
 };
 
@@ -350,29 +401,57 @@ export const shoppingRemoveOffert = (subjectID, chatID) => {
 };
 
 export const shoppingRejectOffert = (subjectID, chatID) => {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(shoppingStartStatusAction(subjectID, chatID));
+    console.log(getState().shopping.data[subjectID].chats[chatID].offerts[0]);
+    offertID = getState().shopping.data[subjectID].chats[chatID].offerts[0]._id;
+    console.log(offertID);
 
-    //API
-    setTimeout(() => {
-      dispatch(shoppingDeleteOffert(subjectID, chatID));
-    }, 2000);
+    axios
+      .post(___REJECT_OFFERT___, {
+        offert: offertID
+      })
+      .then(res => {
+        console.log(res);
+        dispatch({
+          type: actionTypes.SHOPPING_REMOVE_OFFERT,
+          payload: {
+            subjectID,
+            chatID
+          }
+        });
+      })
+      .catch(err => {
+        console.log({ err });
+        dispatch(shoppingOffertFail(subjectID, chatID));
+      });
   };
 };
 
 export const shoppingAcceptOffert = (subjectID, chatID) => {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(shoppingStartStatusAction(subjectID, chatID));
 
-    //API
-    setTimeout(() => {
-      dispatch({
-        type: actionTypes.SHOPPING_ACCEPT_OFFERT,
-        payload: {
-          subjectID,
-          chatID
-        }
+    offertID = getState().shopping.data[subjectID].chats[chatID].offerts[0]._id;
+    console.log(offertID);
+
+    axios
+      .post(___ACCEPT_OFFERT___, {
+        offert: offertID
+      })
+      .then(res => {
+        console.log(res);
+        dispatch({
+          type: actionTypes.SHOPPING_ACCEPT_OFFERT,
+          payload: {
+            subjectID,
+            chatID
+          }
+        });
+      })
+      .catch(err => {
+        console.log({ err });
+        dispatch(shoppingOffertFail(subjectID, chatID));
       });
-    }, 2000);
   };
 };

@@ -9,7 +9,7 @@ import * as searchActions from "../store/actions/search";
 import BookShelf from "../components/Home/BookShelf";
 import SearchLink from "../components/Home/SearchLink";
 import { AndroidBackHandler } from "react-navigation-backhandler";
-import { singleResults } from "../mockData/SearchResults";
+import { singleResults, multiResults } from "../mockData/SearchResults";
 import Button from "../components/Button";
 import protectedAction from "../utils/protectedAction";
 import NotificationCenter from "../components/Home/NotificationCenter";

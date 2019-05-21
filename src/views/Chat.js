@@ -30,9 +30,9 @@ export class Chat extends Component {
   static propTypes = {};
 
   componentDidMount() {
+    this.setChatFocus(true);
     this.readChat(this.state.objectID, this.state.chatID);
     const { navigation } = this.props;
-    this.setChatFocus(true);
     this.focusListeners = [
       navigation.addListener("didFocus", () => this.setChatFocus(true)),
       navigation.addListener("didBlur", () => this.setChatFocus(false))

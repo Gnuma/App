@@ -19,6 +19,8 @@ import colors from "../../styles/colors";
 import Button from "../Button";
 import Composer from "./Composer";
 import Offert from "./Offert";
+import _ from "lodash";
+import { OffertStatus } from "../../views/BookOffert";
 
 export default class Chat extends Component {
   onSend = () => {
@@ -54,10 +56,18 @@ export default class Chat extends Component {
   renderOffert = () => {
     const { data, item, goBookOffert } = this.props;
     console.log(data);
-    if (!data.offert) return null;
+    if (
+      _.isEmpty(data.offerts) ||
+      data.offerts[0].status === OffertStatus.REJECTED
+    )
+      return null;
     else
       return (
-        <Offert offert={data.offert} item={item} goBookOffert={goBookOffert} />
+        <Offert
+          offert={data.offerts[0]}
+          item={item}
+          goBookOffert={goBookOffert}
+        />
       );
   };
 

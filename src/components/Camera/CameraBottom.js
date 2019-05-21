@@ -10,14 +10,7 @@ import SolidButton from "../SolidButton";
 
 export class CameraBottom extends Component {
   render() {
-    const {
-      takePicture,
-      changeFlashMode,
-      flashMode,
-      status,
-      isVisible
-    } = this.props;
-    if (!isVisible) return null;
+    const { takePicture, changeFlashMode, flashMode } = this.props;
     return (
       <View style={bottomBarStyle.container}>
         <View style={bottomBarStyle.leftBox}>

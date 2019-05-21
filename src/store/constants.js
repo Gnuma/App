@@ -26,7 +26,13 @@ export const ___CREATE_COMMENT___ = ___BASE_ENDPOINT___ + "comments/";
 
 export const ___RETRIEVE_CHATS___ = ___BASE_ENDPOINT___ + "chat/operations/";
 export const ___SEND_MESSAGE___ = ___BASE_ENDPOINT___ + "chat/operations/";
+export const ___READ_CHAT___ =
+  ___BASE_ENDPOINT___ + "chat/operations/readMessages/";
 export const ___CONTACT_USER___ = ___BASE_ENDPOINT___ + "chat/";
 
 export const ___CREATE_OFFERT___ =
+  ___BASE_ENDPOINT___ + "chat/operations/createOffert/";
+export const ___ACCEPT_OFFERT___ =
   ___BASE_ENDPOINT___ + "chat/operations/acceptOffert/";
+export const ___REJECT_OFFERT___ =
+  ___BASE_ENDPOINT___ + "chat/operations/rejectOffert/";

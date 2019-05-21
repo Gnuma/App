@@ -12,6 +12,7 @@ import {
 import { notificationsUnsubscribe } from "./notifications";
 import WS from "../../utils/WebSocket";
 import { AutoStart } from "../../utils/constants";
+import CookieManager from "react-native-cookies";
 
 const isOffline = false;
 
@@ -217,7 +218,9 @@ export const authSignup = (username, email, password1, password2) => {
   };
 };
 
-const login = ({ dispatch, resolve, token, data }) => {
+const login = async ({ dispatch, resolve, token, data }) => {
+  await CookieManager.clearAll();
+
   console.log("Logging in...", token);
   if (!token) {
     console.log("ERROR NOT SET IN LOGIN");

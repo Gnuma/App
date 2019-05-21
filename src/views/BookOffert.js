@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { View, Text, ScrollView, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  ToastAndroid
+} from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import BasicHeader from "../components/BasicHeader";
@@ -15,6 +21,7 @@ import Button from "../components/Button";
 import * as salesActions from "../store/actions/sales";
 import * as shoppingActions from "../store/actions/shopping";
 import LoadingOverlay from "../components/LoadingOverlay";
+import _ from "lodash";
 
 const CreateOffert = ({
   item,
@@ -197,6 +204,8 @@ export class BookOffert extends Component {
   };
 
   removeOffert = () => {
+    return ToastAndroid.show("Coming soon...", ToastAndroid.SHORT);
+
     const { objectID, chatID } = this.state;
     if (this.type == ChatType.sales) {
       this.props.salesRemoveOffert(objectID, chatID);
@@ -237,17 +246,20 @@ export class BookOffert extends Component {
 
     if (this.type == ChatType.sales) {
       const { chats, newsCount, ...item } = props.salesData[objectID];
-      const { offert, statusLoading } = chats[chatID];
+      const { offerts, statusLoading } = chats[chatID];
       return {
         item: {
           ...item,
           seller: mockData.item.seller //TEST
         },
-        offert,
+        offert:
+          _.isEmpty(offerts) || offerts[0].status === OffertStatus.REJECTED
+            ? undefined
+            : offerts[0],
         loading: statusLoading
       };
     } else {
-      const { UserTO, item, offert, statusLoading } = props.shoppingData[
+      const { UserTO, item, offerts, statusLoading } = props.shoppingData[
         objectID
       ].chats[chatID];
       return {
@@ -259,7 +271,10 @@ export class BookOffert extends Component {
           ...item,
           seller: UserTO
         },*/
-        offert,
+        offert:
+          _.isEmpty(offerts) || offerts[0].status === OffertStatus.REJECTED
+            ? undefined
+            : offerts[0],
         loading: statusLoading
       };
     }
@@ -273,10 +288,10 @@ export class BookOffert extends Component {
     if (!data.offert) {
       type = OffertType.CREATE;
       title = "Fai una offerta";
-    } else if (data.offert.status == "accepted") {
+    } else if (data.offert.status == OffertStatus.ACCEPTED) {
       type = OffertType.ACCEPTED;
       title = "Offerta Accettata";
-    } else if (data.offert.creator.pk == this.props.userID) {
+    } else if (data.offert.creator._id == this.props.userID) {
       type = OffertType.EDIT;
       title = "La tua offerta";
     } else {
@@ -407,4 +422,10 @@ OffertType = {
   EDIT: "EDIT",
   DECIDE: "DECIDE",
   ACCEPTED: "ACCEPTED"
+};
+
+export const OffertStatus = {
+  PENDING: 0,
+  ACCEPTED: 1,
+  REJECTED: 2
 };

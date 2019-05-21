@@ -5,7 +5,8 @@ import {
   getSubjectIndex,
   getChatIndex,
   highlightItem,
-  createOffert
+  createOffert,
+  createSystemMessage
 } from "../../utils/chatUtility";
 import {
   shoppingLoadMockNew,
@@ -14,6 +15,7 @@ import {
 } from "../../mockData/Chat2";
 import _ from "lodash";
 import uuid from "uuid";
+import { OffertStatus } from "../../views/BookOffert";
 
 const initialState = {
   data: null,
@@ -79,10 +81,10 @@ const shoppingComposer = (state, action) => {
 
 const shoppingReceiveMsg = (state, action) => {
   const { subjectID, chatID, msg } = action.payload;
-  console.log("Receiving...", { subjectID, chatID, msg });
-  inChat = state.chatFocus === chatID; //TO-DO
+  inChat = state.chatFocus === chatID;
   const subjectIndex = getSubjectIndex(subjectID, state);
   const chatIndex = getChatIndex(chatID, state.orderedData[subjectIndex]);
+  const hadNews = state.data[subjectID].chats[chatID].hasNews > 0;
 
   return update(state, {
     data: {
@@ -90,13 +92,12 @@ const shoppingReceiveMsg = (state, action) => {
         chats: {
           [chatID]: {
             messages: { $unshift: [msg] },
-            hasNews: { $set: !inChat }
+            hasNews: { $apply: oldHasNews => (inChat ? 0 : oldHasNews + 1) }
           }
         },
         newsCount: {
-          $set: !inChat
-            ? state.data[subjectID].newsCount + 1
-            : state.data[subjectID].newsCount
+          $apply: oldNewsCount =>
+            !inChat && hadNews ? oldNewsCount + 1 : oldNewsCount
         }
       }
     },
@@ -168,9 +169,8 @@ const shoppingConfirmMsg = (state, action) => {
 
 const shoppingReadChat = (state, action) => {
   const { subjectID, chatID } = action.payload;
-  //console.log(subjectID, chatID);
   const hasNews = state.data[subjectID].chats[chatID].hasNews;
-  //console.log(hasNews);
+
   return update(state, {
     data: {
       [subjectID]: {
@@ -181,7 +181,7 @@ const shoppingReadChat = (state, action) => {
         },
         chats: {
           [chatID]: {
-            hasNews: { $set: false }
+            hasNews: { $set: 0 }
           }
         }
       }
@@ -260,7 +260,8 @@ const shoppingContactUser = (state, action) => {
     UserTO: item.seller.user,
     hasNews: false,
     status: "local",
-    messages: []
+    messages: [],
+    offerts: []
   };
   const subject = {
     _id: subjectID,
@@ -313,14 +314,35 @@ const shoppingStartStatusAction = (state, action) => {
 };
 
 const shoppingCreateOffert = (state, action) => {
-  const { price, subjectID, chatID, user } = action.payload;
+  const { price, subjectID, chatID, pk } = action.payload;
+  console.log(state.data[subjectID].chats[chatID].UserTO);
+
+  const user = action.payload.user
+    ? action.payload.user
+    : {
+        _id: state.data[subjectID].chats[chatID].UserTO._id,
+        user: {
+          username: state.data[subjectID].chats[chatID].UserTO.username
+        }
+      };
+
   return update(state, {
     data: {
       [subjectID]: {
         chats: {
           [chatID]: {
             statusLoading: { $set: false },
-            offert: { $set: createOffert(user, price) }
+            offerts: { $unshift: [createOffert(user, price, pk)] },
+            messages: {
+              $unshift: [
+                createSystemMessage(
+                  user.user.username +
+                    " ha inviato un offerta: €" +
+                    price +
+                    ".00"
+                )
+              ]
+            }
           }
         }
       }
@@ -336,7 +358,7 @@ const shoppingDeleteOffert = (state, action) => {
         chats: {
           [chatID]: {
             statusLoading: { $set: false },
-            offert: { $set: null }
+            offerts: { 0: { $merge: { status: OffertStatus.REJECTED } } }
           }
         }
       }
@@ -351,7 +373,22 @@ const shoppingAcceptOffert = (state, action) => {
       [subjectID]: {
         chats: {
           [chatID]: {
-            offert: { $merge: { status: "accepted" } },
+            offerts: { 0: { $merge: { status: OffertStatus.ACCEPTED } } },
+            statusLoading: { $set: false }
+          }
+        }
+      }
+    }
+  });
+};
+
+const shoppingOffertFail = (state, action) => {
+  const { subjectID, chatID } = action.payload;
+  return update(state, {
+    data: {
+      [subjectID]: {
+        chats: {
+          [chatID]: {
             statusLoading: { $set: false }
           }
         }
@@ -419,6 +456,9 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SHOPPING_ACCEPT_OFFERT:
       return shoppingAcceptOffert(state, action);
 
+    case actionTypes.SHOPPING_OFFERT_FAIL:
+      return shoppingOffertFail(state, action);
+
     default:
       return state;
   }
@@ -484,18 +524,6 @@ const formatData = (arrayData, focus = 0) => {
         ...restItem
       };
 
-      //Da togliere
-      const offert = {
-        creator: {
-          pk: 1,
-          username: "Alberto"
-        },
-        createdAt: "06/05/2019-12:02:14",
-        value: 15,
-        status: "pending"
-      };
-      //---
-
       for (let m = 0; m < chat.messages.length; m++)
         chat.messages[m].createdAt = new Date(chat.messages[m].createdAt);
 
@@ -505,7 +533,6 @@ const formatData = (arrayData, focus = 0) => {
         ...chat,
         composer: "",
         loading: false
-        //offert
       };
     }
     orderedData.push({ subjectID: subject._id, chats: orderedChats });

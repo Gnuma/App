@@ -17,7 +17,7 @@ export default class Signup extends Component {
   constructor(props) {
     super(props);
 
-    validators[2].confirmPwd.functions.push(this.isDifferentPwd);
+    this.validators[2].confirmPwd.functions.push(this.isDifferentPwd);
     this.pwdValue = "";
   }
 
@@ -52,7 +52,7 @@ export default class Signup extends Component {
   continue = () => {
     const { status } = this.props;
     const stateFields = this.state.fields[status];
-    const stateValidators = validators[status];
+    const stateValidators = this.validators[status];
 
     const result = submit(stateFields, stateValidators);
     if (result === true) {
@@ -104,7 +104,7 @@ export default class Signup extends Component {
   checkField = (key, goNext) => {
     const newState = fieldCheck(
       this.state.fields[this.props.status][key],
-      validators[this.props.status][key]
+      this.validators[this.props.status][key]
     );
     this.updateField(key, newState, goNext);
   };
@@ -218,38 +218,40 @@ export default class Signup extends Component {
     );
   }
 
+  getPwd = () => this.state.fields[2].pwd.value;
+
   isDifferentPwd = confirmPwd => {
     console.log(confirmPwd, "+", this.state.fields[2].pwd);
-    const pwd = this.state.fields[2].pwd.value;
+    const pwd = this.getPwd();
     console.log(pwd, confirmPwd);
     return pwd !== confirmPwd;
   };
-}
 
-const validators = {
-  0: {
-    uid: {
-      functions: [isEmpty],
-      warnings: ["Inserisci il nome"]
-    }
-  },
-  1: {
-    email: {
-      functions: [isEmpty, isInvalidEmail],
-      warnings: ["Inserisci l'email", "L'email non è valida"]
-    }
-  },
-  2: {
-    pwd: {
-      functions: [isEmpty],
-      warnings: ["Inserisci la password"]
+  validators = {
+    0: {
+      uid: {
+        functions: [isEmpty],
+        warnings: ["Inserisci il nome"]
+      }
     },
-    confirmPwd: {
-      functions: [isEmpty],
-      warnings: ["Reinserisci la password", "Le due password non coincidono"]
+    1: {
+      email: {
+        functions: [isEmpty, isInvalidEmail],
+        warnings: ["Inserisci l'email", "L'email non è valida"]
+      }
+    },
+    2: {
+      pwd: {
+        functions: [isEmpty],
+        warnings: ["Inserisci la password"]
+      },
+      confirmPwd: {
+        functions: [isEmpty],
+        warnings: ["Reinserisci la password", "Le due password non coincidono"]
+      }
     }
-  }
-};
+  };
+}
 
 const StatusBar = ({ status }) => {
   let statusText;

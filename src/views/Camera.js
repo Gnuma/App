@@ -18,31 +18,18 @@ import ImageReviewer from "../components/Camera/ImageReviewer";
 import ImagePicker from "react-native-image-crop-picker";
 import _ from "lodash";
 import update from "immutability-helper";
+import MainCamera from "../components/Camera/MainCamera";
 
 export class Camera extends Component {
   imgCounter = 5;
+  camera = null;
 
   state = {
     flashMode: RNCamera.Constants.FlashMode.off,
     status: 0, //0: can take photo; 1: loading; 2: accepting/rejecting
     checking: [],
-    cameraStatus: null,
-    headerBound: null,
-    footerBound: null,
-    previewOffset: null,
-    previewSize: null
+    cameraStatus: null
   };
-
-  componentDidMount() {
-    /*
-    const { navigation } = this.props;
-    navigation.addListener("willFocus", () =>
-      this.setState({ focusedScreen: true })
-    );
-    navigation.addListener("willBlur", () =>
-      this.setState({ focusedScreen: false })
-    );*/
-  }
 
   openImagePicker = () => {
     ImagePicker.openPicker(pickerOptions)
@@ -77,7 +64,7 @@ export class Camera extends Component {
               checking: update(prevState.checking, { $push: [data] })
             }));
             this.imgCounter--;
-            setTimeout(() => this.camera.resumePreview(), 500);
+            //setTimeout(() => this.camera.resumePreview(), 500);
           })
           .catch(err => {
             console.log(err);
@@ -90,25 +77,20 @@ export class Camera extends Component {
     }
   };
 
-  handleReview = isAccepted => {
+  handleReview = (isAccepted, offsetPercentage, sizePercentage) => {
     if (isAccepted) {
-      console.log({
-        offset: this.state.previewOffset,
-        size: this.state.previewSize
-      });
-      console.log(this.state.checking);
       const img = this.state.checking[0];
       const uri = img.uri ? img.uri : img.path;
       ImageEditor.cropImage(
         uri,
         {
           offset: {
-            x: img.width * this.state.previewOffset.x,
-            y: img.height * this.state.previewOffset.y
+            x: img.width * offsetPercentage.x,
+            y: img.height * offsetPercentage.y
           },
           size: {
-            width: img.width * this.state.previewSize.width,
-            height: img.height * this.state.previewSize.height
+            width: img.width * sizePercentage.width,
+            height: img.height * sizePercentage.height
           }
         },
         uri => {
@@ -163,108 +145,41 @@ export class Camera extends Component {
   render() {
     const isReviewing = !_.isEmpty(this.state.checking);
     const { flashMode } = this.state;
-    return (
-      <View style={{ flex: 1 }}>
-        {this.props.navigation.isFocused() && (
-          <RNCamera
-            style={{ flex: 1 }}
-            type={RNCamera.Constants.Type.back}
-            flashMode={flashMode}
-            //permissionDialogTitle={"Can I use your camera por favor?"}
-            //permissionDialogMessage={"PLIZZZZ"}
-            captureAudio={false}
-            autoFocusPointOfInterest={{ x: 0.5, y: 0.5 }}
-            ref={camera => {
-              if (camera) {
-                if (!this.camera)
-                  this.setState({
-                    cameraStatus: camera.getStatus()
-                  });
+    const { previews, previewsOrder } = this.props;
 
-                this.camera = camera;
-              }
-            }}
-            onStatusChange={({ cameraStatus }) => {
-              this.setState({
-                cameraStatus
-              });
-            }}
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.black }}>
+        {!isReviewing && (
+          <MainCamera
+            flashMode={flashMode}
+            initCamera={this.initCamera}
+            cameraStatusChange={this.cameraStatusChange}
+            takePicture={this.takePicture}
+            changeFlashMode={this.changeFlashMode}
+            openImagePicker={this.openImagePicker}
           />
         )}
-        {isReviewing ? (
-          <ImageReviewer
-            data={this.state.checking}
-            headerBound={this.state.headerBound}
-            footerBound={this.state.footerBound}
-            setReviewOptions={this.setReviewOptions}
-            handleReview={this.handleReview}
-          />
-        ) : null}
-        {this.getOverlay()}
+        <CameraHeader
+          previews={previews}
+          previewsOrder={previewsOrder}
+          handleGoBack={this.handleGoBack}
+          _reorderPreviews={this._reorderPreviews}
+          deleteItem={this.deleteItem}
+          previewsOrder={previewsOrder}
+          handleGoNext={this.handleGoNext}
+        />
+        <View style={{ flex: 1 }}>
+          {isReviewing && (
+            <ImageReviewer
+              data={this.state.checking[0]}
+              setReviewOptions={this.setReviewOptions}
+              handleReview={this.handleReview}
+            />
+          )}
+        </View>
       </View>
     );
   }
-
-  setReviewOptions = data => {
-    this.setState({
-      previewOffset: data.offset,
-      previewSize: data.size
-    });
-  };
-
-  getOverlay = () => {
-    //console.log(camera, status);
-    const isReviewing = !_.isEmpty(this.state.checking);
-    const { previews, previewsOrder } = this.props;
-    if (this.camera && this.state.cameraStatus === "READY") {
-      return (
-        <View style={StyleSheet.absoluteFill}>
-          <View
-            onLayout={event =>
-              this.setState({
-                headerBound:
-                  event.nativeEvent.layout.y +
-                  event.nativeEvent.layout.height +
-                  5
-              })
-            }
-          >
-            <CameraHeader
-              previews={previews}
-              previewsOrder={previewsOrder}
-              handleGoBack={this.handleGoBack}
-              _reorderPreviews={this._reorderPreviews}
-              deleteItem={this.deleteItem}
-              previewsOrder={previewsOrder}
-              handleGoNext={this.handleGoNext}
-              status={this.state.status}
-            />
-          </View>
-          <View style={{ flex: 1 }} />
-          <View
-            onLayout={event =>
-              this.setState({
-                footerBound: event.nativeEvent.layout.y - 5
-              })
-            }
-          >
-            <CameraBottom
-              takePicture={this.takePicture}
-              flashMode={this.state.flashMode}
-              changeFlashMode={this.changeFlashMode}
-              isVisible={!isReviewing}
-              openImagePicker={this.openImagePicker}
-            />
-          </View>
-          {this.state.status == 1 ? this.renderLoader() : null}
-        </View>
-      );
-    } else if (this.camera && this.state.cameraStatus === "NOT_AUTHORIZED") {
-      return <Header2>Not for permission</Header2>;
-    } else {
-      return this.renderLoader();
-    }
-  };
 
   renderLoader = () => {
     return (
@@ -277,6 +192,23 @@ export class Camera extends Component {
         <ActivityIndicator size="large" color={colors.secondary} />
       </View>
     );
+  };
+
+  initCamera = camera => {
+    if (camera) {
+      if (!this.camera)
+        this.setState({
+          cameraStatus: camera.getStatus()
+        });
+
+      this.camera = camera;
+    }
+  };
+
+  cameraStatusChange = ({ cameraStatus }) => {
+    this.setState({
+      cameraStatus
+    });
   };
 }
 
@@ -304,7 +236,8 @@ const options = {
   orientation: "portrait",
   fixOrientation: true,
   forceUpOrientation: true,
-  pauseAfterCapture: true
+  pauseAfterCapture: true,
+  width: 1080
 };
 
 const pickerOptions = {

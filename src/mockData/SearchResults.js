@@ -104,7 +104,7 @@ export const multiResults = {
 };
 
 export const singleResults = {
-  resultType: "single",
+  resultType: "multi",
   results: [
     {
       book: {

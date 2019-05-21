@@ -10,9 +10,14 @@ import {
   onNewSalesMsg,
   salesInit,
   salesRestart,
-  salesNewChat
+  salesNewChat,
+  salesNewOffert
 } from "../store/actions/sales";
-import { onNewShoppingMsg, shoppingInit } from "../store/actions/shopping";
+import {
+  onNewShoppingMsg,
+  shoppingInit,
+  shoppingNewOffert
+} from "../store/actions/shopping";
 import { authCompleted, authFail } from "../store/actions/auth";
 import update from "immutability-helper";
 import { commentList } from "../mockData/comments";
@@ -123,6 +128,26 @@ class WS {
         case DataType.RETRIEVE_NOTIFICATIONS:
           return store.dispatch(commentsInit(data.notifications));
 
+        case DataType.NEW_OFFERT:
+          if (data.for === "sale")
+            return store.dispatch(
+              salesNewOffert(
+                data._id,
+                data.offert.chat,
+                data.offert.id,
+                data.offert.offert
+              )
+            );
+          else
+            return store.dispatch(
+              shoppingNewOffert(
+                data._id,
+                data.offert.chat,
+                data.offert.id,
+                data.offert.offert
+              )
+            );
+
         default:
           throw `Type ${data.type} not valid`;
       }
@@ -200,7 +225,8 @@ const DataType = {
   NEW_CHAT: "newChat",
   NEW_COMMENT: "newComment",
   NEW_ANSWER: "newAnswer",
-  RETRIEVE_NOTIFICATIONS: "retrieveNotifications"
+  RETRIEVE_NOTIFICATIONS: "retrieveNotifications",
+  NEW_OFFERT: "newOffert"
 };
 
 formatMsg = msg => {

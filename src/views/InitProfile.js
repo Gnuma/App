@@ -42,6 +42,7 @@ export class InitProfile extends Component {
         this.setState({
           options: res.data.results
         });
+        console.log({ res });
       })
       .catch(err => console.log(err.response));
   };

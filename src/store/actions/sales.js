@@ -4,6 +4,14 @@ import uuid from "uuid";
 import NetInfo from "@react-native-community/netinfo";
 import { AppState } from "react-native";
 import { sellerChatList, loadMockNew } from "../../mockData/Chat2";
+import axios from "axios";
+import {
+  ___CREATE_OFFERT___,
+  ___REJECT_OFFERT___,
+  ___ACCEPT_OFFERT___,
+  ___READ_CHAT___
+} from "../constants";
+import { sendReadNotification } from "../../utils/chatUtility";
 
 export const salesInit = data => {
   return {
@@ -164,6 +172,25 @@ export const salesDeleteOffert = (itemID, chatID) => ({
   }
 });
 
+export const salesOffertFail = (itemID, chatID) => ({
+  type: actionTypes.SALES_OFFERT_FAIL,
+  payload: {
+    itemID,
+    chatID
+  }
+});
+
+export const salesNewOffert = (itemID, chatID, offertID, price, user) => ({
+  type: actionTypes.SALES_CREATE_OFFERT,
+  payload: {
+    price,
+    itemID,
+    chatID,
+    pk: offertID,
+    user
+  }
+});
+
 export const salesSend = (itemID, chatID) => {
   return (dispatch, getState) => {
     const myID = getState().auth.id;
@@ -211,9 +238,20 @@ const createMsg = (content, userID) => {
 };
 
 export const salesRead = (itemID, chatID) => {
-  return dispatch => {
+  return (dispatch, getState) => {
     //API to set read (TO-DO)
+    const chat = getState().sales.data[itemID].chats[chatID];
+    const hasNews = chat.hasNews;
+    if (!hasNews) {
+      return console.log("No News ", hasNews);
+    }
+
+    const from = chat.messages[hasNews - 1]._id;
+    const to = chat.messages[0]._id;
+    console.log("CHAT FROM / TO", from, to);
+
     dispatch(salesReadChat(itemID, chatID));
+    sendReadNotification(chatID, from, to);
   };
 };
 
@@ -259,10 +297,16 @@ const salesRetrySend = ({ itemID, chatID, msg }) => {
 
 export const onNewSalesMsg = (itemID, chatID, msg) => {
   return (dispatch, getState) => {
-    dispatch(salesReceiveMsg(itemID, chatID, msg));
-    if (getState().sales.chatFocus === chatID) {
-      //Send API for read
+    //Gotta have this sequentially
+    const state = getState().sales;
+    if (state.chatFocus === chatID) {
+      const chat = state.data[itemID].chats[chatID];
+      const from = chat.messages[chat.hasNews]._id;
+      const to = msg._id;
+      console.log("CHAT FROM / TO", from, to);
+      sendReadNotification(chatID, from, to);
     }
+    dispatch(salesReceiveMsg(itemID, chatID, msg));
   };
 };
 
@@ -305,24 +349,27 @@ export const salesCreateOffert = (itemID, chatID, price) => {
   return (dispatch, getState) => {
     dispatch(salesStartStatusAction(itemID, chatID));
 
-    //API
-    setTimeout(() => {
-      const { username, id } = getState().auth;
-      dispatch({
-        type: actionTypes.SALES_CREATE_OFFERT,
-        payload: {
-          price,
-          itemID,
-          chatID,
-          user: {
-            pk: id,
+    axios
+      .post(___CREATE_OFFERT___, {
+        offert: price,
+        chat: chatID
+      })
+      .then(res => {
+        console.log(res);
+        const { username, id } = getState().auth;
+        dispatch(
+          salesNewOffert(itemID, chatID, res.data.pk, price, {
+            _id: id,
             user: {
               username
             }
-          }
-        }
+          })
+        );
+      })
+      .catch(err => {
+        console.log({ err });
+        dispatch(salesOffertFail(itemID, chatID));
       });
-    }, 2000);
   };
 };
 
@@ -338,29 +385,55 @@ export const salesRemoveOffert = (itemID, chatID) => {
 };
 
 export const salesRejectOffert = (itemID, chatID) => {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(salesStartStatusAction(itemID, chatID));
 
-    //API
-    setTimeout(() => {
-      dispatch(salesDeleteOffert(itemID, chatID));
-    }, 2000);
+    offertID = getState().sales.data[itemID].chats[chatID].offerts[0]._id;
+
+    axios
+      .post(___REJECT_OFFERT___, {
+        offert: offertID
+      })
+      .then(res => {
+        console.log(res);
+        dispatch({
+          type: actionTypes.SALES_REMOVE_OFFERT,
+          payload: {
+            itemID,
+            chatID
+          }
+        });
+      })
+      .catch(err => {
+        console.log({ err });
+        dispatch(salesOffertFail(itemID, chatID));
+      });
   };
 };
 
 export const salesAcceptOffert = (itemID, chatID) => {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(salesStartStatusAction(itemID, chatID));
 
-    //API
-    setTimeout(() => {
-      dispatch({
-        type: actionTypes.SALES_ACCEPT_OFFERT,
-        payload: {
-          itemID,
-          chatID
-        }
+    offertID = getState().sales.data[itemID].chats[chatID].offerts[0]._id;
+
+    axios
+      .post(___ACCEPT_OFFERT___, {
+        offert: offertID
+      })
+      .then(res => {
+        console.log(res);
+        dispatch({
+          type: actionTypes.SALES_ACCEPT_OFFERT,
+          payload: {
+            itemID,
+            chatID
+          }
+        });
+      })
+      .catch(err => {
+        console.log({ err });
+        dispatch(salesOffertFail(itemID, chatID));
       });
-    }, 2000);
   };
 };

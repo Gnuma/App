@@ -1,13 +1,16 @@
 import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
 import update from "immutability-helper";
+import uuid from "uuid";
 import {
   getItemIndex,
   getChatIndex,
   highlightItem,
-  createOffert
+  createOffert,
+  createSystemMessage
 } from "../../utils/chatUtility";
 import { newChat } from "../../mockData/Chat2";
+import { OffertStatus } from "../../views/BookOffert";
 
 const initialState = {
   data: null,
@@ -73,11 +76,10 @@ const salesComposer = (state, action) => {
 
 const salesReceiveMsg = (state, action) => {
   const { item, chat, msg } = action.payload;
-  inChat = state.chatFocus === chat; //TO-DO
+  inChat = state.chatFocus === chat;
   const itemIndex = getItemIndex(item, state);
-  console.log(state.orderedData, itemIndex);
   const chatIndex = getChatIndex(chat, state.orderedData[itemIndex]);
-  console.log(itemIndex, chatIndex);
+  const hadNews = state.data[item].chats[chat].hasNews > 0;
 
   return update(state, {
     data: {
@@ -85,13 +87,12 @@ const salesReceiveMsg = (state, action) => {
         chats: {
           [chat]: {
             messages: { $unshift: [msg] },
-            hasNews: { $set: !inChat }
+            hasNews: { $apply: oldHasNews => (inChat ? 0 : oldHasNews + 1) }
           }
         },
         newsCount: {
-          $set: !inChat
-            ? state.data[item].newsCount + 1
-            : state.data[item].newsCount
+          $apply: oldNewsCount =>
+            !inChat && hadNews ? oldNewsCount + 1 : oldNewsCount
         }
       }
     },
@@ -164,7 +165,7 @@ const salesConfirmMsg = (state, action) => {
 const salesReadChat = (state, action) => {
   const { itemID, chatID } = action.payload;
   const hasNews = state.data[itemID].chats[chatID].hasNews;
-  console.log(state, action);
+  
   return update(state, {
     data: {
       [itemID]: {
@@ -175,7 +176,7 @@ const salesReadChat = (state, action) => {
         },
         chats: {
           [chatID]: {
-            hasNews: { $set: false }
+            hasNews: { $set: 0 }
           }
         }
       }
@@ -254,11 +255,12 @@ const salesNewChat = (state, action) => {
       _id: data.buyer.pk,
       username: data.buyer.user.username
     },
-    hasNews: true,
+    hasNews: 1,
     status: "pending",
     messages: [],
     loading: false,
-    composer: ""
+    composer: "",
+    offerts: []
   };
   const item = {
     _id: itemID,
@@ -317,14 +319,30 @@ const salesStartStatusAction = (state, action) => {
 };
 
 const salesCreateOffert = (state, action) => {
-  const { price, itemID, chatID, user } = action.payload;
+  const { price, itemID, chatID, pk } = action.payload;
+  const user = action.payload.user
+    ? action.payload.user
+    : {
+        _id: state.data[itemID].chats[chatID].UserTO._id,
+        user: {
+          username: state.data[itemID].chats[chatID].UserTO.username
+        }
+      };
+
   return update(state, {
     data: {
       [itemID]: {
         chats: {
           [chatID]: {
             statusLoading: { $set: false },
-            offert: { $set: createOffert(user, price) }
+            offerts: { $unshift: [createOffert(user, price, pk)] },
+            messages: {
+              $unshift: [
+                createSystemMessage(
+                  user.username + " ha inviato un offerta: €" + price + ".00"
+                )
+              ]
+            }
           }
         }
       }
@@ -340,7 +358,7 @@ const salesDeleteOffert = (state, action) => {
         chats: {
           [chatID]: {
             statusLoading: { $set: false },
-            offert: { $set: null }
+            offerts: { 0: { $merge: { status: OffertStatus.REJECTED } } }
           }
         }
       }
@@ -355,7 +373,22 @@ const salesAcceptOffert = (state, action) => {
       [itemID]: {
         chats: {
           [chatID]: {
-            offert: { $merge: { status: "accepted" } },
+            offerts: { 0: { $merge: { status: OffertStatus.ACCEPTED } } },
+            statusLoading: { $set: false }
+          }
+        }
+      }
+    }
+  });
+};
+
+const salesOffertFail = (state, action) => {
+  const { itemID, chatID } = action.payload;
+  return update(state, {
+    data: {
+      [itemID]: {
+        chats: {
+          [chatID]: {
             statusLoading: { $set: false }
           }
         }
@@ -422,6 +455,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SALES_ACCEPT_OFFERT:
       return salesAcceptOffert(state, action);
+
+    case actionTypes.SALES_OFFERT_FAIL:
+      return salesOffertFail(state, action);
 
     default:
       return state;
