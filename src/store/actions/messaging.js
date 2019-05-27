@@ -17,7 +17,7 @@ import { sellerChatList, buyerChatList2 } from "../../mockData/Chat2";
 import axios from "axios";
 import { ___SEND_MESSAGE___ } from "../constants";
 
-queue = [];
+let queue = [];
 
 export const sendMessage = (type, objectID, chatID) => {
   return (dispatch, getState) => {
@@ -70,6 +70,8 @@ export const restart = resolve => {
     }, 2000);
   };
 };
+
+export const messagingClear = () => (queue = []);
 
 const retrySend = ({ type, objectID, chatID, msg }) => {
   return dispatch => {

@@ -180,6 +180,10 @@ export const shoppingNewOffert = (
   }
 });
 
+export const shoppingClear = () => ({
+  type: actionTypes.SHOPPING_CLEAR
+});
+
 export const shoppingSend = (subjectID, chatID) => {
   return (dispatch, getState) => {
     const myID = getState().auth.id;

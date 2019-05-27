@@ -104,6 +104,17 @@ export const setDescription = description => {
   };
 };
 
+export const sellAddReview = data => ({
+  type: actionTypes.SELL_ADD_REVIEW,
+  payload: {
+    data
+  }
+});
+
+export const sellRemoveReview = () => ({
+  type: actionTypes.SELL_REMOVE_REVIEW
+});
+
 export const submit = () => {
   return (dispatch, getState) => {
     return new Promise(function(resolve, reject) {

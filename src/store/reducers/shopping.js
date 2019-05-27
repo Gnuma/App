@@ -397,6 +397,8 @@ const shoppingOffertFail = (state, action) => {
   });
 };
 
+const shoppingClear = () => initialState;
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SHOPPING_INIT:
@@ -458,6 +460,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SHOPPING_OFFERT_FAIL:
       return shoppingOffertFail(state, action);
+
+    case actionTypes.SHOPPING_CLEAR:
+      return shoppingClear(state, action);
 
     default:
       return state;

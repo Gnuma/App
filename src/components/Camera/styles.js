@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, StatusBar } from "react-native";
 import colors from "../../styles/colors";
 
 const sideContainer = 50;
@@ -99,6 +99,7 @@ export const header = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20
+    marginTop: 10 + StatusBar.currentHeight,
+    marginBottom: 10
   }
 });

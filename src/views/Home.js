@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { View, ScrollView, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  ScrollView,
+  TouchableWithoutFeedback,
+  SafeAreaView,
+  StatusBar
+} from "react-native";
 import { withNavigation } from "react-navigation";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
@@ -15,6 +21,8 @@ import protectedAction from "../utils/protectedAction";
 import NotificationCenter from "../components/Home/NotificationCenter";
 import _ from "lodash";
 import MainHome from "../components/Home/MainHome";
+import { GreenBar } from "../components/StatusBars";
+import colors from "../styles/colors";
 
 export class Home extends Component {
   static propTypes = {
@@ -28,9 +36,20 @@ export class Home extends Component {
     isLoading: PropTypes.bool
   };
 
+  componentDidMount() {
+    this._navListener = this.props.navigation.addListener("willFocus", () => {
+      StatusBar.setBackgroundColor(colors.darkGreen);
+    });
+  }
+
+  componentWillUnmount() {
+    this._navListener.remove();
+  }
+
   render() {
     return (
       <AndroidBackHandler onBackPress={this._onBackButtonPressAndroid}>
+        <GreenBar />
         {this.getContent()}
       </AndroidBackHandler>
     );

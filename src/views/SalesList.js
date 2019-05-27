@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text } from "react-native";
+import { View, Text, StatusBar } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import SalesTab from "../components/Sales/SalesTab";
@@ -21,6 +21,16 @@ export class SalesList extends Component {
     orderedData: PropTypes.array
   };
 
+  componentDidMount() {
+    this._navListener = this.props.navigation.addListener("didFocus", () => {
+      StatusBar.setBackgroundColor(colors.lightGrey);
+    });
+  }
+
+  componentWillUnmount() {
+    this._navListener.remove();
+  }
+
   render() {
     const {
       data,
@@ -30,25 +40,29 @@ export class SalesList extends Component {
       isAuthenticated
     } = this.props;
 
-    if (!data || _.isEmpty(data)) return this.renderEmpty();
-
     return (
       <View style={{ flex: 1 }}>
-        <SalesTab
-          goTo={setSaleFocus}
-          isAuthenticated={isAuthenticated}
-          data={data}
-          orderedData={orderedData}
-          focus={focus}
-        />
-        <SalesChatsList
-          isAuthenticated={isAuthenticated}
-          data={data}
-          orderedData={orderedData}
-          focus={focus}
-          onGoChat={this.onGoChat}
-        />
-        <SellButton onPress={this.onGoSell} />
+        {!data || _.isEmpty(data) ? (
+          this.renderEmpty()
+        ) : (
+          <View style={{ flex: 1 }}>
+            <SalesTab
+              goTo={setSaleFocus}
+              isAuthenticated={isAuthenticated}
+              data={data}
+              orderedData={orderedData}
+              focus={focus}
+            />
+            <SalesChatsList
+              isAuthenticated={isAuthenticated}
+              data={data}
+              orderedData={orderedData}
+              focus={focus}
+              onGoChat={this.onGoChat}
+            />
+            <SellButton onPress={this.onGoSell} />
+          </View>
+        )}
       </View>
     );
   }

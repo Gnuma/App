@@ -30,37 +30,35 @@ export default class BookShelf extends Component {
   render() {
     const { activeSlide } = this.state;
     return (
-      <View>
-        <Carousel
-          ref={c => (this.bookShelf = c)}
-          data={data}
-          renderItem={this._renderItem}
-          sliderWidth={sliderWidth}
-          itemWidth={itemWidth}
-          hasParallaxImages={true}
-          inactiveSlideScale={0.82}
-          inactiveSlideOpacity={0.8}
-          //inactiveSlideShift={20}
-          //containerCustomStyle={styles.slider}
-          //contentContainerCustomStyle={styles.sliderContentContainer}
-          //loop={true}
-          onSnapToItem={index => this.setState({ activeSlide: index })}
-        />
-        <Pagination
-          dotsLength={data.length}
-          activeDotIndex={activeSlide}
-          //containerStyle={styles.paginationContainer}
-          dotColor={colors.black}
-          dotStyle={{
-            width: 7,
-            height: 14
-          }}
-          inactiveDotColor={colors.black}
-          inactiveDotOpacity={0.4}
-          inactiveDotScale={0.6}
-          carouselRef={this.bookShelf}
-          tappableDots={!!this._slider1Ref}
-        />
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <View>
+          <Carousel
+            ref={c => (this.bookShelf = c)}
+            data={data}
+            renderItem={this._renderItem}
+            sliderWidth={sliderWidth}
+            itemWidth={itemWidth}
+            hasParallaxImages={true}
+            inactiveSlideScale={0.82}
+            inactiveSlideOpacity={0.8}
+            onSnapToItem={index => this.setState({ activeSlide: index })}
+          />
+          <Pagination
+            dotsLength={data.length}
+            activeDotIndex={activeSlide}
+            //containerStyle={styles.paginationContainer}
+            dotColor={colors.black}
+            dotStyle={{
+              width: 7,
+              height: 14
+            }}
+            inactiveDotColor={colors.black}
+            inactiveDotOpacity={0.4}
+            inactiveDotScale={0.6}
+            carouselRef={this.bookShelf}
+            tappableDots={!!this._slider1Ref}
+          />
+        </View>
       </View>
     );
   }

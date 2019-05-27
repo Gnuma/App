@@ -15,10 +15,12 @@ import CameraHeader from "../components/Camera/CameraHeader";
 import * as sellActions from "../store/actions/sell";
 import colors from "../styles/colors";
 import ImageReviewer from "../components/Camera/ImageReviewer";
-import ImagePicker from "react-native-image-crop-picker";
+//import ImagePicker from "react-native-image-crop-picker";
 import _ from "lodash";
 import update from "immutability-helper";
 import MainCamera from "../components/Camera/MainCamera";
+import { HiddenBar, TransparentBar } from "../components/StatusBars";
+import { SafeAreaView } from "react-navigation";
 
 export class Camera extends Component {
   imgCounter = 5;
@@ -27,27 +29,11 @@ export class Camera extends Component {
   state = {
     flashMode: RNCamera.Constants.FlashMode.off,
     status: 0, //0: can take photo; 1: loading; 2: accepting/rejecting
-    checking: [],
     cameraStatus: null
   };
 
   openImagePicker = () => {
-    ImagePicker.openPicker(pickerOptions)
-      .then(images => {
-        const freeSpace = Math.min(this.imgCounter, images.length);
-        let takenImages = [];
-        for (let i = 0; i < freeSpace; i++) {
-          takenImages.push(images[i]);
-        }
-        console.log(takenImages);
-        this.imgCounter -= takenImages.length;
-        this.setState(prevState => ({
-          checking: update(prevState.checking, { $push: takenImages })
-        }));
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    this.props.navigation.navigate("ImagePicker");
   };
 
   takePicture = async () => {
@@ -60,9 +46,9 @@ export class Camera extends Component {
           .takePictureAsync(options)
           .then(data => {
             this.setState(prevState => ({
-              status: 0,
-              checking: update(prevState.checking, { $push: [data] })
+              status: 0
             }));
+            this.props.addReview(data);
             this.imgCounter--;
             //setTimeout(() => this.camera.resumePreview(), 500);
           })
@@ -79,7 +65,7 @@ export class Camera extends Component {
 
   handleReview = (isAccepted, offsetPercentage, sizePercentage) => {
     if (isAccepted) {
-      const img = this.state.checking[0];
+      const img = this.props.checking[0];
       const uri = img.uri ? img.uri : img.path;
       ImageEditor.cropImage(
         uri,
@@ -111,9 +97,9 @@ export class Camera extends Component {
     }
 
     this.setState(prevState => ({
-      status: 0,
-      checking: update(prevState.checking, { $splice: [[0, 1]] })
+      status: 0
     }));
+    this.props.removeReview();
   };
 
   handleGoNext = () => {
@@ -143,41 +129,44 @@ export class Camera extends Component {
   };
 
   render() {
-    const isReviewing = !_.isEmpty(this.state.checking);
+    const isReviewing = !_.isEmpty(this.props.checking);
     const { flashMode } = this.state;
     const { previews, previewsOrder } = this.props;
 
     return (
-      <View style={{ flex: 1, backgroundColor: colors.black }}>
-        {!isReviewing && (
-          <MainCamera
-            flashMode={flashMode}
-            initCamera={this.initCamera}
-            cameraStatusChange={this.cameraStatusChange}
-            takePicture={this.takePicture}
-            changeFlashMode={this.changeFlashMode}
-            openImagePicker={this.openImagePicker}
-          />
-        )}
-        <CameraHeader
-          previews={previews}
-          previewsOrder={previewsOrder}
-          handleGoBack={this.handleGoBack}
-          _reorderPreviews={this._reorderPreviews}
-          deleteItem={this.deleteItem}
-          previewsOrder={previewsOrder}
-          handleGoNext={this.handleGoNext}
-        />
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.fullBlack }}>
         <View style={{ flex: 1 }}>
-          {isReviewing && (
-            <ImageReviewer
-              data={this.state.checking[0]}
-              setReviewOptions={this.setReviewOptions}
-              handleReview={this.handleReview}
+          <TransparentBar />
+          {!isReviewing && (
+            <MainCamera
+              flashMode={flashMode}
+              initCamera={this.initCamera}
+              cameraStatusChange={this.cameraStatusChange}
+              takePicture={this.takePicture}
+              changeFlashMode={this.changeFlashMode}
+              openImagePicker={this.openImagePicker}
             />
           )}
+          <CameraHeader
+            previews={previews}
+            previewsOrder={previewsOrder}
+            handleGoBack={this.handleGoBack}
+            _reorderPreviews={this._reorderPreviews}
+            deleteItem={this.deleteItem}
+            previewsOrder={previewsOrder}
+            handleGoNext={this.handleGoNext}
+          />
+          <View style={{ flex: 1 }}>
+            {isReviewing && (
+              <ImageReviewer
+                data={this.props.checking[0]}
+                setReviewOptions={this.setReviewOptions}
+                handleReview={this.handleReview}
+              />
+            )}
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -214,7 +203,8 @@ export class Camera extends Component {
 
 const mapStateToProps = state => ({
   previews: state.sell.previews,
-  previewsOrder: state.sell.previewsOrder
+  previewsOrder: state.sell.previewsOrder,
+  checking: state.sell.checking
 });
 
 const mapDispatchToProps = dispatch => {
@@ -222,7 +212,9 @@ const mapDispatchToProps = dispatch => {
     takePreviewRedux: data => dispatch(sellActions.takePreview(data)),
     setPreviewsOrderRedux: nextOrder =>
       dispatch(sellActions.setPreviewsOrder(nextOrder)),
-    deletePreviewRedux: index => dispatch(sellActions.deletePreview(index))
+    deletePreviewRedux: index => dispatch(sellActions.deletePreview(index)),
+    addReview: data => dispatch(sellActions.sellAddReview(data)),
+    removeReview: () => dispatch(sellActions.sellRemoveReview())
   };
 };
 
@@ -234,10 +226,10 @@ export default connect(
 const options = {
   quality: 1,
   orientation: "portrait",
-  fixOrientation: true,
+  //fixOrientation: true,
   forceUpOrientation: true,
-  pauseAfterCapture: true,
-  width: 1080
+  pauseAfterCapture: true
+  //width: 1080
 };
 
 const pickerOptions = {

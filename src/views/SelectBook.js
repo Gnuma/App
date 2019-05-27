@@ -9,6 +9,7 @@ import * as sellActions from "../store/actions/sell";
 import axios from "axios";
 import { ___BOOK_HINTS_ENDPOINT___ } from "../store/constants";
 import _ from "lodash";
+import { GreyBar } from "../components/StatusBars";
 
 export class SelectBook extends Component {
   state = {
@@ -22,6 +23,7 @@ export class SelectBook extends Component {
 
     return (
       <View style={{ flex: 1 }}>
+        <GreyBar />
         <SBHeader
           onChangeText={this.handleChange}
           searchQuery={this.state.searchQuery}

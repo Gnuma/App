@@ -25,6 +25,7 @@ import SalesListScreen from "../views/SalesList";
 import ChatScreen from "../views/Chat";
 import BookOffertScreen from "../views/BookOffert";
 import ShoppingListScreen from "../views/ShoppingList";
+import ImagePickerScreen from "../views/ImagePicker";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -103,6 +104,10 @@ const VendiNavigator = {
         screen: CameraScreen,
         path: "/vendi/camera"
       },
+      ImagePicker: {
+        screen: ImagePickerScreen,
+        path: "/vendi/imagepicker"
+      },
       SelectBook: {
         screen: SelectBookScreen,
         path: "/vendi/selectbook"
@@ -151,29 +156,28 @@ const SalesNavigator = createStackNavigator(
   }
 );
 
-const SalesStack = createSwitchNavigator(
+const SalesStack = createStackNavigator(
   {
     SalesList: SalesNavigator,
     Vendi: VendiNavigator
   },
   {
     backBehavior: "order",
-    resetOnBlur: false
+    resetOnBlur: false,
+    defaultNavigationOptions: {
+      header: null
+    }
   }
 );
 
 SalesStack.navigationOptions = ({ navigation }) => {
-  const { routes } = navigation.state.routes[navigation.state.index];
-  let routeName;
-  if (routes[1]) {
-    routeName = routes[1].routeName;
-  } else {
-    routeName = routes[0].routeName;
-  }
-  console.log(routeName);
-
+  const { routeName, routes, index } = navigation.state.routes[
+    navigation.state.index
+  ];
+  console.log(navigation.state.routes[navigation.state.index]);
+  //console.log(key, navigation.state.routes[navigation.state.index]);
   let navigationOptions = {};
-  if (routeName === "Camera" || routeName === "SaleChat") {
+  if (routeName === "Vendi" || routes[index].routeName === "SaleChat") {
     navigationOptions.tabBarVisible = false;
   }
 

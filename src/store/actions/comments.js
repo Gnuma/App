@@ -24,6 +24,10 @@ export const commentsReceiveAnswer = answer => ({
   }
 });
 
+export const commentsClear = () => ({
+  type: actionTypes.COMMENTS_CLEAR
+});
+
 export const commentsInit = data => {
   return dispatch => {
     dispatch(init(data));

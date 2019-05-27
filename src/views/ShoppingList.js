@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text } from "react-native";
+import { View, Text, StatusBar } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Header3 } from "../components/Text";
@@ -9,6 +9,7 @@ import * as searchActions from "../store/actions/search";
 import ShoppingChatsList from "../components/Shopping/ShoppingChatsList";
 import SearchLink from "../components/Home/SearchLink";
 import _ from "lodash";
+import colors from "../styles/colors";
 
 export class ShoppingList extends Component {
   static propTypes = {
@@ -18,6 +19,16 @@ export class ShoppingList extends Component {
     data: PropTypes.object,
     orderedData: PropTypes.array
   };
+
+  componentDidMount() {
+    this._navListener = this.props.navigation.addListener("willFocus", () => {
+      StatusBar.setBackgroundColor(colors.lightGrey);
+    });
+  }
+
+  componentWillUnmount() {
+    this._navListener.remove();
+  }
 
   render() {
     const {

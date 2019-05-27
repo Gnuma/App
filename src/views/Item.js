@@ -16,6 +16,7 @@ import { notificationsViewItem } from "../store/actions/notifications";
 import protectedAction from "../utils/protectedAction";
 import NavigationService from "../navigator/NavigationService";
 import { mockContactItem } from "../mockData/Chat2";
+import { WhiteBar, GreyBar } from "../components/StatusBars";
 
 export class Item extends Component {
   constructor(props) {
@@ -132,6 +133,7 @@ export class Item extends Component {
 
     return (
       <View style={{ flex: 1 }}>
+        <GreyBar />
         <ItemHeader
           handleGoBack={this._handleGoBack}
           title={bookName}

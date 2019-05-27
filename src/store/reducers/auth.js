@@ -47,15 +47,7 @@ const authFail = (state, action) => {
   });
 };
 
-const logoutSuccess = (state, action) => {
-  return updateObject(state, {
-    token: null,
-    error: null,
-    loading: false,
-    gnumaUser: null,
-    username: null
-  });
-};
+const logoutSuccess = (state, action) => initialState;
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {

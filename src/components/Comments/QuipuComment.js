@@ -41,11 +41,13 @@ class QuipuComment extends Component {
     const { value } = this.state;
     return (
       <View>
-        <CommentComposer
-          value={value}
-          onTextChange={this._handleComposing}
-          onSend={() => this.send("question")}
-        />
+        {this.props.user.id !== this.props.sellerPK && (
+          <CommentComposer
+            value={value}
+            onTextChange={this._handleComposing}
+            onSend={() => this.send("question")}
+          />
+        )}
         <View>{this.state.data.map(this._renderMainComment)}</View>
       </View>
     );
@@ -208,45 +210,52 @@ class QuipuComment extends Component {
     const content = this.state.value;
     protectedAction()
       .then(() => {
-        this.mainCommentQueue++;
-        //console.log(this.mainCommentQueue);
-        this.setState(
-          prevState => ({
-            value: "",
-            data: update(prevState.data, {
-              $unshift: [this.composeComment(prevState.value)]
-            })
-          }),
-          () => {
-            //send validation
-            console.log("Creating Comment: ", {
-              type: "comment",
-              item: this.props.itemPK,
-              content: content
-            });
-            axios
-              .post(___CREATE_COMMENT___, {
+        if (this.props.user.id === this.props.sellerPK) {
+          ToastAndroid.show(
+            "Non puoi creare delle domande alle tue inserzioni",
+            ToastAndroid.SHORT
+          );
+        } else {
+          this.mainCommentQueue++;
+          //console.log(this.mainCommentQueue);
+          this.setState(
+            prevState => ({
+              value: "",
+              data: update(prevState.data, {
+                $unshift: [this.composeComment(prevState.value)]
+              })
+            }),
+            () => {
+              //send validation
+              console.log("Creating Comment: ", {
                 type: "comment",
                 item: this.props.itemPK,
                 content: content
-              })
-              .then(res => {
-                console.log(res);
-                this.sendingConfirmation(0, null, {
-                  pk: res.data.pk,
-                  created_at: res.data.timestamp
-                  //content
-                });
-              })
-              .catch(err => {
-                console.warn(err);
-                console.log(err.response);
               });
+              axios
+                .post(___CREATE_COMMENT___, {
+                  type: "comment",
+                  item: this.props.itemPK,
+                  content: content
+                })
+                .then(res => {
+                  console.log(res);
+                  this.sendingConfirmation(0, null, {
+                    pk: res.data.pk,
+                    created_at: res.data.timestamp
+                    //content
+                  });
+                })
+                .catch(err => {
+                  console.warn(err);
+                  console.log(err.response);
+                });
 
-            this.commentsCreated++;
-            Keyboard.dismiss();
-          }
-        );
+              this.commentsCreated++;
+              Keyboard.dismiss();
+            }
+          );
+        }
       })
       .catch(() => {
         console.log("Not logged in");

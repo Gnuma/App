@@ -35,12 +35,12 @@ export class ShoppingTab extends Component {
     this.tabBar.scrollTo({ x: this.layout[itemID].x });
     Animated.timing(this.state.barPosition, {
       toValue: this.layout[itemID].x + this.layout[itemID].width / 2,
-      duration: 200,
+      duration: 100,
       useNativeDriver: true
     }).start();
     Animated.timing(this.state.barScale, {
       toValue: this.layout[itemID].width - 40,
-      duration: 200,
+      duration: 100,
       useNativeDriver: true
     }).start();
   };

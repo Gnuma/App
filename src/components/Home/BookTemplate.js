@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Platform, StyleSheet, Dimensions } from "react-native";
+import { View, Platform, StyleSheet, Dimensions, Ima } from "react-native";
 import { ParallaxImage } from "react-native-snap-carousel";
 import { slideHeight, itemWidth, itemHorizontalMargin } from "./styles";
 import { Header1, Header2 } from "../Text";
@@ -19,14 +19,12 @@ export default class BookTemplate extends Component {
         source={require("../../media/imgs/mockHomeBook.png")}
         containerStyle={{
           flex: 1,
-          marginBottom: IS_IOS ? 0 : -1, // Prevent a random Android rendering issue
-          backgroundColor: colors.white,
-          borderRadius: 6
+          backgroundColor: "white"
         }}
         style={{
           ...StyleSheet.absoluteFillObject,
-          resizeMode: "contain",
-          borderRadius: 6 //Watch out for IOS border radius "BUG" -> carousel example
+          borderRadius: 6,
+          resizeMode: "cover"
         }}
         parallaxFactor={0.1}
         showSpinner={true}
@@ -53,12 +51,19 @@ export default class BookTemplate extends Component {
           style={{
             flex: 1,
             backgroundColor: "white",
-            elevation: 5,
+            elevation: 4,
             borderRadius: 6
           }}
           onPress={this._onBookPick}
         >
-          {this.image}
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "white"
+            }}
+          >
+            {this.image}
+          </View>
         </Button>
         <View style={{ justifyContent: "center", paddingTop: 10 }}>
           <Header1

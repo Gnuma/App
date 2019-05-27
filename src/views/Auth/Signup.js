@@ -70,7 +70,7 @@ export default class Signup extends Component {
 
         this.props
           .signup(uid, email, pwd, confirmPwd)
-          .then(token => this.props.resolve(token))
+          .then(token => this.props.completeAuth(token))
           .catch(err => console.log(err));
       }
     } else {

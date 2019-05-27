@@ -165,7 +165,7 @@ const salesConfirmMsg = (state, action) => {
 const salesReadChat = (state, action) => {
   const { itemID, chatID } = action.payload;
   const hasNews = state.data[itemID].chats[chatID].hasNews;
-  
+
   return update(state, {
     data: {
       [itemID]: {
@@ -397,6 +397,8 @@ const salesOffertFail = (state, action) => {
   });
 };
 
+const salesClear = () => initialState;
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SALES_INIT:
@@ -458,6 +460,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SALES_OFFERT_FAIL:
       return salesOffertFail(state, action);
+
+    case actionTypes.SALES_CLEAR:
+      return salesClear(state, action);
 
     default:
       return state;

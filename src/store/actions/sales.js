@@ -191,6 +191,10 @@ export const salesNewOffert = (itemID, chatID, offertID, price, user) => ({
   }
 });
 
+export const salesClear = () => ({
+  type: actionTypes.SALES_CLEAR
+});
+
 export const salesSend = (itemID, chatID) => {
   return (dispatch, getState) => {
     const myID = getState().auth.id;

@@ -13,6 +13,10 @@ import { notificationsUnsubscribe } from "./notifications";
 import WS from "../../utils/WebSocket";
 import { AutoStart } from "../../utils/constants";
 import CookieManager from "react-native-cookies";
+import { commentsClear } from "./comments";
+import { salesClear } from "./sales";
+import { shoppingClear } from "./shopping";
+import { messagingClear } from "../actions/messaging";
 
 const isOffline = false;
 
@@ -115,7 +119,7 @@ export const authLogin = (username, password) => {
 export const autoLogin = () => {
   return (dispatch, getState) => {
     return new Promise(function(resolve, reject) {
-      //if (getState().auth.loading) return reject(AutoStart.busy);
+      if (getState().auth.token) return resolve(AutoStart.logged);
       dispatch(authStart());
       multiGet([tokenKey, officeKey])
         .then(userInfos => {
@@ -163,17 +167,22 @@ export const autoLogin = () => {
 
 export const authLogout = () => {
   return dispatch => {
-    dispatch(authStart());
+    //dispatch(authStart());
     axios
       .post(___LOGOUT_ENDPOINT___)
-      .then(() => {
-        dispatch(notificationsUnsubscribe());
-        WS.close();
-        dispatch(logoutSuccess());
+      .then(res => {
+        console.log(res);
       })
       .catch(err => {
         dispatch(authFail(err));
       });
+
+    dispatch(commentsClear());
+    dispatch(salesClear());
+    dispatch(shoppingClear());
+    messagingClear();
+    WS.close();
+    dispatch(logoutSuccess());
   };
 };
 

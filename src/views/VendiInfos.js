@@ -7,8 +7,10 @@ import MainSell from "../components/Sell/MainSell";
 import * as sellActions from "../store/actions/sell";
 import { Header2 } from "../components/Text";
 import colors from "../styles/colors";
-import { Actions } from "react-navigation";
+import { Actions, SwitchAction } from "react-navigation";
 import NavigationService from "../navigator/NavigationService";
+import { GreyBar } from "../components/StatusBars";
+import protectedAction from "../utils/protectedAction";
 
 export class VendiInfos extends Component {
   state = {
@@ -69,19 +71,23 @@ export class VendiInfos extends Component {
       this.props.description &&
       this.props.conditions !== undefined
     ) {
-      this.props
-        .submitRedux()
+      protectedAction()
         .then(() => {
-          //this.props.navigation.dispatch(StackActions.popToTop());
-          //console.log(SwitchActions.jumpTo({ routeName: "SalesList" }));
-          //this.props.navigation.dispatch(
-          //  SwitchActions.jumpTo({ routeName: "SalesList" })
-          //);
-          //this.props.navigation.navigate("Home");
+          this.props
+            .submitRedux()
+            .then(() => {
+              //this.props.navigation.dispatch(StackActions.popToTop());
+              //console.log(SwitchActions.jumpTo({ routeName: "SalesList" }));
+              //this.props.navigation.dispatch(
+              //  SwitchActions.jumpTo({ routeName: "SalesList" })
+              //);
+              this.props.navigation.navigate("SalesList");
+            })
+            .catch(err => {
+              console.log("Nope.", err);
+            });
         })
-        .catch(err => {
-          console.log("Nope.", err);
-        });
+        .catch(() => console.log("Need to be logged in"));
     }
   };
 }

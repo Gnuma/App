@@ -19,6 +19,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 import * as authActions from "../../store/actions/auth";
 import LoadingOverlay from "../../components/LoadingOverlay";
+import { HiddenBar } from "../../components/StatusBars";
 
 export class Auth extends Component {
   constructor(props) {
@@ -85,6 +86,11 @@ export class Auth extends Component {
       status: 0
     }));
 
+  completeAuth = token => {
+    this._resolve(token);
+    this.props.navigation.goBack(null);
+  };
+
   render() {
     const { signupRedux, isLoading, loginRedux, serverError } = this.props;
     const { authType } = this.state;
@@ -94,6 +100,7 @@ export class Auth extends Component {
         onBackPress={this._goBack}
         style={StyleSheet.absoluteFill}
       >
+        <HiddenBar />
         {isLoading ? <LoadingOverlay /> : null}
         <View style={{ flex: 1, marginHorizontal: 20 }}>
           <View style={{ marginBottom: 10, flex: 1 }}>
@@ -137,16 +144,16 @@ export class Auth extends Component {
                 signup={signupRedux}
                 status={this.state.status}
                 goNext={this._goNext}
-                resolve={this._resolve}
                 hideFooter={this.hideFooter}
+                completeAuth={this.completeAuth}
               />
             ) : (
               <Login
                 login={loginRedux}
                 status={this.state.status}
                 goNext={this._goNext}
-                resolve={this._resolve}
                 hideFooter={this.hideFooter}
+                completeAuth={this.completeAuth}
               />
             )}
           </View>

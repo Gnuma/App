@@ -7,7 +7,9 @@ import Button from "../components/Button";
 import { Header1 } from "../components/Text";
 import { AutoStart } from "../utils/constants";
 import NavigatorService from "../navigator/NavigationService";
+import { HiddenBar } from "../components/StatusBars";
 
+let mounted = false;
 export class AppLoader extends Component {
   componentDidMount() {
     this.props
@@ -15,7 +17,7 @@ export class AppLoader extends Component {
       .then(() => NavigatorService.navigate("Home"))
       .catch(err => {
         if (err === AutoStart.anonymous) {
-          NavigatorService.navigate("Home");
+          NavigatorService.navigate("Main");
         } else if (err === AutoStart.firstTime) {
           NavigatorService.navigate("InitProfile");
         }
@@ -25,6 +27,7 @@ export class AppLoader extends Component {
   render() {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <HiddenBar />
         <Button onPress={() => this.props.navigation.navigate("App")}>
           <Header1>Quipu</Header1>
         </Button>

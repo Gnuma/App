@@ -100,6 +100,8 @@ const commentsRead = (state, action) => {
   });
 };
 
+const commentsClear = () => initialState;
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.COMMENTS_INIT:
@@ -110,6 +112,9 @@ const reducer = (state = initialState, action) => {
       return commentsReceiveAnswer(state, action);
     case actionTypes.COMMENTS_READ:
       return commentsRead(state, action);
+    case actionTypes.COMMENTS_CLEAR:
+      return commentsClear(state, action);
+
     default:
       return state;
   }

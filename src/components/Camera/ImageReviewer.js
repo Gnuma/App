@@ -75,36 +75,53 @@ export default class ImageReviewer extends Component {
     }
   };
 
-  updateLayout = event => {
+  updateLayout = async event => {
     const margin = 1;
 
     const data = this.props.data;
-    const imgRatio = data.height / data.width;
-    const layoutWidth = event.nativeEvent.layout.width;
-    const layoutHeight = event.nativeEvent.layout.height;
+
+    if (event) {
+      this.layoutWidth = event.nativeEvent.layout.width;
+      this.layoutHeight = event.nativeEvent.layout.height;
+    }
+
+    const { width: imgWidth, height: imgHeight } = await getImageSize(data.uri);
+
+    const imgRatio = imgHeight / imgWidth;
+
+    console.log(imgWidth, imgHeight);
+
+    console.log(imgRatio);
 
     let height, width;
-    if (layoutWidth * imgRatio > layoutHeight) {
+    if (this.layoutWidth * imgRatio > this.layoutHeight) {
       console.log("Per Altezza");
-      height = layoutHeight;
-      width = layoutHeight / imgRatio;
-      this.cropperHeight = height - margin;
-      this.cropperWidth = this.cropperHeight / ___BOOK_IMG_RATIO___;
-    } else {
-      console.log("Per Larghezza");
-      width = layoutWidth;
-      height = layoutWidth * imgRatio;
+      height = this.layoutHeight;
+      width = this.layoutHeight / imgRatio;
+      //this.cropperHeight = height - margin;
+      //this.cropperWidth = this.cropperHeight / ___BOOK_IMG_RATIO___;
+
       this.cropperWidth = width - margin;
       this.cropperHeight = this.cropperWidth * ___BOOK_IMG_RATIO___;
+    } else {
+      console.log("Per Larghezza");
+      width = this.layoutWidth;
+      height = this.layoutWidth * imgRatio;
+      //this.cropperWidth = width - margin;
+      //this.cropperHeight = this.cropperWidth * ___BOOK_IMG_RATIO___;
+
+      this.cropperHeight = height - margin;
+      this.cropperWidth = this.cropperHeight / ___BOOK_IMG_RATIO___;
     }
+    console.log(width, height, this.cropperWidth, this.cropperHeight);
 
     this.lastScale = 0.9;
     this.baseScale.setValue(this.lastScale);
     this.pinchScale.setValue(1);
 
     this.lastPan = {
-      x: 0,
-      y: 0
+      x: (width - this.cropperWidth) / 2,
+      y: (height - this.cropperHeight) / 2
     };
     this.pan.setOffset(this.lastPan);
 
@@ -226,7 +243,8 @@ export default class ImageReviewer extends Component {
               <View
                 style={{
                   height: layout.height,
-                  width: layout.width
+                  width: layout.width,
+                  alignSelf: "center"
                 }}
               >
                 <Image
@@ -235,10 +253,9 @@ export default class ImageReviewer extends Component {
                   }}
                   source={{ uri: data.uri ? data.uri : data.path }}
                   resizeMode="contain"
-                  onLayout={event => console.log(event.nativeEvent)}
-                  onLoad={event => console.log(event.nativeEvent)}
+                  onLoad={() => this.updateLayout()}
                 />
-                <View style={{ backgroundColor: "red" }}>
+                <View>
                   <Animated.View
                     style={{
                       ...StyleSheet.absoluteFill,
@@ -349,3 +366,12 @@ const Handlers = ({
     </PanGestureHandler>
   );
 };
+
+const getImageSize = uri =>
+  new Promise((resolve, reject) => {
+    Image.getSize(
+      uri,
+      (width, height) => resolve({ width, height }),
+      err => reject(err)
+    );
+  });
