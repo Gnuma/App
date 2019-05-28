@@ -157,7 +157,12 @@ class WS {
   };
 
   startConnection = () => {
-    console.log("Connecting to WS Server...");
+    console.log(
+      "Connecting to WS Server... -> " +
+        ___WS_ENDPOINT___ +
+        "?token=" +
+        this.token
+    );
     this.ws = new WebSocket(___WS_ENDPOINT___ + "?token=" + this.token);
     //this.ws = new WebSocket(___WS_TEST_ENDPOINT);
     this.ws.onopen = this.onOpen;

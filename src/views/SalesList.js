@@ -11,6 +11,7 @@ import _ from "lodash";
 import Button from "../components/Button";
 import colors from "../styles/colors";
 import IconPlus from "../media/vectors/plus-icon";
+import { GreyBar } from "../components/StatusBars";
 
 export class SalesList extends Component {
   static propTypes = {

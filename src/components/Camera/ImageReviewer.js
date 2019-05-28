@@ -69,7 +69,12 @@ export default class ImageReviewer extends Component {
       };
 
       console.log(offsetPercentage, sizePercentage);
-      this.props.handleReview(true, offsetPercentage, sizePercentage);
+      this.props.handleReview(
+        true,
+        this.state.img,
+        offsetPercentage,
+        sizePercentage
+      );
     } else {
       this.props.handleReview(false);
     }
@@ -86,6 +91,12 @@ export default class ImageReviewer extends Component {
     }
 
     const { width: imgWidth, height: imgHeight } = await getImageSize(data.uri);
+
+    const img = {
+      uri: data.uri,
+      width: imgWidth,
+      height: imgHeight
+    };
 
     const imgRatio = imgHeight / imgWidth;
 
@@ -127,6 +138,7 @@ export default class ImageReviewer extends Component {
 
     this.setState(
       {
+        img,
         layout: {
           width,
           height

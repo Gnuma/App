@@ -63,9 +63,8 @@ export class Camera extends Component {
     }
   };
 
-  handleReview = (isAccepted, offsetPercentage, sizePercentage) => {
+  handleReview = (isAccepted, img, offsetPercentage, sizePercentage) => {
     if (isAccepted) {
-      const img = this.props.checking[0];
       const uri = img.uri ? img.uri : img.path;
       ImageEditor.cropImage(
         uri,
@@ -130,7 +129,7 @@ export class Camera extends Component {
 
   render() {
     const isReviewing = !_.isEmpty(this.props.checking);
-    const { flashMode } = this.state;
+    const { flashMode, loaded } = this.state;
     const { previews, previewsOrder } = this.props;
 
     return (
@@ -226,9 +225,10 @@ export default connect(
 const options = {
   quality: 1,
   orientation: "portrait",
-  //fixOrientation: true,
+  fixOrientation: true,
   forceUpOrientation: true,
-  pauseAfterCapture: true
+  pauseAfterCapture: true,
+  skipProcessing: true
   //width: 1080
 };
 

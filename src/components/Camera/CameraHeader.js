@@ -5,6 +5,7 @@ import colors from "../../styles/colors";
 import CameraPreviews from "./CameraPreviews";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { header as headerStyle, generalStyle } from "./styles";
+import _ from "lodash";
 
 export class CameraHeader extends Component {
   render() {
@@ -16,6 +17,16 @@ export class CameraHeader extends Component {
       previewsOrder,
       handleGoNext
     } = this.props;
+
+    let hasPreviews = false;
+    for (const key in previews) {
+      if (previews.hasOwnProperty(key)) {
+        if (previews[key]) {
+          hasPreviews = true;
+          break;
+        }
+      }
+    }
 
     return (
       <View style={headerStyle.container}>
@@ -33,12 +44,16 @@ export class CameraHeader extends Component {
           />
         </View>
         <View style={{ width: 50 }}>
-          <Button style={generalStyle.p10} onPress={handleGoNext}>
+          <Button
+            style={generalStyle.p10}
+            onPress={handleGoNext}
+            disabled={!hasPreviews}
+          >
             <Icon
               name="arrow-circle-right"
               size={30}
               style={{
-                color: colors.secondary
+                color: !hasPreviews ? colors.lightGrey : colors.secondary
               }}
             />
           </Button>

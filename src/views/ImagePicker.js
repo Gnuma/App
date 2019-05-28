@@ -8,7 +8,8 @@ import {
   Text,
   Dimensions,
   FlatList,
-  ToastAndroid
+  ToastAndroid,
+  PermissionsAndroid
 } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
@@ -36,16 +37,17 @@ export class ImagePicker extends Component {
     this.state = {
       data: [],
       hasMore: true,
-      selected: []
+      selected: [],
+      numSelected: 0,
+      hasPermission: undefined
     };
 
     this.retrieveIndex = undefined;
     this.loading = false;
-    this.numSelected = 0;
   }
 
   componentDidMount() {
-    this.retrieveImages(BATCH_SIZE);
+    this.requestPermissions();
   }
 
   retrieveImages = numImages => {
@@ -119,8 +121,8 @@ export class ImagePicker extends Component {
                 update(state || false, {
                   $apply: oldStatus => {
                     if (!oldStatus) {
-                      if (this.numSelected < 5) {
-                        this.numSelected++;
+                      if (prevState.numSelected < 5) {
+                        prevState.numSelected++;
                         return true;
                       } else {
                         ToastAndroid.show(
@@ -130,7 +132,7 @@ export class ImagePicker extends Component {
                         return false;
                       }
                     } else {
-                      this.numSelected--;
+                      prevState.numSelected--;
                       return false;
                     }
                   }
@@ -198,28 +200,46 @@ export class ImagePicker extends Component {
   };
 
   render() {
-    const { data } = this.state;
+    const { data, numSelected, hasPermission } = this.state;
     //console.log(data);
+    if (hasPermission === undefined) {
+      return null;
+    }
+
     return (
       <View style={{ flex: 1 }}>
         <GreyBar />
-        <PickerHeader complete={this.complete} goBack={this.exitPicker} />
-        <View style={{ flex: 1 }}>
-          <SectionList
-            sections={data}
-            renderItem={this.renderItem}
-            renderSectionHeader={this.renderHeader}
-            keyExtractor={this.keyExtractor}
-            onEndReached={() => {
-              this.state.hasMore &&
-                !this.loading &&
-                this.retrieveImages(BATCH_SIZE);
-            }}
-            onEndReachedThreshold={0.5}
-            //initialNumToRender={50}
-            ListFooterComponent={this.renderFooter}
-          />
-        </View>
+        <PickerHeader
+          complete={this.complete}
+          goBack={this.exitPicker}
+          numSelected={numSelected}
+        />
+        {hasPermission ? (
+          <View style={{ flex: 1 }}>
+            <SectionList
+              sections={data}
+              renderItem={this.renderItem}
+              renderSectionHeader={this.renderHeader}
+              keyExtractor={this.keyExtractor}
+              onEndReached={() => {
+                this.state.hasMore &&
+                  !this.loading &&
+                  this.retrieveImages(BATCH_SIZE);
+              }}
+              onEndReachedThreshold={0.5}
+              //initialNumToRender={50}
+              ListFooterComponent={this.renderFooter}
+            />
+          </View>
+        ) : (
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <Header3 color="black">
+              Per accedere alle immagini abbiamo bisogno del tuo permesso
+            </Header3>
+          </View>
+        )}
       </View>
     );
   }
@@ -236,6 +256,31 @@ export class ImagePicker extends Component {
         style={{ alignSelf: "center", marginVertical: 10 }}
       />
     );
+  };
+
+  requestPermissions = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        {
+          title: "Quipu Accesso File",
+          message:
+            "Abbiamo bisogno del tuo permesso per farti scegliere le tue immagini",
+          buttonNegative: "NO",
+          buttonPositive: "SI"
+        }
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        this.setState({ hasPermission: true });
+        console.log("You can use the camera");
+        this.retrieveImages(BATCH_SIZE);
+      } else {
+        this.setState({ hasPermission: false });
+        console.log("Camera permission denied");
+      }
+    } catch (err) {
+      console.warn(err);
+    }
   };
 }
 
@@ -314,34 +359,51 @@ class ImageRoll extends PureComponent {
 
 class PickerHeader extends PureComponent {
   render() {
+    const { numSelected } = this.props;
+    let statusBar = [];
+    for (let i = 0; i < 5; i++) {
+      statusBar.push(
+        <View
+          key={i}
+          style={[
+            i < numSelected ? styles.statusActive : styles.statusInactive,
+            i == 4 && { marginRight: 0 }
+          ]}
+        />
+      );
+    }
+
     return (
       <View style={styles.headerContainer}>
-        <Button onPress={this.props.goBack} style={styles.goBtn}>
-          <Icon name="chevron-left" size={24} style={styles.backIcon} />
-        </Button>
-        <View style={{ flex: 1 }}>
-          <View>
-            <Header1 color={"primary"}>{"Seleziona le foto"}</Header1>
+        <View style={styles.headerContent}>
+          <Button onPress={this.props.goBack} style={styles.goBtn}>
+            <Icon name="chevron-left" size={24} style={styles.backIcon} />
+          </Button>
+          <View style={{ flex: 1 }}>
+            <View>
+              <Header1 color={"primary"}>{"Seleziona le foto"}</Header1>
+            </View>
           </View>
+          <Button
+            onPress={this.complete}
+            disabled={numSelected == 0}
+            style={styles.goBtn}
+            onPress={this.props.complete}
+          >
+            <Icon
+              name="arrow-circle-right"
+              size={34}
+              style={[
+                styles.completeIcon,
+                numSelected == 0 && { color: colors.lightGrey }
+              ]}
+            />
+          </Button>
         </View>
-        <Button
-          onPress={this.complete}
-          style={styles.goBtn}
-          onPress={this.props.complete}
-        >
-          <Icon
-            name="arrow-circle-right"
-            size={34}
-            style={styles.completeIcon}
-          />
-        </Button>
+        <View style={styles.headerStatus}>{statusBar}</View>
       </View>
     );
   }
-
-  renderItem = ({ item }) => {
-    return <Header2>Seleionato</Header2>;
-  };
 }
 
 const margin = 10;
@@ -392,10 +454,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row"
   },
+  headerContent: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center"
+  },
   headerContainer: {
     height: 60,
-    flexDirection: "row",
-    alignItems: "center",
     backgroundColor: "white",
     elevation: 6
   },
@@ -409,6 +474,22 @@ const styles = StyleSheet.create({
   },
   completeIcon: {
     color: colors.secondary
+  },
+  headerStatus: {
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  statusInactive: {
+    flex: 1 / 5,
+    height: 2,
+    backgroundColor: colors.lightGrey,
+    marginRight: 4
+  },
+  statusActive: {
+    flex: 1 / 5,
+    height: 2,
+    backgroundColor: colors.secondary,
+    marginRight: 4
   }
 });
 

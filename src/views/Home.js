@@ -49,7 +49,6 @@ export class Home extends Component {
   render() {
     return (
       <AndroidBackHandler onBackPress={this._onBackButtonPressAndroid}>
-        <GreenBar />
         {this.getContent()}
       </AndroidBackHandler>
     );
