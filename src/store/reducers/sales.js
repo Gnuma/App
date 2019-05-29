@@ -2,6 +2,7 @@ import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
 import update from "immutability-helper";
 import uuid from "uuid";
+
 import {
   getItemIndex,
   getChatIndex,
@@ -77,7 +78,7 @@ const salesComposer = (state, action) => {
 const salesReceiveMsg = (state, action) => {
   const { item, chat, msg } = action.payload;
   inChat = state.chatFocus === chat;
-  const itemIndex = getItemIndex(item, state);
+  const itemIndex = getItemIndex(item, state.orderedData);
   const chatIndex = getChatIndex(chat, state.orderedData[itemIndex]);
   const hadNews = state.data[item].chats[chat].hasNews > 0;
 
@@ -109,7 +110,7 @@ const salesReceiveMsg = (state, action) => {
 const salesSendMsg = (state, action) => {
   const { itemID, chatID, msg } = action.payload;
 
-  const itemIndex = getItemIndex(itemID, state);
+  const itemIndex = getItemIndex(itemID, state.orderedData);
   const chatIndex = getChatIndex(chatID, state.orderedData[itemIndex]);
 
   console.log(itemID, chatID, msg);
@@ -271,7 +272,7 @@ const salesNewChat = (state, action) => {
     newsCount: 1
   };
 
-  const itemIndex = getItemIndex(itemID, state);
+  const itemIndex = getItemIndex(itemID, state.orderedData);
 
   if (itemIndex != -1) {
     return update(state, {
@@ -506,6 +507,8 @@ const formatData = (data, focus = 0) => {
 */
 
 const formatData = (arrayData, focus = 0) => {
+  console.log("SALES: ", arrayData);
+
   let orderedData = [];
   let data = {};
   for (let i = 0; i < arrayData.length; i++) {

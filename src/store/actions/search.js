@@ -143,7 +143,7 @@ export const handleSearchQueryChange = search_query => {
 */
 
 //Epics
-export const searchChangeEpic = action$ =>
+const searchChangeEpic = action$ =>
   action$.pipe(
     ofType(actionTypes.SEARCH_SET_SEARCHQUERY),
     switchMap(action =>
@@ -160,3 +160,5 @@ export const searchChangeEpic = action$ =>
         )
     )
   );
+
+export const searchEpics = [searchChangeEpic];

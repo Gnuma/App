@@ -82,7 +82,7 @@ const shoppingComposer = (state, action) => {
 const shoppingReceiveMsg = (state, action) => {
   const { subjectID, chatID, msg } = action.payload;
   inChat = state.chatFocus === chatID;
-  const subjectIndex = getSubjectIndex(subjectID, state);
+  const subjectIndex = getSubjectIndex(subjectID, state.orderedData);
   const chatIndex = getChatIndex(chatID, state.orderedData[subjectIndex]);
   const hadNews = state.data[subjectID].chats[chatID].hasNews > 0;
 
@@ -114,7 +114,7 @@ const shoppingReceiveMsg = (state, action) => {
 const shoppingSendMsg = (state, action) => {
   const { subjectID, chatID, msg } = action.payload;
   //console.log(subjectID, chatID, msg);
-  const subjectIndex = getSubjectIndex(subjectID, state);
+  const subjectIndex = getSubjectIndex(subjectID, state.orderedData);
   const chatIndex = getChatIndex(chatID, state.orderedData[subjectIndex]);
 
   return update(state, {
@@ -269,7 +269,7 @@ const shoppingContactUser = (state, action) => {
     newsCount: 0,
     chats: {}
   };
-  const subjectIndex = getSubjectIndex(subjectID, state);
+  const subjectIndex = getSubjectIndex(subjectID, state.orderedData);
 
   return update(state, {
     data: {

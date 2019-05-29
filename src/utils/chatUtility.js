@@ -3,16 +3,16 @@ import { OffertStatus } from "../views/BookOffert";
 import { ___READ_CHAT___ } from "../store/constants";
 import axios from "axios";
 
-export const getSubjectIndex = (subjectID, state) => {
+export const getSubjectIndex = (subjectID, orderedData) => {
   for (let i = 0; i < state.orderedData.length; i++) {
-    if (state.orderedData[i].subjectID === subjectID) return i;
+    if (orderedData[i].subjectID === subjectID) return i;
   }
   return -1;
 };
 
-export const getItemIndex = (itemID, state) => {
+export const getItemIndex = (itemID, orderedData) => {
   for (let i = 0; i < state.orderedData.length; i++) {
-    if (state.orderedData[i].itemID === itemID) return i;
+    if (orderedData[i].itemID === itemID) return i;
   }
   return -1;
 };

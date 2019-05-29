@@ -7,6 +7,7 @@ import notificationsReducer from "./notifications";
 import salesReducer from "./sales";
 import shoppingReducer from "./shopping";
 import commentsReducer from "./comments";
+import chatReducer from "./chat";
 
 export const rootReducer = combineReducers({
   search: searchReducer,
@@ -15,9 +16,11 @@ export const rootReducer = combineReducers({
   notifications: notificationsReducer,
   sales: salesReducer,
   shopping: shoppingReducer,
-  comments: commentsReducer
+  comments: commentsReducer,
+  chat: chatReducer
 });
 
-import { searchChangeEpic } from "../actions/search";
+import { searchEpics } from "../actions/search";
+import { chatEpics } from "../actions/chat";
 
-export const rootEpic = combineEpics(searchChangeEpic);
+export const rootEpic = combineEpics(...searchEpics, ...chatEpics);

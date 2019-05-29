@@ -108,9 +108,9 @@ export class SalesList extends Component {
 
 const mapStateToProps = state => ({
   isAuthenticated: state.auth.token !== null,
-  focus: state.sales.focus,
-  data: state.sales.data,
-  orderedData: state.sales.orderedData
+  focus: state.chat.salesFocus,
+  data: state.chat.data,
+  orderedData: state.chat.salesOrderedData
 });
 
 const mapDispatchToProps = dispatch => ({

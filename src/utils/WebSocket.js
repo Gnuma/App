@@ -36,6 +36,7 @@ import { AppState } from "react-native";
 import { ChatType } from "./constants";
 import { restart } from "../store/actions/messaging";
 import axios from "axios";
+import { chatInit } from "../store/actions/chat";
 
 class WS {
   ws = null;
@@ -57,8 +58,9 @@ class WS {
       .get(___RETRIEVE_CHATS___)
       .then(res => {
         console.log(res);
-        store.dispatch(shoppingInit(res.data.shopping));
-        store.dispatch(salesInit(res.data.sales));
+        //store.dispatch(shoppingInit(res.data.shopping));
+        //store.dispatch(salesInit(res.data.sales));
+        store.dispatch(chatInit(res.data.sales, res.data.shopping));
         store.dispatch(authCompleted());
         this.startConnection();
 

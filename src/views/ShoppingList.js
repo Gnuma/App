@@ -92,9 +92,9 @@ export class ShoppingList extends Component {
 
 const mapStateToProps = state => ({
   isAuthenticated: state.auth.token !== null,
-  focus: state.shopping.focus,
-  data: state.shopping.data,
-  orderedData: state.shopping.orderedData
+  focus: state.chat.shoppingFocus,
+  data: state.chat.data,
+  orderedData: state.chat.shoppingOrderedData
 });
 
 const mapDispatchToProps = dispatch => ({
