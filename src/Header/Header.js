@@ -96,7 +96,7 @@ const mapDispatchToProps = dispatch => {
     setActiveRedux: isActive =>
       dispatch(searchActions.searchSetActive(isActive)),
     handleSearchQueryChange: searchQuery =>
-      dispatch(searchActions.handleSearchQueryChange(searchQuery)),
+      dispatch(searchActions.searchSetSearchQuery(searchQuery)),
     logoutRedux: () => dispatch(authActions.authLogout()),
     goHomeRedux: () => dispatch(searchActions.searchGoHome())
   };

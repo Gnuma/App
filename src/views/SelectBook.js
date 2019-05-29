@@ -10,8 +10,28 @@ import axios from "axios";
 import { ___BOOK_HINTS_ENDPOINT___ } from "../store/constants";
 import _ from "lodash";
 import { GreyBar } from "../components/StatusBars";
+import { Subject } from "rxjs";
+import { switchMap } from "rxjs/operators";
+import { ajax } from "rxjs/ajax";
 
 export class SelectBook extends Component {
+  constructor(props) {
+    super(props);
+    this.bookQuery = new Subject().pipe(
+      switchMap(value =>
+        ajax.post(___BOOK_HINTS_ENDPOINT___, {
+          keyword: value
+        })
+      )
+    );
+
+    this.bookQuery.subscribe({
+      next: value => console.log(value),
+      error: err => console.log(err),
+      complete: () => console.log("Completed")
+    });
+  }
+
   state = {
     searchQuery: "",
     results: []
@@ -40,6 +60,7 @@ export class SelectBook extends Component {
     );
   }
 
+  /*
   handleChange = text => {
     this.setState({
       searchQuery: text
@@ -57,6 +78,14 @@ export class SelectBook extends Component {
           });
         });
     }
+  };
+  */
+
+  handleChange = text => {
+    this.setState({
+      searchQuery: text
+    });
+    this.bookQuery.next(text);
   };
 
   _goCreateBook = () => {
