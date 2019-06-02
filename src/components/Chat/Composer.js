@@ -6,6 +6,10 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { Header4 } from "../Text";
 
 export default class Composer extends Component {
+  state = {
+    recording: false
+  };
+
   render() {
     const { text, onSend, onComposerTextChanged, data, type } = this.props;
     const showPendingWarning = type === "shopping" && data.status === "pending";
@@ -40,59 +44,51 @@ export default class Composer extends Component {
             onChangeText={onComposerTextChanged}
             value={text}
           />
-          <Button
-            style={{
-              paddingHorizontal: 5,
-              paddingVertical: 2,
-              marginHorizontal: 15,
-              textAlign: "center",
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 26,
-              backgroundColor: colors.white
-            }}
-            onPress={onSend}
-            disabled={!text}
-          >
-            <Icon
-              name={"paper-plane"}
-              size={26}
-              style={{ color: !text ? colors.black : colors.secondary }}
-            />
-          </Button>
+          {text ? (
+            <Button
+              style={{
+                paddingHorizontal: 5,
+                paddingVertical: 2,
+                marginHorizontal: 15,
+                textAlign: "center",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 26,
+                backgroundColor: colors.white
+              }}
+              onPress={onSend}
+              disabled={!text}
+            >
+              <Icon
+                name={"paper-plane"}
+                size={26}
+                style={{ color: !text ? colors.black : colors.secondary }}
+              />
+            </Button>
+          ) : (
+            <Button
+              style={{
+                marginHorizontal: 15,
+                textAlign: "center",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 15,
+                backgroundColor: colors.secondary
+              }}
+              onPress={onSend}
+            >
+              <Icon
+                name={"microphone"}
+                size={40}
+                style={{
+                  color: !text ? colors.black : colors.primary,
+                  flex: 1
+                }}
+              />
+            </Button>
+          )}
         </View>
       </View>
     );
   }
 }
-
-/*
-renderSend = props => {
-  const isDisabled = !this.props.data[this.props.itemID].chats[
-    this.props.chatID
-  ].composer;
-  return (
-    <View style={{ marginRight: 15, marginLeft: 5, marginVertical: 2 }}>
-      <Button
-        style={{
-          padding: 3,
-          flex: 1,
-          textAlign: "center",
-          justifyContent: "center",
-          alignItems: "center",
-          borderRadius: 26,
-          backgroundColor: colors.white
-        }}
-        onPress={this.onSend}
-        disabled={isDisabled}
-      >
-        <Icon
-          name={"paper-plane"}
-          size={26}
-          style={{ color: isDisabled ? colors.black : colors.secondary }}
-        />
-      </Button>
-    </View>
-  );
-};
-*/
