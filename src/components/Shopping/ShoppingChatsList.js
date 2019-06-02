@@ -23,7 +23,7 @@ export default class ShoppingChatsList extends Component {
 
     return (
       <FlatList
-        data={orderedData[focus].chats}
+        data={list.chats}
         renderItem={this._renderItem}
         keyExtractor={this._keyExtractor}
         extraData={data}

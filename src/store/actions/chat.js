@@ -12,9 +12,10 @@ import { loadMockNew } from "../../mockData/Chat2";
 import protectedAction from "../../utils/protectedAction";
 import axios from "axios";
 import NavigationService from "../../navigator/NavigationService";
-import { mergeMap } from "rxjs/operators";
+import { mergeMap, map, catchError, filter } from "rxjs/operators";
 import { ofType } from "redux-observable";
 import { ajax } from "rxjs/ajax";
+import { of } from "rxjs";
 
 export const chatInit = (salesData, shoppingData) => ({
   type: actionTypes.CHAT_INIT,
@@ -53,9 +54,9 @@ export const chatSetShoppingListFocus = focus => ({
   payload: { focus }
 });
 
-export const chatSetChatFocus = chatID => ({
+export const chatSetChatFocus = (objectID, chatID) => ({
   type: actionTypes.CHAT_SET_CHAT_FOCUS,
-  payload: { chatID }
+  payload: { objectID, chatID }
 });
 
 export const chatSetComposer = (objectID, chatID, value) => ({
@@ -93,6 +94,7 @@ export const chatConfirmMsg = (objectID, chatID, msgID, data) => ({
   }
 });
 
+/*
 export const chatRead = (objectID, chatID) => ({
   type: actionTypes.CHAT_READ,
   payload: {
@@ -100,15 +102,7 @@ export const chatRead = (objectID, chatID) => ({
     chatID
   }
 });
-
-export const chatSettle = (objectID, chatID, status) => ({
-  type: actionTypes.CHAT_SETTLE,
-  payload: {
-    objectID,
-    chatID,
-    status
-  }
-});
+*/
 
 export const chatNewChat = (objectID, chatID, data) => ({
   type: actionTypes.CHAT_NEW_CHAT,
@@ -154,7 +148,62 @@ export const chatOffertFail = (objectID, chatID) => ({
   }
 });
 
+const chatSettleAction = (objectID, chatID, status) => ({
+  type: actionTypes.CHAT_SETTLE,
+  payload: {
+    objectID,
+    chatID,
+    status
+  }
+});
+
 // ---THUNK---
+
+export const chatRead = (objectID, chatID) => (dispatch, getState) => {
+  const chat = getState().chat.data[objectID].chats[chatID];
+  console.log(chat.hasNews);
+  if (chat.hasNews) {
+    const from = chat.messages[chat.hasNews - 1]._id;
+    const to = chat.messages[0]._id;
+    axios
+      .post(___READ_CHAT___, {
+        chat: chatID,
+        from,
+        to
+      })
+      .then(res => console.log(res))
+      .catch(err => console.log({ err }));
+    dispatch({
+      type: actionTypes.CHAT_READ,
+      payload: {
+        objectID,
+        chatID
+      }
+    });
+  } else {
+    console.log("Chat had no news");
+  }
+};
+
+export const chatSettle = (objectID, chatID, isAccepting) => dispatch => {
+  dispatch(chatStartChatAction(objectID, chatID));
+  //API
+  setTimeout(() => {
+    if (isAccepting) {
+      dispatch(chatSettleAction(objectID, chatID, "pending"));
+    } else {
+      dispatch(chatSettleAction(objectID, chatID, "rejected"));
+    }
+  }, 1000);
+};
+
+export const chatRequestContact = (objectID, chatID) => dispatch => {
+  dispatch(chatStartChatAction(objectID, chatID));
+  //API
+  setTimeout(() => {
+    dispatch(chatSettleAction(objectID, chatID, "pending"));
+  }, 1000);
+};
 
 export const chatLoadEarlier = (objectID, chatID) => dispatch => {
   dispatch(chatStartChatAction(objectID, chatID));
@@ -271,27 +320,65 @@ export const chatAcceptOffert = (objectID, chatID) => (dispatch, getState) => {
     });
 };
 
-//  ---EPICS---
+export const onNewMessage = (objectID, chatID, msg, type) => (
+  dispatch,
+  getState
+) => {
+  const state = getState().chat;
+  dispatch(chatReceiveMessage(objectID, chatID, msg, type));
+  if (state.chatFocus === chatID) {
+    dispatch(chatRead(objectID, chatID));
+  }
+};
 
-const readChatEpic = action$ =>
+//  ---EPICS---
+//newMessage inChat || open chat
+const readChatEpic = (action$, state$) =>
   action$.pipe(
-    ofType(actionTypes.CHAT_READ),
-    mergeMap(action =>
-      ajax
-        .post(___READ_CHAT___, {
-          chat: action.payload.chatID,
-          from: action.payload.from,
-          to: action.payload.to
-        })
+    ofType(actionTypes.CHAT_SET_CHAT_FOCUS, actionTypes.CHAT_RECEIVE_MSG),
+    filter(action => {
+      const { chatID } = action.payload;
+      return chatID !== null && state$.value.chat.chatFocus === chatID;
+    }),
+    /* 
+    filter(action => {
+      const { objectID, chatID } = action.payload;
+      const chat = state$.value.chat.data[objectID].chats[chatID];
+      console.log(objectID, chatID, chat);
+      return chat.hasNews > 0;
+    }),
+    
+    mergeMap(action => {
+      const { objectID, chatID } = action.payload;
+      const chat = state$.value.chat.data[objectID].chats[chatID];
+      const from = chat.messagges[chat.hasNews - 1]._id;
+      const to = chat.messagges[0]._id;
+      return ajax
+        .post(
+          ___READ_CHAT___,
+          {
+            chat: chatID,
+            from,
+            to
+          },
+          {
+            Authorization: "Token " + state$.value.auth.token
+          }
+        )
         .pipe(
           map(response => {
             console.log("CHAT_READ", response);
           }),
           catchError(error => {
-            console.log({ error });
+            return of(chatFail(error));
           })
-        )
-    )
+        );
+    })
+    */
+    mergeMap(action => {
+      const { objectID, chatID } = action.payload;
+      return of(chatRead(objectID, chatID));
+    })
   );
 
 export const chatEpics = [readChatEpic];

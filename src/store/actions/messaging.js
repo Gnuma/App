@@ -13,6 +13,7 @@ import {
   salesRetrieveData,
   salesStartGlobalAction
 } from "./sales";
+import { chatConfirmMsg, chatSendMsg, chatStartGlobalAction } from "./chat";
 import { sellerChatList, buyerChatList2 } from "../../mockData/Chat2";
 import axios from "axios";
 import { ___SEND_MESSAGE___ } from "../constants";
@@ -22,9 +23,11 @@ let queue = [];
 export const sendMessage = (type, objectID, chatID) => {
   return (dispatch, getState) => {
     const myID = getState().auth.id;
-    const content = getState()[type].data[objectID].chats[chatID].composer;
+    const content = getState().chat.data[objectID].chats[chatID].composer;
     const msg = createMsg(content, myID);
-    dispatch(startSending(type, objectID, chatID, msg));
+
+    console.log(type, objectID, chatID);
+    dispatch(chatSendMsg(objectID, chatID, msg, type));
     //Connection check
     NetInfo.isConnected.fetch().then(isConnected => {
       if (isConnected) {
@@ -36,14 +39,18 @@ export const sendMessage = (type, objectID, chatID) => {
           })
           .then(res => {
             console.log(res);
-            dispatch(confirmMessage(type, objectID, chatID, msg));
+            dispatch(
+              chatConfirmMsg(objectID, chatID, msg._id, {
+                isSending: false,
+                _id: uuid.v4()
+              })
+            );
           })
           .catch(err => {
             console.log(err);
           });
       } else {
         queue.push({
-          type,
           objectID,
           chatID,
           msg

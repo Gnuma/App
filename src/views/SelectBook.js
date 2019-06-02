@@ -10,8 +10,8 @@ import axios from "axios";
 import { ___BOOK_HINTS_ENDPOINT___ } from "../store/constants";
 import _ from "lodash";
 import { GreyBar } from "../components/StatusBars";
-import { Subject } from "rxjs";
-import { switchMap } from "rxjs/operators";
+import { Subject, of } from "rxjs";
+import { switchMap, catchError, map } from "rxjs/operators";
 import { ajax } from "rxjs/ajax";
 
 export class SelectBook extends Component {
@@ -19,22 +19,48 @@ export class SelectBook extends Component {
     super(props);
     this.bookQuery = new Subject().pipe(
       switchMap(value =>
-        ajax.post(___BOOK_HINTS_ENDPOINT___, {
-          keyword: value
-        })
+        ajax
+          .post(___BOOK_HINTS_ENDPOINT___, {
+            keyword: value
+          })
+          .pipe(
+            map(res => res.response.results),
+            catchError(error => of([]))
+          )
       )
     );
 
     this.bookQuery.subscribe({
-      next: value => console.log(value),
-      error: err => console.log(err),
+      next: results => {
+        console.log(results);
+        this.setState({ results });
+      },
+      error: err => {
+        console.log(err);
+        this.setState({
+          results: []
+        });
+      },
       complete: () => console.log("Completed")
+    });
+  }
+
+  componentDidMount() {
+    const soldBooks = {};
+    for (let i = 0; i < this.props.sales.length; i++) {
+      soldBooks[
+        this.props.chatData[this.props.sales[i].itemID].book.isbn
+      ] = true;
+    }
+    this.setState({
+      soldBooks
     });
   }
 
   state = {
     searchQuery: "",
-    results: []
+    results: [],
+    soldBooks: {}
   };
 
   render() {
@@ -55,6 +81,7 @@ export class SelectBook extends Component {
           handleSelection={this.handleSelection}
           hasNoResults={hasNoResults}
           goCreateBook={this._goCreateBook}
+          soldBooks={this.state.soldBooks}
         />
       </View>
     );
@@ -104,7 +131,10 @@ export class SelectBook extends Component {
   };
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  chatData: state.chat.data,
+  sales: state.chat.salesOrderedData
+});
 
 const mapDispatchToProps = dispatch => {
   return {

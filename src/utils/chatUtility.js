@@ -4,22 +4,24 @@ import { ___READ_CHAT___ } from "../store/constants";
 import axios from "axios";
 
 export const getSubjectIndex = (subjectID, orderedData) => {
-  for (let i = 0; i < state.orderedData.length; i++) {
-    if (orderedData[i].subjectID === subjectID) return i;
+  console.log(orderedData, subjectID);
+  for (let i = 0; i < orderedData.length; i++) {
+    console.log(orderedData[i].subjectID, subjectID);
+    if (orderedData[i].subjectID == subjectID) return i;
   }
   return -1;
 };
 
 export const getItemIndex = (itemID, orderedData) => {
-  for (let i = 0; i < state.orderedData.length; i++) {
-    if (orderedData[i].itemID === itemID) return i;
+  for (let i = 0; i < orderedData.length; i++) {
+    if (orderedData[i].itemID == itemID) return i;
   }
   return -1;
 };
 
 export const getChatIndex = (chatID, item) => {
   for (let i = 0; i < item.chats.length; i++) {
-    if (item.chats[i] === chatID) return i;
+    if (item.chats[i] == chatID) return i;
   }
   return -1;
 };

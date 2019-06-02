@@ -44,7 +44,11 @@ export default class SelectBookList extends Component {
 
   _renderItem = ({ item }) => {
     return (
-      <BookItem data={item} handleSelection={this.props.handleSelection} />
+      <BookItem
+        data={item}
+        handleSelection={this.props.handleSelection}
+        disabled={!!this.props.soldBooks[item.isbn]}
+      />
     );
   };
 }

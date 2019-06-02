@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Header3 } from "../components/Text";
 import ShoppingTab from "../components/Shopping/ShoppingTab";
-import * as shoppingActions from "../store/actions/shopping";
 import * as searchActions from "../store/actions/search";
+import * as chatActions from "../store/actions/chat";
 import ShoppingChatsList from "../components/Shopping/ShoppingChatsList";
 import SearchLink from "../components/Home/SearchLink";
 import _ from "lodash";
@@ -39,7 +39,7 @@ export class ShoppingList extends Component {
       isAuthenticated
     } = this.props;
 
-    if (!data || _.isEmpty(data)) return this.renderEmpty();
+    if (!orderedData || _.isEmpty(orderedData)) return this.renderEmpty();
 
     return (
       <View style={{ flex: 1 }}>
@@ -98,7 +98,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  setShoppingFocus: focus => dispatch(shoppingActions.shoppingSetFocus(focus)),
+  setShoppingFocus: focus =>
+    dispatch(chatActions.chatSetShoppingListFocus(focus)),
   setSearchActive: isActive => dispatch(searchActions.searchSetActive(isActive))
 });
 

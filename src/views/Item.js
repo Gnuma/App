@@ -10,8 +10,8 @@ import colors from "../styles/colors";
 import NavigatorService from "../navigator/NavigationService";
 import axios from "axios";
 import { ___GET_AD___ } from "../store/constants";
-import * as shoppingActions from "../store/actions/shopping";
 import * as commentActions from "../store/actions/comments";
+import * as chatActions from "../store/actions/chat";
 import { notificationsViewItem } from "../store/actions/notifications";
 import protectedAction from "../utils/protectedAction";
 import NavigationService from "../navigator/NavigationService";
@@ -193,7 +193,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    contactRedux: item => dispatch(shoppingActions.shoppingContact(item)),
+    contactRedux: item => dispatch(chatActions.chatContactUser(item)),
     notificationViewItemRedux: itemPK =>
       dispatch(notificationsViewItem(itemPK)),
     readComments: item => dispatch(commentActions.commentsRead(item))

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, Image } from "react-native";
+import { Text, View, Image, StyleSheet } from "react-native";
 import { Header3, Header4, Header5 } from "../../Text";
 import Button from "../../Button";
 import { CachedImage } from "react-native-cached-image";
@@ -11,7 +11,10 @@ export default class BookItem extends Component {
     const { title, img, authors, isbn, subject } = this.props.data;
     const year = this._formatYears(this.props.year);
     return (
-      <Button onPress={this._local_handleSelection}>
+      <Button
+        onPress={this._local_handleSelection}
+        disabled={this.props.disabled}
+      >
         <View
           style={{
             flex: 1,
@@ -21,7 +24,8 @@ export default class BookItem extends Component {
             backgroundColor: "white",
             elevation: 4,
             marginVertical: 6,
-            marginHorizontal: 15
+            marginHorizontal: 15,
+            overflow: "hidden"
           }}
         >
           <CachedImage
@@ -53,6 +57,14 @@ export default class BookItem extends Component {
               </View>
             </View>
           </View>
+          {this.props.disabled && (
+            <View
+              style={{
+                ...StyleSheet.absoluteFill,
+                backgroundColor: "rgba(0,0,0,0.5)"
+              }}
+            />
+          )}
         </View>
       </Button>
     );

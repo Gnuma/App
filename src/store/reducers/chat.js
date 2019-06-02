@@ -10,6 +10,7 @@ import {
   createOffert
 } from "../../utils/chatUtility";
 import { OffertStatus } from "../../views/BookOffert";
+import { ChatType } from "../../utils/constants";
 
 const initialState = {
   data: {},
@@ -96,7 +97,8 @@ const chatReceiveMessage = (
   state,
   { payload: { objectID, chatID, msg, type } }
 ) => {
-  const inChat = state.chatFocus === chatID;
+  //const inChat = state.chatFocus === chatID;
+  const inChat = false; //Test
   const orderedType =
     type === "sale" ? "salesOrderedData" : "shoppingOrderedData";
   const objectIndex =
@@ -134,12 +136,13 @@ const chatReceiveMessage = (
 
 const chatSendMsg = (state, { payload: { objectID, chatID, msg, type } }) => {
   const orderedType =
-    type === "sale" ? "salesOrderedData" : "shoppingOrderedData";
+    type === ChatType.sales ? "salesOrderedData" : "shoppingOrderedData";
   const objectIndex =
-    type === "sale"
+    type === ChatType.sales
       ? getItemIndex(objectID, state.salesOrderedData)
       : getSubjectIndex(objectID, state.shoppingOrderedData);
   const chatIndex = (chatID, state[orderedType][objectIndex]);
+  console.log(type, orderedType, objectIndex, chatIndex);
 
   return update(state, {
     data: {
@@ -192,6 +195,7 @@ const chatConfirmMsg = (
 };
 
 const chatRead = (state, { payload: { objectID, chatID } }) => {
+  console.log(objectID, chatID);
   const hasNews = state.data[objectID].chats[chatID].hasNews;
   return update(state, {
     data: {

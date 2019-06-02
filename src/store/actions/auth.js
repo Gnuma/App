@@ -14,9 +14,8 @@ import WS from "../../utils/WebSocket";
 import { AutoStart } from "../../utils/constants";
 import CookieManager from "react-native-cookies";
 import { commentsClear } from "./comments";
-import { salesClear } from "./sales";
-import { shoppingClear } from "./shopping";
 import { messagingClear } from "../actions/messaging";
+import { chatClear } from "./chat";
 
 const isOffline = false;
 
@@ -178,8 +177,7 @@ export const authLogout = () => {
       });
 
     dispatch(commentsClear());
-    dispatch(salesClear());
-    dispatch(shoppingClear());
+    dispatch(chatClear());
     messagingClear();
     WS.close();
     dispatch(logoutSuccess());

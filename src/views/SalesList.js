@@ -3,7 +3,7 @@ import { View, Text, StatusBar } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import SalesTab from "../components/Sales/SalesTab";
-import * as salesActions from "../store/actions/sales";
+import * as chatActions from "../store/actions/chat";
 import { Header3, Header2 } from "../components/Text";
 import SalesChatsList from "../components/Sales/SalesChatsList";
 import SellButton from "../components/Sales/SellButton";
@@ -43,7 +43,7 @@ export class SalesList extends Component {
 
     return (
       <View style={{ flex: 1 }}>
-        {!data || _.isEmpty(data) ? (
+        {!orderedData || _.isEmpty(orderedData) ? (
           this.renderEmpty()
         ) : (
           <View style={{ flex: 1 }}>
@@ -114,7 +114,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  setSaleFocus: focus => dispatch(salesActions.salesSetFocus(focus))
+  setSaleFocus: focus => dispatch(chatActions.chatSetSalesListFocus(focus))
 });
 
 export default connect(

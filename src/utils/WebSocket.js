@@ -6,18 +6,6 @@ import {
 import { ToastAndroid } from "react-native";
 //import "./MockWS";
 import store from "../store/store";
-import {
-  onNewSalesMsg,
-  salesInit,
-  salesRestart,
-  salesNewChat,
-  salesNewOffert
-} from "../store/actions/sales";
-import {
-  onNewShoppingMsg,
-  shoppingInit,
-  shoppingNewOffert
-} from "../store/actions/shopping";
 import { authCompleted, authFail } from "../store/actions/auth";
 import update from "immutability-helper";
 import { commentList } from "../mockData/comments";
@@ -36,7 +24,12 @@ import { AppState } from "react-native";
 import { ChatType } from "./constants";
 import { restart } from "../store/actions/messaging";
 import axios from "axios";
-import { chatInit } from "../store/actions/chat";
+import {
+  chatInit,
+  chatNewChat,
+  chatReceiveMessage,
+  chatNewOffert
+} from "../store/actions/chat";
 
 class WS {
   ws = null;
@@ -107,19 +100,28 @@ class WS {
       switch (data.type) {
         case DataType.NEW_CHAT:
           return store.dispatch(
-            salesNewChat(data.chat.item.pk, data.chat._id, data.chat)
+            //salesNewChat(data.chat.item.pk, data.chat._id, data.chat)
+            chatNewChat(data.chat.item.pk, data.chat._id, data.chat)
           );
 
         case DataType.NEW_MESSAGE:
           const msg = formatMsg(data.message);
-          if (data.for === "sale")
+          /*if (data.for === "sale")
             return store.dispatch(
               onNewSalesMsg(data.objectID, data.chatID, msg)
             );
           else
             return store.dispatch(
               onNewShoppingMsg(data.objectID, data.chatID, msg)
-            );
+            );*/
+          return store.dispatch(
+            chatReceiveMessage(
+              (data.for === "sale" ? "" : "s") + data.objectID,
+              data.chatID,
+              msg,
+              data.for
+            )
+          );
 
         case DataType.NEW_COMMENT:
           return store.dispatch(commentsReceiveComment(data.comment));
@@ -131,6 +133,7 @@ class WS {
           return store.dispatch(commentsInit(data.notifications));
 
         case DataType.NEW_OFFERT:
+          /*
           if (data.for === "sale")
             return store.dispatch(
               salesNewOffert(
@@ -149,6 +152,15 @@ class WS {
                 data.offert.offert
               )
             );
+            */
+          return store.dispatch(
+            chatNewOffert(
+              (data.for === "sale" ? "" : "s") + data._id,
+              data.offert.chat,
+              data.offert.id,
+              data.offert.offert
+            )
+          );
 
         default:
           throw `Type ${data.type} not valid`;

@@ -18,8 +18,7 @@ import PriceInput from "../components/Sell/PriceInput";
 import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../styles/colors";
 import Button from "../components/Button";
-import * as salesActions from "../store/actions/sales";
-import * as shoppingActions from "../store/actions/shopping";
+import * as chatActions from "../store/actions/chat";
 import LoadingOverlay from "../components/LoadingOverlay";
 import _ from "lodash";
 
@@ -185,8 +184,8 @@ export class BookOffert extends Component {
       chatID,
       price:
         this.type == ChatType.sales
-          ? props.salesData[objectID].price.toString()
-          : props.shoppingData[objectID].chats[chatID].item.price.toString()
+          ? props.data[objectID].price.toString()
+          : props.data[objectID].chats[chatID].item.price.toString()
     };
   }
 
@@ -196,40 +195,22 @@ export class BookOffert extends Component {
 
   createOffert = () => {
     const { objectID, chatID, price } = this.state;
-    if (this.type == ChatType.sales) {
-      this.props.salesCreateOffert(objectID, chatID, price);
-    } else {
-      this.props.shoppingCreateOffert(objectID, chatID, price);
-    }
+    this.props.chatCreateOffert(objectID, chatID, price);
   };
 
   removeOffert = () => {
     return ToastAndroid.show("Coming soon...", ToastAndroid.SHORT);
-
-    const { objectID, chatID } = this.state;
-    if (this.type == ChatType.sales) {
-      this.props.salesRemoveOffert(objectID, chatID);
-    } else {
-      this.props.shoppingRemoveOffert(objectID, chatID);
-    }
+    this.props.chatCancelOffert(objectID, chatID);
   };
 
   rejectOffert = () => {
     const { objectID, chatID } = this.state;
-    if (this.type == ChatType.sales) {
-      this.props.salesRejectOffert(objectID, chatID);
-    } else {
-      this.props.shoppingRejectOffert(objectID, chatID);
-    }
+    this.props.chatRejectOffert(objectID, chatID);
   };
 
   acceptOffert = () => {
     const { objectID, chatID } = this.state;
-    if (this.type == ChatType.sales) {
-      this.props.salesAcceptOffert(objectID, chatID);
-    } else {
-      this.props.shoppingAcceptOffert(objectID, chatID);
-    }
+    this.props.chatAcceptOffert(objectID, chatID);
   };
 
   setPrice = price => this.setState({ price });
@@ -244,8 +225,9 @@ export class BookOffert extends Component {
   getData = (props = this.props) => {
     const { objectID, chatID } = this.state;
 
+    console.log(this.type, props.data[objectID].chats[chatID].offerts);
     if (this.type == ChatType.sales) {
-      const { chats, newsCount, ...item } = props.salesData[objectID];
+      const { chats, newsCount, ...item } = props.data[objectID];
       const { offerts, statusLoading } = chats[chatID];
       return {
         item: {
@@ -259,7 +241,7 @@ export class BookOffert extends Component {
         loading: statusLoading
       };
     } else {
-      const { UserTO, item, offerts, statusLoading } = props.shoppingData[
+      const { UserTO, item, offerts, statusLoading } = props.data[
         objectID
       ].chats[chatID];
       return {
@@ -345,29 +327,20 @@ export class BookOffert extends Component {
 }
 
 const mapStateToProps = state => ({
-  salesData: state.sales.data,
-  shoppingData: state.shopping.data,
+  data: state.chat.data,
   userID: state.auth.id
 });
 
 const mapDispatchToProps = dispatch => ({
-  salesCreateOffert: (itemID, chatID, price) =>
-    dispatch(salesActions.salesCreateOffert(itemID, chatID, price)),
-  salesRemoveOffert: (itemID, chatID) =>
-    dispatch(salesActions.salesRemoveOffert(itemID, chatID)),
-  salesRejectOffert: (itemID, chatID) =>
-    dispatch(salesActions.salesRejectOffert(itemID, chatID)),
-  salesAcceptOffert: (itemID, chatID) =>
-    dispatch(salesActions.salesAcceptOffert(itemID, chatID)),
-
-  shoppingCreateOffert: (subjectID, chatID, price) =>
-    dispatch(shoppingActions.shoppingCreateOffert(subjectID, chatID, price)),
-  shoppingRemoveOffert: (subjectID, chatID) =>
-    dispatch(shoppingActions.shoppingRemoveOffert(subjectID, chatID)),
-  shoppingRejectOffert: (subjectID, chatID) =>
-    dispatch(shoppingActions.shoppingRejectOffert(subjectID, chatID)),
-  shoppingAcceptOffert: (subjectID, chatID) =>
-    dispatch(shoppingActions.shoppingAcceptOffert(subjectID, chatID))
+  //new
+  chatCreateOffert: (objectID, chatID, price) =>
+    dispatch(chatActions.chatCreateOffert(objectID, chatID, price)),
+  chatCancelOffert: (objectID, chatID) =>
+    dispatch(chatActions.chatCancelOffert(objectID, chatID)),
+  chatRejectOffert: (objectID, chatID) =>
+    dispatch(chatActions.chatRejectOffert(objectID, chatID)),
+  chatAcceptOffert: (objectID, chatID) =>
+    dispatch(chatActions.chatAcceptOffert(objectID, chatID))
 });
 
 export default connect(

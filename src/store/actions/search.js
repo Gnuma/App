@@ -152,9 +152,9 @@ const searchChangeEpic = action$ =>
           keyword: action.payload.search_query
         })
         .pipe(
-          map(response => {
+          map(({ response }) => {
             console.log(response);
-            searchSuggest(response.data.results);
+            return searchSuggest(response.results);
           }),
           catchError(error => of(searchFail(error)))
         )
