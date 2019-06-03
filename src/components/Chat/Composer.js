@@ -1,17 +1,97 @@
 import React, { Component } from "react";
-import { View, Text, TextInput, KeyboardAvoidingView } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  PermissionsAndroid,
+  Platform
+} from "react-native";
 import Button from "../Button";
 import colors from "../../styles/colors";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Header4 } from "../Text";
+import { Header4, Header3 } from "../Text";
+import { AudioRecorder, AudioUtils } from "react-native-audio";
+import NativeButton from "../NativeButton";
+import Sound from "react-native-sound";
+
+const audioPath = AudioUtils.CachesDirectoryPath + "/AAA.aac";
+
+Sound.setCategory("Playback");
 
 export default class Composer extends Component {
+  componentDidMount() {
+    this.requestPermissions();
+  }
+
   state = {
-    recording: false
+    recording: false,
+    hasPermission: false,
+    currentTime: 0
   };
+
+  startRecording = async () => {
+    if (this.state.recording) return console.log("Can't Start Recording");
+    if (!this.state.hasPermission)
+      return console.warn("Can't record, no permission granted!");
+
+    this.setState({
+      recording: true
+    });
+    try {
+      const filePath = await AudioRecorder.startRecording();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  stopRecording = async () => {
+    if (!this.state.recording) {
+      return console.log("Can't Stop Recording");
+    }
+
+    try {
+      const filePath = await AudioRecorder.stopRecording();
+
+      if (Platform.OS === "android") {
+        this.finishRecording(true, filePath);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  finishRecording(didSucceed, filePath, fileSize) {
+    console.log(
+      `Finished recording of duration ${
+        this.state.currentTime
+      } seconds at path: ${filePath} and size of ${fileSize || 0} bytes`
+    );
+    setTimeout(() => {
+      var sound = new Sound(audioPath, Sound.MAIN_BUNDLE, error => {
+        if (error) {
+          console.log("failed to load the sound", error);
+        }
+      });
+
+      setTimeout(() => {
+        sound.play(success => {
+          if (success) {
+            console.log("successfully finished playing");
+          } else {
+            console.log("playback failed due to audio decoding errors");
+          }
+          this.prepareRecording(audioPath);
+          this.setState({
+            recording: false
+          });
+        });
+      }, 100);
+    }, 100);
+  }
 
   render() {
     const { text, onSend, onComposerTextChanged, data, type } = this.props;
+    const { recording, currentTime } = this.state;
     const showPendingWarning = type === "shopping" && data.status === "pending";
     return (
       <View
@@ -34,26 +114,44 @@ export default class Composer extends Component {
             elevation: 2,
             marginBottom: 10,
             marginTop: 5,
-            marginHorizontal: 20
+            marginHorizontal: 20,
+            minHeight: 50
           }}
         >
-          <TextInput
-            style={{ flex: 1, fontSize: 18, maxHeight: 130, paddingLeft: 14 }}
-            multiline={true}
-            placeholder="Scrivi un messaggio"
-            onChangeText={onComposerTextChanged}
-            value={text}
-          />
+          {recording ? (
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              <Header3
+                style={{
+                  fontSize: 22,
+                  paddingLeft: 14,
+                  color: colors.secondary
+                }}
+              >
+                {`${parseInt(currentTime / 60) % 10}:${parseInt(
+                  currentTime / 10
+                ) % 10}${parseInt(currentTime / 1) % 10}`}
+              </Header3>
+            </View>
+          ) : (
+            <TextInput
+              style={{ flex: 1, fontSize: 18, maxHeight: 130, paddingLeft: 14 }}
+              multiline={true}
+              placeholder="Scrivi un messaggio"
+              onChangeText={onComposerTextChanged}
+              value={text}
+            />
+          )}
           {text ? (
             <Button
               style={{
-                paddingHorizontal: 5,
-                paddingVertical: 2,
-                marginHorizontal: 15,
+                width: 40,
+                height: 40,
+                marginHorizontal: 10,
                 textAlign: "center",
                 justifyContent: "center",
                 alignItems: "center",
-                borderRadius: 26,
+                alignSelf: "center",
+                borderRadius: 20,
                 backgroundColor: colors.white
               }}
               onPress={onSend}
@@ -66,29 +164,75 @@ export default class Composer extends Component {
               />
             </Button>
           ) : (
-            <Button
+            <NativeButton
               style={{
-                marginHorizontal: 15,
+                width: 40,
+                height: 40,
+                marginHorizontal: 10,
                 textAlign: "center",
                 justifyContent: "center",
                 alignItems: "center",
-                borderRadius: 15,
-                backgroundColor: colors.secondary
+                alignSelf: "center",
+                borderRadius: 20
               }}
-              onPress={onSend}
+              onPressIn={this.startRecording}
+              onPressOut={this.stopRecording}
             >
               <Icon
                 name={"microphone"}
-                size={40}
+                size={30}
                 style={{
-                  color: !text ? colors.black : colors.primary,
-                  flex: 1
+                  color: colors.secondary
                 }}
               />
-            </Button>
+            </NativeButton>
           )}
         </View>
       </View>
     );
   }
+
+  requestPermissions = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        {
+          title: "Quipu Accesso Microfono",
+          message: "Utilizzare il microfono per mandari messaggi vocali",
+          buttonNegative: "NO",
+          buttonPositive: "SI"
+        }
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        this.setState({ hasPermission: true });
+        AudioRecorder.onProgress = data => {
+          this.setState({ currentTime: Math.floor(data.currentTime) });
+        };
+        AudioRecorder.onFinished = data => {
+          if (Platform.OS === "ios") {
+            this.finishRecording(
+              data.status === "OK",
+              data.audioFileURL,
+              data.audioFileSize
+            );
+          }
+        };
+        this.prepareRecording(audioPath);
+      } else {
+        this.setState({ hasPermission: false });
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  prepareRecording = path => {
+    AudioRecorder.prepareRecordingAtPath(path, {
+      SampleRate: 22050,
+      Channels: 1,
+      AudioQuality: "Low",
+      AudioEncoding: "aac"
+      //AudioEncodingBitRate: 32000
+    });
+  };
 }

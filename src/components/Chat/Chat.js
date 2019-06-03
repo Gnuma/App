@@ -160,6 +160,16 @@ export default class Chat extends Component {
   listViewProps = {
     onScroll: this.onScroll
   };
+
+  prepareRecordingPath(audioPath) {
+    AudioRecorder.prepareRecordingAtPath(audioPath, {
+      SampleRate: 22050,
+      Channels: 1,
+      AudioQuality: "Low",
+      AudioEncoding: "aac",
+      AudioEncodingBitRate: 32000
+    });
+  }
 }
 
 /*

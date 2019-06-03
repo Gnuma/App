@@ -215,7 +215,7 @@ const chatRead = (state, { payload: { objectID, chatID } }) => {
   });
 };
 
-const chatSettle = (state, { payload: { objectID, chatID } }) =>
+const chatSettle = (state, { payload: { objectID, chatID, status } }) =>
   update(state, {
     data: {
       [objectID]: {

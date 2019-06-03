@@ -169,7 +169,7 @@ const mapDispatchToProps = dispatch => ({
   chatSettle: (objectID, chatID, isAccepting) =>
     dispatch(chatActions.chatSettle(objectID, chatID, isAccepting)),
   chatRequestContact: (objectID, chatID) =>
-    dispatch(chatActins.chatRequestContact(objectID, chatID)),
+    dispatch(chatActions.chatRequestContact(objectID, chatID)),
   chatSetChatFocus: (objectID, chatID) =>
     dispatch(chatActions.chatSetChatFocus(objectID, chatID)),
   chatLoadEarlier: (objectID, chatID) =>

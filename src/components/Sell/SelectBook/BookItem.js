@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Text, View, Image, StyleSheet } from "react-native";
-import { Header3, Header4, Header5 } from "../../Text";
+import { Header3, Header4, Header5, Header2 } from "../../Text";
 import Button from "../../Button";
 import { CachedImage } from "react-native-cached-image";
 
@@ -61,9 +61,13 @@ export default class BookItem extends Component {
             <View
               style={{
                 ...StyleSheet.absoluteFill,
-                backgroundColor: "rgba(0,0,0,0.5)"
+                backgroundColor: "rgba(0,0,0,0.8)",
+                justifyContent: "center",
+                alignItems: "center"
               }}
-            />
+            >
+              <Header2 color="white">Già in vendita</Header2>
+            </View>
           )}
         </View>
       </Button>

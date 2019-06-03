@@ -92,15 +92,15 @@ export class ChatLink extends Component {
 
   renderFooter = () => {
     const { data } = this.props;
-    if (data.messages.length > 0) {
-      return (
-        <View>
-          <Header3 numberOfLines={1} color="black">
-            {data.item.book.title}
-          </Header3>
-          <Header3 numberOfLines={1} color="black">
-            EUR {data.item.price}
-          </Header3>
+    return (
+      <View>
+        <Header3 numberOfLines={1} color="black">
+          {data.item.book.title}
+        </Header3>
+        <Header3 numberOfLines={1} color="black">
+          EUR {data.item.price}
+        </Header3>
+        {data.messages.length > 0 && (
           <View
             style={{
               flexDirection: "row",
@@ -118,10 +118,8 @@ export class ChatLink extends Component {
               {helper.dateDisplay(data.messages[0].createdAt)}
             </Header5>
           </View>
-        </View>
-      );
-    } else {
-      return null;
-    }
+        )}
+      </View>
+    );
   };
 }

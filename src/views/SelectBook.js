@@ -29,8 +29,10 @@ export class SelectBook extends Component {
           )
       )
     );
+  }
 
-    this.bookQuery.subscribe({
+  componentDidMount() {
+    this.querySubscription = this.bookQuery.subscribe({
       next: results => {
         console.log(results);
         this.setState({ results });
@@ -40,12 +42,9 @@ export class SelectBook extends Component {
         this.setState({
           results: []
         });
-      },
-      complete: () => console.log("Completed")
+      }
     });
-  }
 
-  componentDidMount() {
     const soldBooks = {};
     for (let i = 0; i < this.props.sales.length; i++) {
       soldBooks[
@@ -55,6 +54,10 @@ export class SelectBook extends Component {
     this.setState({
       soldBooks
     });
+  }
+
+  componentWillUnmount() {
+    this.querySubscription && this.querySubscription.unsubscribe();
   }
 
   state = {

@@ -163,23 +163,27 @@ export const chatRead = (objectID, chatID) => (dispatch, getState) => {
   const chat = getState().chat.data[objectID].chats[chatID];
   console.log(chat.hasNews);
   if (chat.hasNews) {
-    const from = chat.messages[chat.hasNews - 1]._id;
-    const to = chat.messages[0]._id;
-    axios
-      .post(___READ_CHAT___, {
-        chat: chatID,
-        from,
-        to
-      })
-      .then(res => console.log(res))
-      .catch(err => console.log({ err }));
-    dispatch({
-      type: actionTypes.CHAT_READ,
-      payload: {
-        objectID,
-        chatID
-      }
-    });
+    try {
+      const from = chat.messages[chat.hasNews - 1]._id;
+      const to = chat.messages[0]._id;
+      axios
+        .post(___READ_CHAT___, {
+          chat: chatID,
+          from,
+          to
+        })
+        .then(res => console.log(res))
+        .catch(err => console.log({ err }));
+      dispatch({
+        type: actionTypes.CHAT_READ,
+        payload: {
+          objectID,
+          chatID
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
   } else {
     console.log("Chat had no news");
   }
@@ -190,7 +194,7 @@ export const chatSettle = (objectID, chatID, isAccepting) => dispatch => {
   //API
   setTimeout(() => {
     if (isAccepting) {
-      dispatch(chatSettleAction(objectID, chatID, "pending"));
+      dispatch(chatSettleAction(objectID, chatID, "active"));
     } else {
       dispatch(chatSettleAction(objectID, chatID, "rejected"));
     }
