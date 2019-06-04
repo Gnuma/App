@@ -1,4 +1,4 @@
-package com.app;
+package com.quipualpha;
 
 import android.app.Application;
 
