@@ -162,8 +162,10 @@ const mapDispatchToProps = dispatch => ({
   //new
   //readChat: (objectID, chatID) =>
   //  dispatch(chatActions.chatRead(objectID, chatID)),
+  //sendMessage: (type, objectID, chatID) =>
+  //  dispatch(messagingAction.sendMessage(type, objectID, chatID)),
   sendMessage: (type, objectID, chatID) =>
-    dispatch(messagingAction.sendMessage(type, objectID, chatID)),
+    dispatch(chatActions.chatSend(type, objectID, chatID)),
   chatSetComposer: (objectID, chatID, composer) =>
     dispatch(chatActions.chatSetComposer(objectID, chatID, composer)),
   chatSettle: (objectID, chatID, isAccepting) =>

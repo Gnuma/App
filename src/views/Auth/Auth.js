@@ -101,7 +101,6 @@ export class Auth extends Component {
         style={StyleSheet.absoluteFill}
       >
         <HiddenBar />
-        {isLoading ? <LoadingOverlay /> : null}
         <View style={{ flex: 1, marginHorizontal: 20 }}>
           <View style={{ marginBottom: 10, flex: 1 }}>
             <View
@@ -159,6 +158,11 @@ export class Auth extends Component {
           </View>
           {this._renderFooter()}
         </View>
+        {isLoading ? (
+          <View style={{ ...StyleSheet.absoluteFill, elevation: 10 }}>
+            <LoadingOverlay />
+          </View>
+        ) : null}
       </AndroidBackHandler>
     );
   }

@@ -64,19 +64,14 @@ class WS {
         resolve(token);
       });
 
-    this.connectionSubscription = NetInfo.isConnected.addEventListener(
+    /*this.connectionSubscription = NetInfo.isConnected.addEventListener(
       "connectionChange",
       isConnected => {
         console.log(isConnected);
         if (this.lastConnectionState === false) this.restart(isConnected);
         this.lastConnectionState = isConnected;
       }
-    );
-
-    //this.stateSubscription = AppState.addEventListener(
-    //  "change",
-    //  this.stateChange
-    //);
+    );*/
   }
 
   restart = isConnected => {
@@ -86,7 +81,6 @@ class WS {
 
   refresh = () => {
     return new Promise(function(resolve, reject) {
-      //store.dispatch(commentsInit(commentList));
       store.dispatch(restart(resolve));
     });
   };
@@ -95,25 +89,14 @@ class WS {
     try {
       let data = JSON.parse(msg.data);
       console.log(data);
-      //if (data.notifications) data.type = DataType.RETRIEVE_NOTIFICATIONS;
-
       switch (data.type) {
         case DataType.NEW_CHAT:
           return store.dispatch(
-            //salesNewChat(data.chat.item.pk, data.chat._id, data.chat)
             chatNewChat(data.chat.item.pk, data.chat._id, data.chat)
           );
 
         case DataType.NEW_MESSAGE:
           const msg = formatMsg(data.message);
-          /*if (data.for === "sale")
-            return store.dispatch(
-              onNewSalesMsg(data.objectID, data.chatID, msg)
-            );
-          else
-            return store.dispatch(
-              onNewShoppingMsg(data.objectID, data.chatID, msg)
-            );*/
           return store.dispatch(
             chatReceiveMessage(
               (data.for === "sale" ? "" : "s") + data.objectID,
@@ -133,26 +116,6 @@ class WS {
           return store.dispatch(commentsInit(data.notifications));
 
         case DataType.NEW_OFFERT:
-          /*
-          if (data.for === "sale")
-            return store.dispatch(
-              salesNewOffert(
-                data._id,
-                data.offert.chat,
-                data.offert.id,
-                data.offert.offert
-              )
-            );
-          else
-            return store.dispatch(
-              shoppingNewOffert(
-                data._id,
-                data.offert.chat,
-                data.offert.id,
-                data.offert.offert
-              )
-            );
-            */
           return store.dispatch(
             chatNewOffert(
               (data.for === "sale" ? "" : "s") + data._id,
@@ -188,14 +151,12 @@ class WS {
   close = () => {
     if (this.ws) {
       console.log("Closing connection...");
-      this.retries = 0;
+      this.retries = -1;
       try {
         this.ws.close();
-        console.log(this.connectionSubscription, this.stateSubscription);
-        this.connectionSubscription.remove();
-        AppState.removeEventListener("change", this.stateChange);
+        //this.connectionSubscription.remove();
       } catch (error) {
-        console.warn(error);
+        //console.warn(error);
       }
     }
   };
@@ -215,27 +176,21 @@ class WS {
     console.log(this.retries);
     if (this.retries > 0) {
       console.log("Restarting...");
+      setTimeout(this.startConnection, 100);
       this.retries--;
-      this.startConnection();
-    } else {
+    } else if (this.retries == 0) {
+      console.log("Restarting in 5 sec");
+      setTimeout(this.startConnection, 5000);
       ToastAndroid.show("Disconnected", ToastAndroid.SHORT);
+    } else {
+      console.log("Closed");
+      ToastAndroid.show("Logout", ToastAndroid.SHORT);
     }
   };
 
   onError = err => {
-    console.warn(err);
+    //console.warn(err);
     console.log(this.retries);
-  };
-
-  stateChange = appState => {
-    console.log(appState);
-    if (appState == "active" && this.lastAppState == "background") {
-      NetInfo.isConnected
-        .fetch()
-        .then(isConnected => this.restart(isConnected));
-    } else if (appState == "background") {
-    }
-    this.lastAppState = appState;
   };
 }
 

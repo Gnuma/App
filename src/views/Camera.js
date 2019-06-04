@@ -65,6 +65,15 @@ export class Camera extends Component {
 
   handleReview = (isAccepted, img, offsetPercentage, sizePercentage) => {
     if (isAccepted) {
+      console.log("Offset:", {
+        x: img.width * offsetPercentage.x,
+        y: img.height * offsetPercentage.y
+      });
+      console.log("Size:", {
+        width: img.width * sizePercentage.width,
+        height: img.height * sizePercentage.height
+      });
+      console.log("Image:", img);
       const uri = img.uri ? img.uri : img.path;
       ImageEditor.cropImage(
         uri,
@@ -83,6 +92,7 @@ export class Camera extends Component {
             uri,
             base64 => {
               this.props.takePreviewRedux({ base64, uri });
+              //this.props.addReview({ base64, uri });
             },
             () => {
               console.warn("Err base64");
@@ -224,11 +234,9 @@ export default connect(
 
 const options = {
   quality: 1,
-  orientation: "portrait",
   fixOrientation: true,
   forceUpOrientation: true,
-  pauseAfterCapture: true,
-  skipProcessing: true
+  pauseAfterCapture: true
   //width: 1080
 };
 

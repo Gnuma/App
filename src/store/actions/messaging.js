@@ -60,39 +60,7 @@ export const sendMessage = (type, objectID, chatID) => {
   };
 };
 
-export const restart = resolve => {
-  return dispatch => {
-    while (queue.length !== 0) {
-      const item = queue.shift();
-      dispatch(retrySend(item));
-    }
-    dispatch(shoppingStartGlobalAction());
-    dispatch(salesStartGlobalAction());
-
-    //API
-    setTimeout(() => {
-      dispatch(shoppingRetrieveData(buyerChatList2));
-      dispatch(salesRetrieveData(sellerChatList));
-      resolve();
-    }, 2000);
-  };
-};
-
 export const messagingClear = () => (queue = []);
-
-const retrySend = ({ type, objectID, chatID, msg }) => {
-  return dispatch => {
-    setTimeout(() => {
-      dispatch(confirmMessage(type, objectID, chatID, msg));
-    }, 1000);
-  };
-};
-
-const startSending = (type, objectID, chatID, msg) => {
-  return type === ChatType.shopping
-    ? shoppingSendMsg(objectID, chatID, msg)
-    : salesSendMsg(objectID, chatID, msg);
-};
 
 const confirmMessage = (type, objectID, chatID, msg) => {
   return type === ChatType.shopping

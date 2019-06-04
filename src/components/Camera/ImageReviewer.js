@@ -41,6 +41,10 @@ export default class ImageReviewer extends Component {
 
   handleReview = isValid => {
     if (isValid) {
+      console.log("CropperWidth", this.cropperWidth);
+      console.log("CropperHeight", this.cropperHeight);
+      console.log("LastScale", this.lastScale);
+
       const dx = (this.cropperWidth - this.cropperWidth * this.lastScale) / 2;
       const dy = (this.cropperHeight - this.cropperHeight * this.lastScale) / 2;
 
@@ -68,7 +72,8 @@ export default class ImageReviewer extends Component {
         )
       };
 
-      console.log(offsetPercentage, sizePercentage);
+      console.log("OffsetPercentage", offsetPercentage);
+      console.log("SicePercentage", sizePercentage);
       this.props.handleReview(
         true,
         this.state.img,
@@ -89,8 +94,10 @@ export default class ImageReviewer extends Component {
       this.layoutWidth = event.nativeEvent.layout.width;
       this.layoutHeight = event.nativeEvent.layout.height;
     }
-
-    const { width: imgWidth, height: imgHeight } = await getImageSize(data.uri);
+    console.log(data);
+    const { width: imgWidth, height: imgHeight } = data.width
+      ? data
+      : await getImageSize(data.uri);
 
     const img = {
       uri: data.uri,

@@ -79,6 +79,7 @@ export class ImagePicker extends Component {
         }
         for (let i = 0; i < res.edges.length; i++) {
           const node = res.edges[i].node;
+          console.log(node);
           const day = new Date(node.timestamp * 1000);
           if (day.getDay() !== data[dataIndex].title.getDay()) {
             data = update(data, {

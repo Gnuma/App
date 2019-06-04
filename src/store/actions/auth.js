@@ -104,12 +104,13 @@ export const authLogin = (username, password) => {
             .catch(err => {
               console.log("Error -> ", err);
               dispatch(authFail(err));
-              reject(AutoStart.anonymous);
+              reject(err);
             });
         })
         .catch(err => {
           console.log(err);
           dispatch(authFail(err));
+          reject(err);
         });
     });
   };
@@ -214,11 +215,13 @@ export const authSignup = (username, email, password1, password2) => {
               .catch(err => {
                 dispatch(authFail(err));
                 console.log("DENTRO");
+                reject(err);
               });
           })
           .catch(err => {
             dispatch(authFail(err));
             console.log("FUORI");
+            reject(err);
           });
       }
     });

@@ -43,7 +43,9 @@ export default class Login extends Component {
         this.props
           .login(uid, pwd)
           .then(token => this.props.completeAuth(token))
-          .catch(err => console.log(err));
+          .catch(err => {
+            this.setState({ error: "Login Error: " + err.response.status });
+          });
       }
     } else {
       this.setState(prevState => ({

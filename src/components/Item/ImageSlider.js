@@ -23,7 +23,7 @@ export class ImageSlider extends Component {
         }}
       >
         <ParallaxImage
-          source={mockData[0] /*{ uri: item }*/}
+          source={/*mockData[0]*/ { uri: item }}
           containerStyle={{
             flex: 1,
             marginBottom: IS_IOS ? 0 : -1, // Prevent a random Android rendering issue
@@ -50,7 +50,7 @@ export class ImageSlider extends Component {
       <View style={[this.props.style]}>
         <Carousel
           ref={c => (this.slider = c)}
-          data={/*data*/ mockData}
+          data={data /*mockData*/}
           renderItem={this._renderItem}
           sliderWidth={sliderWidth}
           itemWidth={itemWidth}

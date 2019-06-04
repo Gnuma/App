@@ -7,6 +7,7 @@ import FormData from "form-data";
 import uuid from "uuid";
 import { ___BASE_UPLOAD_PICTURE___, ___CREATE_AD___ } from "../constants";
 import { ___BOOK_IMG_RATIO___ } from "../../utils/constants";
+import { chatNewItem } from "./chat";
 
 const isOffline = true;
 
@@ -161,6 +162,7 @@ export const submit = () => {
           })
           .then(res => {
             console.log(res);
+            dispatch(chatNewItem());
             dispatch(sellSuccess());
             resolve();
           })

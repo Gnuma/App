@@ -359,6 +359,10 @@ const chatContactUser = (state, { payload: { item, chatID } }) => {
   });
 };
 
+const chatNewItem = (state, { payload: { item } }) => {
+  return state;
+};
+
 const chatNewOffert = (
   state,
   { payload: { objectID, chatID, price, pk, user } }
@@ -503,6 +507,9 @@ export default (state = initialState, action) => {
     case actionTypes.CHAT_OFFERT_FAIL:
       return chatOffertFail(state, action);
 
+    case actionTypes.CHAT_NEW_ITEM:
+      return chatNewItem(state, action);
+
     default:
       return state;
   }
@@ -515,7 +522,6 @@ const formatSalesData = (arrayData, focus = 0) => {
   let data = {};
   for (let i = 0; i < arrayData.length; i++) {
     const { chats, _id: itemID, ...restItem } = arrayData[i];
-
     data[itemID] = {
       _id: itemID,
       ...restItem,
@@ -555,15 +561,17 @@ const formatSalesData = (arrayData, focus = 0) => {
 };
 
 const formatShoppingData = (arrayData, focus = 0) => {
+  console.log("SHOPPING: ", arrayData);
   let orderedData = [];
   let data = {};
   for (let i = 0; i < arrayData.length; i++) {
-    const { subject, items, ...restSubject } = arrayData[i];
+    const { subject, items, newsCount, ...restSubject } = arrayData[i];
 
     data["s" + subject._id] = {
       _id: "s" + subject._id,
       title: subject.title,
       ...restSubject,
+      newsCount: newsCount || 0,
       chats: {}
     };
     let orderedChats = [];

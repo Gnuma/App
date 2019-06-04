@@ -6,16 +6,17 @@ import {
   ___REJECT_OFFERT___,
   ___ACCEPT_OFFERT___,
   ___READ_CHAT___,
-  ___CONTACT_USER___
+  ___CONTACT_USER___,
+  ___SEND_MESSAGE___
 } from "../constants";
 import { loadMockNew } from "../../mockData/Chat2";
 import protectedAction from "../../utils/protectedAction";
 import axios from "axios";
 import NavigationService from "../../navigator/NavigationService";
-import { mergeMap, map, catchError, filter } from "rxjs/operators";
+import { map, filter, retryWhen, concatMap } from "rxjs/operators";
 import { ofType } from "redux-observable";
 import { ajax } from "rxjs/ajax";
-import { of } from "rxjs";
+import { of, timer, interval, fromEvent } from "rxjs";
 
 export const chatInit = (salesData, shoppingData) => ({
   type: actionTypes.CHAT_INIT,
@@ -84,6 +85,16 @@ export const chatSendMsg = (objectID, chatID, msg, type) => ({
   }
 });
 
+export const chatRetrySendMsg = (objectID, chatID, msg, type) => ({
+  type: actionTypes.CHAT_RETRY_SEND_MSG,
+  payload: {
+    objectID,
+    chatID,
+    msg,
+    type
+  }
+});
+
 export const chatConfirmMsg = (objectID, chatID, msgID, data) => ({
   type: actionTypes.CHAT_CONFIRM_MSG,
   payload: {
@@ -93,16 +104,6 @@ export const chatConfirmMsg = (objectID, chatID, msgID, data) => ({
     data
   }
 });
-
-/*
-export const chatRead = (objectID, chatID) => ({
-  type: actionTypes.CHAT_READ,
-  payload: {
-    objectID,
-    chatID
-  }
-});
-*/
 
 export const chatNewChat = (objectID, chatID, data) => ({
   type: actionTypes.CHAT_NEW_CHAT,
@@ -148,6 +149,11 @@ export const chatOffertFail = (objectID, chatID) => ({
   }
 });
 
+export const chatNewItem = item => ({
+  type: actionTypes.CHAT_NEW_ITEM,
+  payload: { item }
+});
+
 const chatSettleAction = (objectID, chatID, status) => ({
   type: actionTypes.CHAT_SETTLE,
   payload: {
@@ -158,6 +164,16 @@ const chatSettleAction = (objectID, chatID, status) => ({
 });
 
 // ---THUNK---
+
+export const chatSend = (type, objectID, chatID) => {
+  return (dispatch, getState) => {
+    const myID = getState().auth.id;
+    const content = getState().chat.data[objectID].chats[chatID].composer;
+    const msg = createMsg(content, myID);
+
+    dispatch(chatSendMsg(objectID, chatID, msg, type));
+  };
+};
 
 export const chatRead = (objectID, chatID) => (dispatch, getState) => {
   const chat = getState().chat.data[objectID].chats[chatID];
@@ -344,45 +360,51 @@ const readChatEpic = (action$, state$) =>
       const { chatID } = action.payload;
       return chatID !== null && state$.value.chat.chatFocus === chatID;
     }),
-    /* 
-    filter(action => {
+    map(action => {
       const { objectID, chatID } = action.payload;
-      const chat = state$.value.chat.data[objectID].chats[chatID];
-      console.log(objectID, chatID, chat);
-      return chat.hasNews > 0;
-    }),
-    
-    mergeMap(action => {
-      const { objectID, chatID } = action.payload;
-      const chat = state$.value.chat.data[objectID].chats[chatID];
-      const from = chat.messagges[chat.hasNews - 1]._id;
-      const to = chat.messagges[0]._id;
-      return ajax
+      return chatRead(objectID, chatID);
+    })
+  );
+
+const sendMessageEpic = (action$, state$) =>
+  action$.pipe(
+    ofType(actionTypes.CHAT_SEND_MSG, actionTypes.CHAT_RETRY_SEND_MSG),
+    concatMap(({ payload: { chatID, objectID, msg, type } }) =>
+      ajax
         .post(
-          ___READ_CHAT___,
+          ___SEND_MESSAGE___,
           {
             chat: chatID,
-            from,
-            to
+            content: msg.text
           },
           {
             Authorization: "Token " + state$.value.auth.token
           }
         )
         .pipe(
-          map(response => {
-            console.log("CHAT_READ", response);
+          map(res => {
+            console.log(res);
+            return chatConfirmMsg(objectID, chatID, msg._id, {
+              isSending: false,
+              _id: uuid.v4()
+            });
           }),
-          catchError(error => {
-            return of(chatFail(error));
-          })
-        );
-    })
-    */
-    mergeMap(action => {
-      const { objectID, chatID } = action.payload;
-      return of(chatRead(objectID, chatID));
-    })
+          retryWhen(err => fromEvent(NetInfo, "connectionChange"))
+        )
+    )
   );
 
-export const chatEpics = [readChatEpic];
+export const chatEpics = [readChatEpic, sendMessageEpic];
+
+const createMsg = (content, userID) => {
+  return {
+    _id: uuid.v4(),
+    text: content,
+    createdAt: new Date(),
+    user: {
+      _id: userID
+    },
+    isRead: true,
+    isSending: true
+  };
+};

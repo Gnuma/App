@@ -5,11 +5,7 @@ import { connect } from "react-redux";
 import ItemHeader from "../components/Item/ItemHeader";
 import MainSell from "../components/Sell/MainSell";
 import * as sellActions from "../store/actions/sell";
-import { Header2 } from "../components/Text";
 import colors from "../styles/colors";
-import { Actions, SwitchAction } from "react-navigation";
-import NavigationService from "../navigator/NavigationService";
-import { GreyBar } from "../components/StatusBars";
 import protectedAction from "../utils/protectedAction";
 
 export class VendiInfos extends Component {

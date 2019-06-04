@@ -9,6 +9,14 @@ import { Header3 } from "../components/Text";
 import colors from "../styles/colors";
 
 export class CenterHeader extends Component {
+  componentDidUpdate(prevProps) {
+    if (this.props.isActive !== prevProps.isActive) {
+      this.props.isActive
+        ? this.searchField && this.searchField.focus()
+        : this.searchField && this.searchField.blur();
+    }
+  }
+
   static propTypes = {
     isActive: PropTypes.bool,
     searchQuery: PropTypes.string,
@@ -16,7 +24,9 @@ export class CenterHeader extends Component {
     onFocus: PropTypes.func,
     refProp: PropTypes.object,
     onSubmitEditing: PropTypes.func,
-    resetToHome: PropTypes.func
+    resetToHome: PropTypes.func,
+    showSearchBar: PropTypes.bool
+    //focus: PropTypes.func
   };
   render() {
     const {
@@ -26,9 +36,10 @@ export class CenterHeader extends Component {
       onFocus,
       onSubmitEditing,
       resetToHome,
-      setRef
+      setRef,
+      showSearchBar
     } = this.props;
-    if (isActive || searchQuery) {
+    if (isActive || showSearchBar) {
       return (
         <View style={styles.searchBoxContainer}>
           <TextInput
@@ -37,12 +48,12 @@ export class CenterHeader extends Component {
             style={styles.searchInput}
             onSubmitEditing={onSubmitEditing}
             blurOnSubmit={true}
-            ref={setRef}
-            autoFocus={!searchQuery}
+            ref={input => (this.searchField = input)}
+            autoFocus={true}
             onFocus={onFocus}
             placeholder={"Cerca un libro"}
           />
-          {searchQuery && isActive ? (
+          {showSearchBar && isActive ? (
             <Button
               onPress={resetToHome}
               style={[styles.p5, { marginRight: 3 }]}

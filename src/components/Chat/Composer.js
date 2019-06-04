@@ -141,8 +141,8 @@ export default class Composer extends Component {
               value={text}
             />
           )}
-          {text ? (
-            <Button
+          {text || true /* NoRecording */ ? (
+            <NativeButton
               style={{
                 width: 40,
                 height: 40,
@@ -162,7 +162,7 @@ export default class Composer extends Component {
                 size={26}
                 style={{ color: !text ? colors.black : colors.secondary }}
               />
-            </Button>
+            </NativeButton>
           ) : (
             <NativeButton
               style={{
