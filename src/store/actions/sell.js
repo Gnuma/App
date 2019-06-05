@@ -162,7 +162,7 @@ export const submit = () => {
           })
           .then(res => {
             console.log(res);
-            dispatch(chatNewItem());
+            dispatch(chatNewItem(res.data.item));
             dispatch(sellSuccess());
             resolve();
           })
