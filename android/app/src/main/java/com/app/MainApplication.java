@@ -13,10 +13,7 @@ import com.imagepicker.ImagePickerPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.horcrux.svg.SvgPackage;
-import io.invertase.firebase.RNFirebasePackage;
-import io.invertase.firebase.auth.RNFirebaseAuthPackage; 
-import io.invertase.firebase.database.RNFirebaseDatabasePackage;
-import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
+
 import org.reactnative.camera.RNCameraPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.facebook.react.ReactNativeHost;
@@ -49,12 +46,8 @@ public class MainApplication extends Application implements ReactApplication {
             new RNFetchBlobPackage(),
             new VectorIconsPackage(),
             new SvgPackage(),
-            new RNFirebasePackage(),
             new RNCameraPackage(),
-            new RNGestureHandlerPackage(),
-            new RNFirebaseAuthPackage(),
-            new RNFirebaseDatabasePackage(),
-            new RNFirebaseFirestorePackage() 
+            new RNGestureHandlerPackage()
       );
     }
     
