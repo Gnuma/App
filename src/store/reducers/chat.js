@@ -360,7 +360,28 @@ const chatContactUser = (state, { payload: { item, chatID } }) => {
 };
 
 const chatNewItem = (state, { payload: { item } }) => {
-  return state;
+  console.log(item);
+  const { pk: _id, ...rest } = item;
+  return update(state, {
+    data: {
+      [_id]: {
+        $set: {
+          _id,
+          chats: {},
+          hasNews: 0,
+          ...rest
+        }
+      }
+    },
+    salesOrderedData: {
+      $push: [
+        {
+          itemID: _id,
+          chats: []
+        }
+      ]
+    }
+  });
 };
 
 const chatNewOffert = (
