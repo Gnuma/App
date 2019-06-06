@@ -8,14 +8,12 @@ import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.psykar.cookiemanager.CookieManagerPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
-
-import com.imagepicker.ImagePickerPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.horcrux.svg.SvgPackage;
-
 import org.reactnative.camera.RNCameraPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -41,7 +39,6 @@ public class MainApplication extends Application implements ReactApplication {
             new FastImageViewPackage(),
             new CookieManagerPackage(),
             new NetInfoPackage(),
-            new ImagePickerPackage(),
             new RNFetchBlobPackage(),
             new VectorIconsPackage(),
             new SvgPackage(),

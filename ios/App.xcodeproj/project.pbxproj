@@ -61,7 +61,6 @@
 		16AEEDA0D9FD402CB9F2E801 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 58C8BD5744D84272B053B454 /* Octicons.ttf */; };
 		E373B6F4DF954C42AE9ABF8C /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AB943A7AA52F496481EBF65C /* SimpleLineIcons.ttf */; };
 		B52CFB9387B14CFA86AEAEE9 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 88746C19F5C94F33B29AA53D /* Zocial.ttf */; };
-		EF5FB3383DFA46A4A20C54CE /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 917BAADA428946A6A9E6EA45 /* libRNImagePicker.a */; };
 		8CC43F277BBB4B4D98126019 /* libRNCNetInfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CD8A782B5FB44BA5B23DF5F7 /* libRNCNetInfo.a */; };
 		AEAECB2640BB4AB796E6474D /* libRNCNetInfo-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DC2D7AD672442FDBBC0D59F /* libRNCNetInfo-tvOS.a */; };
 		42F8C50D37FB4C49864407E1 /* libRNCookieManagerIOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0706F16B5D224740A4475B3D /* libRNCookieManagerIOS.a */; };
@@ -402,8 +401,6 @@
 		58C8BD5744D84272B053B454 /* Octicons.ttf */ = {isa = PBXFileReference; name = "Octicons.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		AB943A7AA52F496481EBF65C /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; name = "SimpleLineIcons.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		88746C19F5C94F33B29AA53D /* Zocial.ttf */ = {isa = PBXFileReference; name = "Zocial.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		19B8CCB5887C4647B1333F81 /* RNImagePicker.xcodeproj */ = {isa = PBXFileReference; name = "RNImagePicker.xcodeproj"; path = "../node_modules/react-native-image-picker/ios/RNImagePicker.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		917BAADA428946A6A9E6EA45 /* libRNImagePicker.a */ = {isa = PBXFileReference; name = "libRNImagePicker.a"; path = "libRNImagePicker.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		0C43926E4DBA472085012785 /* RNCNetInfo.xcodeproj */ = {isa = PBXFileReference; name = "RNCNetInfo.xcodeproj"; path = "../node_modules/@react-native-community/netinfo/ios/RNCNetInfo.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		CD8A782B5FB44BA5B23DF5F7 /* libRNCNetInfo.a */ = {isa = PBXFileReference; name = "libRNCNetInfo.a"; path = "libRNCNetInfo.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		6DC2D7AD672442FDBBC0D59F /* libRNCNetInfo-tvOS.a */ = {isa = PBXFileReference; name = "libRNCNetInfo-tvOS.a"; path = "libRNCNetInfo-tvOS.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
@@ -448,7 +445,6 @@
 				DD45F7061EC6485BA5FC2762 /* libRNSVG.a in Frameworks */,
 				A6BECA3BE6D54D2FB490A329 /* libRNVectorIcons.a in Frameworks */,
 				023D47EEEFE5433680DD5DFB /* libRNFetchBlob.a in Frameworks */,
-				EF5FB3383DFA46A4A20C54CE /* libRNImagePicker.a in Frameworks */,
 				8CC43F277BBB4B4D98126019 /* libRNCNetInfo.a in Frameworks */,
 				42F8C50D37FB4C49864407E1 /* libRNCookieManagerIOS.a in Frameworks */,
 				D3AD15DB3502499CBF3148D1 /* libFastImage.a in Frameworks */,
@@ -651,7 +647,6 @@
 				FCCB5D0B30594FAD8F19ED2E /* RNSVG.xcodeproj */,
 				6589E1A172EB45ECAE17FDFD /* RNVectorIcons.xcodeproj */,
 				74B39B92423142199277E8A7 /* RNFetchBlob.xcodeproj */,
-				19B8CCB5887C4647B1333F81 /* RNImagePicker.xcodeproj */,
 				0C43926E4DBA472085012785 /* RNCNetInfo.xcodeproj */,
 				24C6AA23914947E385BDBD83 /* RNCookieManagerIOS.xcodeproj */,
 				02A99EEBB8214D87B28EB22F /* FastImage.xcodeproj */,
@@ -1331,7 +1326,6 @@
 					"$(SRCROOT)\..\node_modules\react-native-svg\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
-					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
 					"$(SRCROOT)\..\node_modules\@react-native-community\netinfo\ios",
 					"$(SRCROOT)\..\node_modules\react-native-cookies\ios\RNCookieManagerIOS",
 					"$(SRCROOT)\..\node_modules\react-native-fast-image\ios\FastImage/**",
@@ -1366,7 +1360,6 @@
 					"$(SRCROOT)\..\node_modules\react-native-svg\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
-					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
 					"$(SRCROOT)\..\node_modules\@react-native-community\netinfo\ios",
 					"$(SRCROOT)\..\node_modules\react-native-cookies\ios\RNCookieManagerIOS",
 					"$(SRCROOT)\..\node_modules\react-native-fast-image\ios\FastImage/**",
@@ -1399,7 +1392,6 @@
 					"$(SRCROOT)\..\node_modules\react-native-svg\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
-					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
 					"$(SRCROOT)\..\node_modules\@react-native-community\netinfo\ios",
 					"$(SRCROOT)\..\node_modules\react-native-cookies\ios\RNCookieManagerIOS",
 					"$(SRCROOT)\..\node_modules\react-native-fast-image\ios\FastImage/**",
@@ -1431,7 +1423,6 @@
 					"$(SRCROOT)\..\node_modules\react-native-svg\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
-					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
 					"$(SRCROOT)\..\node_modules\@react-native-community\netinfo\ios",
 					"$(SRCROOT)\..\node_modules\react-native-cookies\ios\RNCookieManagerIOS",
 					"$(SRCROOT)\..\node_modules\react-native-fast-image\ios\FastImage/**",
@@ -1474,7 +1465,6 @@
 					"$(SRCROOT)\..\node_modules\react-native-svg\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
-					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
 					"$(SRCROOT)\..\node_modules\@react-native-community\netinfo\ios",
 					"$(SRCROOT)\..\node_modules\react-native-cookies\ios\RNCookieManagerIOS",
 					"$(SRCROOT)\..\node_modules\react-native-fast-image\ios\FastImage/**",
@@ -1517,7 +1507,6 @@
 					"$(SRCROOT)\..\node_modules\react-native-svg\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
-					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
 					"$(SRCROOT)\..\node_modules\@react-native-community\netinfo\ios",
 					"$(SRCROOT)\..\node_modules\react-native-cookies\ios\RNCookieManagerIOS",
 					"$(SRCROOT)\..\node_modules\react-native-fast-image\ios\FastImage/**",
@@ -1559,7 +1548,6 @@
 					"$(SRCROOT)\..\node_modules\react-native-svg\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
-					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
 					"$(SRCROOT)\..\node_modules\@react-native-community\netinfo\ios",
 					"$(SRCROOT)\..\node_modules\react-native-cookies\ios\RNCookieManagerIOS",
 					"$(SRCROOT)\..\node_modules\react-native-fast-image\ios\FastImage/**",
@@ -1601,7 +1589,6 @@
 					"$(SRCROOT)\..\node_modules\react-native-svg\ios/**",
 					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
 					"$(SRCROOT)\..\node_modules\rn-fetch-blob\ios/**",
-					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
 					"$(SRCROOT)\..\node_modules\@react-native-community\netinfo\ios",
 					"$(SRCROOT)\..\node_modules\react-native-cookies\ios\RNCookieManagerIOS",
 					"$(SRCROOT)\..\node_modules\react-native-fast-image\ios\FastImage/**",
