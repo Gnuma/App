@@ -15,7 +15,6 @@ import CameraHeader from "../components/Camera/CameraHeader";
 import * as sellActions from "../store/actions/sell";
 import colors from "../styles/colors";
 import ImageReviewer from "../components/Camera/ImageReviewer";
-//import ImagePicker from "react-native-image-crop-picker";
 import _ from "lodash";
 import update from "immutability-helper";
 import MainCamera from "../components/Camera/MainCamera";

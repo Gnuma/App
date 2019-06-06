@@ -8,7 +8,7 @@ import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.psykar.cookiemanager.CookieManagerPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
-import com.reactnative.ivpusic.imagepicker.PickerPackage;
+
 import com.imagepicker.ImagePickerPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -41,7 +41,6 @@ public class MainApplication extends Application implements ReactApplication {
             new FastImageViewPackage(),
             new CookieManagerPackage(),
             new NetInfoPackage(),
-            new PickerPackage(),
             new ImagePickerPackage(),
             new RNFetchBlobPackage(),
             new VectorIconsPackage(),
