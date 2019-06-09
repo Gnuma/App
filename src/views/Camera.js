@@ -20,6 +20,7 @@ import update from "immutability-helper";
 import MainCamera from "../components/Camera/MainCamera";
 import { HiddenBar, TransparentBar } from "../components/StatusBars";
 import { SafeAreaView } from "react-navigation";
+import NewImageReviewr from "../components/Camera/NewImageReviewr";
 
 export class Camera extends Component {
   imgCounter = 5;
@@ -64,6 +65,7 @@ export class Camera extends Component {
 
   handleReview = (isAccepted, img, offsetPercentage, sizePercentage) => {
     if (isAccepted) {
+      /*
       console.log("Offset:", {
         x: img.width * offsetPercentage.x,
         y: img.height * offsetPercentage.y
@@ -102,6 +104,7 @@ export class Camera extends Component {
           console.warn("Error while cropping preview");
         }
       );
+      */
     }
 
     this.setState(prevState => ({
@@ -166,7 +169,7 @@ export class Camera extends Component {
           />
           <View style={{ flex: 1 }}>
             {isReviewing && (
-              <ImageReviewer
+              <NewImageReviewr
                 data={this.props.checking[0]}
                 setReviewOptions={this.setReviewOptions}
                 handleReview={this.handleReview}
@@ -233,13 +236,10 @@ export default connect(
 
 const options = {
   quality: 1,
-  fixOrientation: true,
-  forceUpOrientation: true,
-  pauseAfterCapture: true
-  //width: 1080
-};
-
-const pickerOptions = {
-  multiple: true,
-  mediaType: "photo"
+  orientation: "portrait",
+  //fixOrientation: true,
+  //forceUpOrientation: true,
+  pauseAfterCapture: true,
+  //width: 1080,
+  skipProcessing: true
 };

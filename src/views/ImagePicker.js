@@ -209,7 +209,6 @@ export class ImagePicker extends Component {
 
     return (
       <View style={{ flex: 1 }}>
-        <GreyBar />
         <PickerHeader
           complete={this.complete}
           goBack={this.exitPicker}
