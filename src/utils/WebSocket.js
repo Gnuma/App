@@ -28,7 +28,8 @@ import {
   chatInit,
   chatNewChat,
   chatReceiveMessage,
-  chatNewOffert
+  chatNewOffert,
+  chatOnline
 } from "../store/actions/chat";
 
 class WS {
@@ -64,14 +65,12 @@ class WS {
         resolve(token);
       });
 
-    /*this.connectionSubscription = NetInfo.isConnected.addEventListener(
+    this.connectionSubscription = NetInfo.isConnected.addEventListener(
       "connectionChange",
       isConnected => {
-        console.log(isConnected);
-        if (this.lastConnectionState === false) this.restart(isConnected);
-        this.lastConnectionState = isConnected;
+        if(isConnected) store.dispatch(chatOnline())
       }
-    );*/
+    );
   }
 
   restart = isConnected => {

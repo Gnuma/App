@@ -531,6 +531,9 @@ export default (state = initialState, action) => {
     case actionTypes.CHAT_NEW_ITEM:
       return chatNewItem(state, action);
 
+    case actionTypes.CHAT_ONLINE:
+      return chatStartGlobalAction(state, action);
+
     default:
       return state;
   }

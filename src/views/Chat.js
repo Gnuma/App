@@ -92,10 +92,6 @@ export class Chat extends Component {
     }
   };
 
-  getGlobalLoading = () => {
-    this.props.loading;
-  };
-
   loadEarlier = () => {
     this.props.chatLoadEarlier(this.state.objectID, this.state.chatID);
   };
@@ -104,7 +100,6 @@ export class Chat extends Component {
     const { objectID, chatID } = this.state;
     const chatData = this.getChatData();
     const item = this.getItem();
-    //console.log(this.getGlobalLoading());
 
     return (
       <View style={{ flex: 1 }}>
@@ -132,7 +127,7 @@ export class Chat extends Component {
               objectID={objectID}
               chatID={chatID}
               data={chatData}
-              globalLoading={this.getGlobalLoading()}
+              globalLoading={this.props.loading}
               salesSend={this.sendMsg}
               salesSetComposer={this.setComposer}
               type={this.type}

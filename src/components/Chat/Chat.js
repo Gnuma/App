@@ -21,6 +21,7 @@ import Composer from "./Composer";
 import Offert from "./Offert";
 import _ from "lodash";
 import { OffertStatus } from "../../views/BookOffert";
+import LoadingOverlay from "../LoadingOverlay";
 
 export default class Chat extends Component {
   onSend = () => {
@@ -131,23 +132,16 @@ export default class Chat extends Component {
             );
           }}
         />
-        <Composer
-          onSend={this.onSend}
-          onComposerTextChanged={this.onComposerTextChanged}
-          text={data.composer}
-          type={type}
-          data={data}
-        />
-        {globalLoading ? (
-          <ActivityIndicator
-            style={{
-              position: "absolute",
-              top: 15,
-              alignSelf: "center"
-            }}
-            size="large"
+        <View style={{ zIndex: 0 }}>
+          <Composer
+            onSend={this.onSend}
+            onComposerTextChanged={this.onComposerTextChanged}
+            text={data.composer}
+            type={type}
+            data={data}
           />
-        ) : null}
+        </View>
+        {globalLoading && <LoadingOverlay />}
       </View>
     );
   }

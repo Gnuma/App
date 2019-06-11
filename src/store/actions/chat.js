@@ -7,7 +7,8 @@ import {
   ___ACCEPT_OFFERT___,
   ___READ_CHAT___,
   ___CONTACT_USER___,
-  ___SEND_MESSAGE___
+  ___SEND_MESSAGE___,
+  ___RETRIEVE_CHATS___
 } from "../constants";
 import { loadMockNew } from "../../mockData/Chat2";
 import protectedAction from "../../utils/protectedAction";
@@ -85,16 +86,6 @@ export const chatSendMsg = (objectID, chatID, msg, type) => ({
   }
 });
 
-export const chatRetrySendMsg = (objectID, chatID, msg, type) => ({
-  type: actionTypes.CHAT_RETRY_SEND_MSG,
-  payload: {
-    objectID,
-    chatID,
-    msg,
-    type
-  }
-});
-
 export const chatConfirmMsg = (objectID, chatID, msgID, data) => ({
   type: actionTypes.CHAT_CONFIRM_MSG,
   payload: {
@@ -161,6 +152,10 @@ const chatSettleAction = (objectID, chatID, status) => ({
     chatID,
     status
   }
+});
+
+export const chatOnline = () => ({
+  type: actionTypes.CHAT_ONLINE
 });
 
 // ---THUNK---
@@ -351,6 +346,15 @@ export const onNewMessage = (objectID, chatID, msg, type) => (
   }
 };
 
+export const chatRestart = () => dispatch => {
+  axios
+    .get(___RETRIEVE_CHATS___)
+    .then(res => {
+      dispatch(chatInit(res.data.sales, res.data.shopping));
+    })
+    .catch(err => dispatch(chatFail(err)));
+};
+
 //  ---EPICS---
 //newMessage inChat || open chat
 const readChatEpic = (action$, state$) =>
@@ -368,9 +372,11 @@ const readChatEpic = (action$, state$) =>
 
 const sendMessageEpic = (action$, state$) =>
   action$.pipe(
-    ofType(actionTypes.CHAT_SEND_MSG, actionTypes.CHAT_RETRY_SEND_MSG),
-    concatMap(({ payload: { chatID, objectID, msg, type } }) =>
-      ajax
+    ofType(actionTypes.CHAT_SEND_MSG, actionTypes.CHAT_ONLINE),
+    concatMap(action => {
+      if (action.type === actionTypes.CHAT_ONLINE) return of(chatRestart());
+      const { chatID, objectID, msg } = action.payload;
+      return ajax
         .post(
           ___SEND_MESSAGE___,
           {
@@ -382,16 +388,16 @@ const sendMessageEpic = (action$, state$) =>
           }
         )
         .pipe(
+          retryWhen(err => fromEvent(NetInfo, "connectionChange")),
           map(res => {
             console.log(res);
             return chatConfirmMsg(objectID, chatID, msg._id, {
               isSending: false,
               _id: uuid.v4()
             });
-          }),
-          retryWhen(err => fromEvent(NetInfo, "connectionChange"))
-        )
-    )
+          })
+        );
+    })
   );
 
 export const chatEpics = [readChatEpic, sendMessageEpic];
