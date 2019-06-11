@@ -1,32 +1,32 @@
 import React, { Component } from "react";
-import { View, StyleSheet, Animated, Dimensions, Image } from "react-native";
+import { View, Image, StyleSheet, Animated } from "react-native";
 import PropTypes from "prop-types";
-import colors from "../../styles/colors";
-import Button from "../Button";
-import Icon from "react-native-vector-icons/FontAwesome";
 import {
   PinchGestureHandler,
   PanGestureHandler,
   State
 } from "react-native-gesture-handler";
+import colors from "../../styles/colors";
 import { ___BOOK_IMG_RATIO___ } from "../../utils/constants";
-
-const { height: hW, width: wW } = Dimensions.get("window");
-const minScale = 0.3;
+import Button from "../Button";
+import Icon from "react-native-vector-icons/FontAwesome";
+import ImageSize from "react-native-image-size";
 
 export default class ImageReviewer extends Component {
-  constructor(props) {
-    super(props);
+  static propTypes = {
+    data: PropTypes.object.isRequired,
+    setReviewOptions: PropTypes.func,
+    handleReview: PropTypes.func
+  };
 
-    this.state = {
-      layout: null,
-      right_c: wW,
-      bottom_c: hW,
-      left_c: 0,
-      top_c: 0,
-      scale_c: 1
-    };
-  }
+  state = {
+    loading: true,
+    right_c: null,
+    bottom_c: null,
+    left_c: null,
+    top_c: null,
+    scale_c: null
+  };
 
   pan = new Animated.ValueXY();
   lastPan = { x: 0, y: 0 };
@@ -34,129 +34,136 @@ export default class ImageReviewer extends Component {
   baseScale = new Animated.Value(1);
   pinchScale = new Animated.Value(1);
   scale = Animated.multiply(this.baseScale, this.pinchScale);
-  lastScale = 0.9;
+  lastScale = 1;
+  initialized = false;
 
-  cropperHeight = 0;
-  cropperWidth = 0;
+  componentDidUpdate(prevProps) {
+    if (prevProps.data.uri !== this.props.data.uri) {
+      this.updateLayout();
+    }
+  }
+
+  updateLayout = async () => {
+    const margin = 0.2;
+    console.log(this.props.data);
+    this.lastPan = { x: 0, y: 0 };
+    this.pan.setValue(this.lastPan);
+    this.pan.setOffset(this.lastPan);
+
+    this.lastScale = 1;
+    this.baseScale.setValue(1);
+    this.baseScale.setOffset(0);
+    this.pinchScale.setValue(1);
+    this.pinchScale.setOffset(0);
+
+    const { data } = this.props;
+    const { container } = this.state;
+    //const { width: imgWidth, height: imgHeight } =
+    //  !this.props.data.width || !this.props.data.height
+    //    ? await getImageSize(data.uri)
+    //    : data;
+    let { width: imgWidth, height: imgHeight } =
+      !this.props.data.width || !this.props.data.height
+        ? await ImageSize.getSize(data.uri)
+        : data;
+
+    console.log(imgWidth, imgHeight);
+
+    //console.log(Image.resolveAssetSource(data.uri));
+
+    const imgRatio = imgHeight / imgWidth;
+    let layoutHeight, layoutWidth;
+    let cropperHeight, cropperWidth;
+    if (this.container.width * imgRatio > this.container.height) {
+      console.log("HEIGHT LIMIT");
+      layoutHeight = this.container.height;
+      layoutWidth = this.container.height / imgRatio;
+      cropperWidth = layoutWidth - margin * layoutWidth;
+      cropperHeight = cropperWidth * ___BOOK_IMG_RATIO___;
+    } else {
+      console.log("WIDTH LIMIT");
+      layoutWidth = this.container.width;
+      layoutHeight = this.container.width * imgRatio;
+      cropperHeight = layoutHeight - margin * layoutHeight;
+      cropperWidth = cropperHeight / ___BOOK_IMG_RATIO___;
+    }
+    if (layoutWidth * ___BOOK_IMG_RATIO___ > layoutHeight) {
+      cropperHeight = layoutHeight - margin * layoutHeight;
+      cropperWidth = cropperHeight / ___BOOK_IMG_RATIO___;
+    } else {
+      cropperWidth = layoutWidth - margin * layoutWidth;
+      cropperHeight = cropperWidth * ___BOOK_IMG_RATIO___;
+    }
+
+    const horizontalConstraint = Math.max(0, (layoutWidth - cropperWidth) / 2);
+    const verticalConstraint = Math.max(0, (layoutHeight - cropperHeight) / 2);
+    const horizontalScaleConstraint = cropperWidth / layoutWidth;
+    const verticalScaleConstraint = cropperHeight / layoutHeight;
+
+    const scaleConstraint = Math.max(
+      horizontalScaleConstraint,
+      verticalScaleConstraint
+    );
+
+    console.log(horizontalConstraint, verticalConstraint);
+
+    this.setState({
+      img: {
+        width: imgWidth,
+        height: imgHeight,
+        uri: data.uri
+      },
+      layout: {
+        height: layoutHeight,
+        width: layoutWidth
+      },
+      left_c: -horizontalConstraint,
+      right_c: horizontalConstraint,
+      top_c: -verticalConstraint,
+      bottom_c: verticalConstraint,
+      scale_c: scaleConstraint,
+      cropper: {
+        height: cropperHeight,
+        width: cropperWidth
+      },
+      loading: false
+    });
+  };
 
   handleReview = isValid => {
     if (isValid) {
-      console.log("CropperWidth", this.cropperWidth);
-      console.log("CropperHeight", this.cropperHeight);
-      console.log("LastScale", this.lastScale);
+      const {
+        cropper: { width: cropperWidth, height: cropperHeight },
+        layout: { width: layoutWidth, height: layoutHeight }
+      } = this.state;
 
-      const dx = (this.cropperWidth - this.cropperWidth * this.lastScale) / 2;
-      const dy = (this.cropperHeight - this.cropperHeight * this.lastScale) / 2;
+      const fullWidth = layoutWidth * this.lastScale;
+      const fullHeight = layoutHeight * this.lastScale;
 
-      const offsetPercentage = {
-        x: Math.min(
-          Math.max(0, (this.lastPan.x + dx) / this.cropperWidth),
-          100
-        ),
-        y: Math.min(
-          Math.max(0, (this.lastPan.y + dy) / this.cropperHeight),
-          100
-        )
-      };
-      const sizePercentage = {
-        width: Math.min(
-          100,
-          Math.max(0, (this.cropperWidth * this.lastScale) / this.cropperWidth)
-        ),
-        height: Math.min(
-          100,
-          Math.max(
-            0,
-            (this.cropperHeight * this.lastScale) / this.cropperHeight
-          )
-        )
-      };
+      const widthPercentage = cropperWidth / fullWidth;
+      const heightPercentage = cropperHeight / fullHeight;
 
-      console.log("OffsetPercentage", offsetPercentage);
-      console.log("SicePercentage", sizePercentage);
+      const xOffset = (fullWidth - cropperWidth) / 2 - this.lastPan.x;
+      const yOffset = (fullHeight - cropperHeight) / 2 - this.lastPan.y;
+
+      const xPercentage = xOffset / fullWidth;
+      const yPercentage = yOffset / fullHeight;
+
+      console.log(
+        this.state.img,
+        { x: xPercentage, y: yPercentage },
+        { width: widthPercentage, height: heightPercentage }
+      );
+
       this.props.handleReview(
         true,
         this.state.img,
-        offsetPercentage,
-        sizePercentage
+        { x: xPercentage, y: yPercentage },
+        { width: widthPercentage, height: heightPercentage }
       );
     } else {
       this.props.handleReview(false);
     }
-  };
-
-  updateLayout = async event => {
-    const margin = 1;
-
-    const data = this.props.data;
-
-    if (event) {
-      this.layoutWidth = event.nativeEvent.layout.width;
-      this.layoutHeight = event.nativeEvent.layout.height;
-    }
-    console.log(data);
-    const { width: imgWidth, height: imgHeight } = data.width
-      ? data
-      : await getImageSize(data.uri);
-
-    const img = {
-      uri: data.uri,
-      width: imgWidth,
-      height: imgHeight
-    };
-
-    const imgRatio = imgHeight / imgWidth;
-
-    console.log(imgWidth, imgHeight);
-
-    console.log(imgRatio);
-
-    let height, width;
-    if (this.layoutWidth * imgRatio > this.layoutHeight) {
-      console.log("Per Altezza");
-      height = this.layoutHeight;
-      width = this.layoutHeight / imgRatio;
-      //this.cropperHeight = height - margin;
-      //this.cropperWidth = this.cropperHeight / ___BOOK_IMG_RATIO___;
-
-      this.cropperWidth = width - margin;
-      this.cropperHeight = this.cropperWidth * ___BOOK_IMG_RATIO___;
-    } else {
-      console.log("Per Larghezza");
-      width = this.layoutWidth;
-      height = this.layoutWidth * imgRatio;
-      //this.cropperWidth = width - margin;
-      //this.cropperHeight = this.cropperWidth * ___BOOK_IMG_RATIO___;
-
-      this.cropperHeight = height - margin;
-      this.cropperWidth = this.cropperHeight / ___BOOK_IMG_RATIO___;
-    }
-    console.log(width, height, this.cropperWidth, this.cropperHeight);
-
-    this.lastScale = 0.9;
-    this.baseScale.setValue(this.lastScale);
-    this.pinchScale.setValue(1);
-
-    this.lastPan = {
-      x: (width - this.cropperWidth) / 2,
-      y: (height - this.cropperHeight) / 2
-    };
-    this.pan.setOffset(this.lastPan);
-
-    this.setState(
-      {
-        img,
-        layout: {
-          width,
-          height
-        },
-        right_c: width - this.cropperWidth,
-        bottom_c: height - this.cropperHeight
-      },
-      () => {
-        this.updateTranslationConstraints();
-      }
-    );
   };
 
   onPanGestureEvent = Animated.event(
@@ -175,7 +182,6 @@ export default class ImageReviewer extends Component {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       this.lastPan.x += event.nativeEvent.translationX;
       this.lastPan.y += event.nativeEvent.translationY;
-
       this.lastPan.x = Math.min(
         Math.max(this.state.left_c, this.lastPan.x),
         this.state.right_c
@@ -184,7 +190,6 @@ export default class ImageReviewer extends Component {
         Math.min(this.state.bottom_c, this.lastPan.y),
         this.state.top_c
       );
-
       this.pan.setOffset({
         x: this.lastPan.x,
         y: this.lastPan.y
@@ -197,60 +202,91 @@ export default class ImageReviewer extends Component {
   onPinchStateChange = event => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       this.lastScale *= event.nativeEvent.scale;
-      this.lastScale = Math.max(
-        minScale,
-        Math.min(this.lastScale, this.state.scale_c)
-      );
+      this.lastScale = Math.max(this.lastScale, this.state.scale_c);
       this.baseScale.setValue(this.lastScale);
       this.pinchScale.setValue(1);
-      this.updateTranslationConstraints();
+      this.updateTranslationConstaints();
     }
   };
 
   updateScaleConstraints = () => {
-    const { left_c, top_c, right_c, bottom_c } = this.state;
-    const wD = Math.min(this.lastPan.x - left_c, right_c - this.lastPan.x);
-    const hD = Math.min(this.lastPan.y - top_c, bottom_c - this.lastPan.y);
+    const {
+      cropper: { width: cropperWidth, height: cropperHeight },
+      layout: { width: layoutWidth, height: layoutHeight }
+    } = this.state;
+    console.log(this.lastPan.x, this.state.right_c);
+    const horizontalScaleConstaint = Math.min(
+      Math.abs(this.lastPan.x + this.state.left_c),
+      Math.abs(this.lastPan.x + this.state.right_c)
+    );
+    const verticalScaleConstraint = Math.min(
+      Math.abs(this.lastPan.y + this.state.top_c),
+      Math.abs(this.lastPan.y + this.state.bottom_c)
+    );
 
-    let overScale;
-    if (wD < hD) {
-      overScale = wD / (this.cropperWidth * this.lastScale);
-    } else {
-      overScale = hD / (this.cropperHeight * this.lastScale);
-    }
+    const OuterWidth = layoutWidth * this.lastScale;
+    const OuterHeight = layoutHeight * this.lastScale;
+    const InnerWidth = OuterWidth - horizontalScaleConstaint * 2;
+    const InnerHeight = OuterHeight - verticalScaleConstraint * 2;
+    const scaleOffsetConstraint = Math.max(
+      InnerWidth / OuterWidth,
+      InnerHeight / OuterHeight
+    );
+    console.log(scaleOffsetConstraint, this.lastScale);
+    this.setState({
+      scale_c: this.lastScale * scaleOffsetConstraint
+    });
+  };
 
-    this.setState(({ scale_c: lastScale_c }) => ({
-      scale_c: this.lastScale + this.lastScale * overScale * 2
-    }));
+  updateTranslationConstaints = () => {
+    const bugOffset = 0;
+    const {
+      cropper: { width: cropperWidth, height: cropperHeight },
+      layout: { width: layoutWidth, height: layoutHeight }
+    } = this.state;
+
+    const horizontalConstraint =
+      Math.max(0, layoutWidth * this.lastScale - cropperWidth) / 2 + bugOffset;
+    const verticalConstraint =
+      Math.max(0, layoutHeight * this.lastScale - cropperHeight) / 2 +
+      bugOffset;
+
+    this.setState({
+      left_c: -horizontalConstraint,
+      right_c: horizontalConstraint,
+      top_c: -verticalConstraint,
+      bottom_c: verticalConstraint
+    });
+
+    console.log("UPDATING TRANSLATIONAL CONSTRAINTS", {
+      left_c: -horizontalConstraint,
+      right_c: horizontalConstraint,
+      top_c: -verticalConstraint,
+      bottom_c: verticalConstraint
+    });
     console.log(this.lastPan);
   };
 
-  updateTranslationConstraints = () => {
-    const dWidth = ((this.lastScale - 1) * this.cropperWidth) / 2;
-    const dHeight = ((this.lastScale - 1) * this.cropperHeight) / 2;
-
-    this.setState({
-      left_c: dWidth,
-      top_c: dHeight,
-      right_c: this.state.layout.width - this.cropperWidth - dWidth,
-      bottom_c: this.state.layout.height - this.cropperHeight - dHeight
-    });
-
-    console.log(this.lastScale);
-  };
-
   render() {
-    const { data } = this.props;
-    const { layout, left_c, top_c, right_c, bottom_c, scale_c } = this.state;
-
+    const {
+      layout,
+      loading,
+      img,
+      cropper,
+      left_c,
+      right_c,
+      top_c,
+      bottom_c,
+      scale_c
+    } = this.state;
+    console.log(cropper);
     return (
       <View style={{ flex: 1 }}>
         <View
           style={{
-            flex: 1,
-            backgroundColor: colors.fullBlack
+            flex: 1
           }}
-          onLayout={this.updateLayout}
+          onLayout={event => this.setContainerSize(event.nativeEvent)}
         >
           <Handlers
             onPanGestureChange={this.onPanGestureChange}
@@ -258,56 +294,68 @@ export default class ImageReviewer extends Component {
             onPinchGestureEvent={this.onPinchGestureEvent}
             onPinchStateChange={this.onPinchStateChange}
           >
-            {layout && (
+            {!loading && (
               <View
                 style={{
-                  height: layout.height,
-                  width: layout.width,
-                  alignSelf: "center"
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  overflow: "hidden",
+                  backgroundColor: colors.fullBlack
                 }}
               >
-                <Image
+                <View
                   style={{
-                    ...StyleSheet.absoluteFill
+                    height: layout.height,
+                    width: layout.width,
+                    justifyContent: "center",
+                    alignItems: "center"
                   }}
-                  source={{ uri: data.uri ? data.uri : data.path }}
-                  resizeMode="contain"
-                  onLoad={() => this.updateLayout()}
-                />
-                <View>
-                  <Animated.View
+                >
+                  <Animated.Image
                     style={{
                       ...StyleSheet.absoluteFill,
-                      width: this.cropperWidth,
-                      height: this.cropperHeight,
-                      borderColor: colors.white,
-                      borderWidth: 2,
                       transform: [
                         {
                           translateX: this.pan.x.interpolate({
-                            inputRange: [left_c, right_c],
-                            outputRange: [left_c, right_c],
+                            inputRange: [
+                              left_c - BUG_OFFSET,
+                              right_c + BUG_OFFSET
+                            ],
+                            outputRange: [
+                              left_c - BUG_OFFSET,
+                              right_c + BUG_OFFSET
+                            ],
                             extrapolate: "clamp"
                           })
                         },
                         {
                           translateY: this.pan.y.interpolate({
-                            inputRange: [top_c, bottom_c],
-                            outputRange: [top_c, bottom_c],
+                            inputRange: [
+                              top_c - BUG_OFFSET,
+                              bottom_c + BUG_OFFSET
+                            ],
+                            outputRange: [
+                              top_c - BUG_OFFSET,
+                              bottom_c + BUG_OFFSET
+                            ],
                             extrapolate: "clamp"
                           })
                         },
                         {
                           scale: this.scale.interpolate({
-                            inputRange: [minScale, scale_c + 0.001],
-                            outputRange: [minScale, scale_c],
+                            inputRange: [scale_c, 100],
+                            outputRange: [scale_c, 100],
                             extrapolate: "clamp"
                           })
                         }
                       ]
                     }}
+                    resizeMode="contain"
+                    source={{ uri: img.uri }}
                   />
                 </View>
+                <Overlay container={this.container} cropper={cropper} />
               </View>
             )}
           </Handlers>
@@ -357,7 +405,27 @@ export default class ImageReviewer extends Component {
       </View>
     );
   }
+
+  setContainerSize = ({ layout }) => {
+    this.container = {
+      width: layout.width,
+      height: layout.height
+    };
+    if (!this.initialized) {
+      this.initialized = true;
+      this.updateLayout();
+    }
+  };
 }
+
+const getImageSize = uri =>
+  new Promise((resolve, reject) => {
+    Image.getSize(
+      uri,
+      (width, height) => resolve({ width, height }),
+      err => reject(err)
+    );
+  });
 
 const Handlers = ({
   onPanGestureEvent,
@@ -386,11 +454,109 @@ const Handlers = ({
   );
 };
 
-const getImageSize = uri =>
-  new Promise((resolve, reject) => {
-    Image.getSize(
-      uri,
-      (width, height) => resolve({ width, height }),
-      err => reject(err)
-    );
-  });
+const BUG_OFFSET = Math.pow(10, -5);
+
+const Overlay = ({ cropper, container }) => {
+  return (
+    <View
+      style={{
+        ...StyleSheet.absoluteFill
+      }}
+    >
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.65)"
+        }}
+      />
+      <View
+        style={{
+          height: cropper.height,
+          flexDirection: "row"
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.65)"
+          }}
+        />
+        <View
+          style={{
+            width: cropper.width,
+            borderColor: colors.white,
+            borderWidth: 2,
+            borderStyle: "dashed",
+            borderRadius: 4,
+            margin: -1,
+            zIndex: 2,
+            justifyContent: "space-between"
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between"
+            }}
+          >
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                borderLeftWidth: 4,
+                borderTopWidth: 4,
+                borderColor: colors.white
+              }}
+            />
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                borderRightWidth: 4,
+                borderTopWidth: 4,
+                borderColor: colors.white
+              }}
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between"
+            }}
+          >
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                borderLeftWidth: 4,
+                borderBottomWidth: 4,
+                borderColor: colors.white
+              }}
+            />
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                borderRightWidth: 4,
+                borderBottomWidth: 4,
+                borderColor: colors.white
+              }}
+            />
+          </View>
+        </View>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.65)"
+          }}
+        />
+      </View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.65)"
+        }}
+      />
+    </View>
+  );
+};

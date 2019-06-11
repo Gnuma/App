@@ -21,7 +21,8 @@ export default class MainCamera extends Component {
       cameraStatusChange,
       takePicture,
       changeFlashMode,
-      openImagePicker
+      openImagePicker,
+      loading
     } = this.props;
 
     return (
@@ -40,6 +41,7 @@ export default class MainCamera extends Component {
           flashMode={flashMode}
           changeFlashMode={changeFlashMode}
           openImagePicker={openImagePicker}
+          loading={loading}
         />
       </View>
     );

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import {
   View,
-  ImageBackground,
   StyleSheet,
   ActivityIndicator,
   ImageEditor,
@@ -9,18 +8,15 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import { RNCamera } from "react-native-camera";
-import { Header2 } from "../components/Text";
-import CameraBottom from "../components/Camera/CameraBottom";
 import CameraHeader from "../components/Camera/CameraHeader";
 import * as sellActions from "../store/actions/sell";
 import colors from "../styles/colors";
-import ImageReviewer from "../components/Camera/ImageReviewer";
 import _ from "lodash";
-import update from "immutability-helper";
 import MainCamera from "../components/Camera/MainCamera";
-import { HiddenBar, TransparentBar } from "../components/StatusBars";
+import { TransparentBar } from "../components/StatusBars";
 import { SafeAreaView } from "react-navigation";
-import NewImageReviewr from "../components/Camera/NewImageReviewr";
+import ImageReviewer from "../components/Camera/ImageReviewer";
+import { ___BOOK_IMG_RATIO___ } from "../utils/constants";
 
 export class Camera extends Component {
   imgCounter = 5;
@@ -28,8 +24,9 @@ export class Camera extends Component {
 
   state = {
     flashMode: RNCamera.Constants.FlashMode.off,
-    status: 0, //0: can take photo; 1: loading; 2: accepting/rejecting
-    cameraStatus: null
+    loading: false,
+    cameraStatus: null,
+    loading: 0
   };
 
   openImagePicker = () => {
@@ -37,16 +34,16 @@ export class Camera extends Component {
   };
 
   takePicture = async () => {
-    if (this.camera && this.state.status == 0) {
+    if (this.camera && !this.state.loading) {
       if (this.imgCounter > 0) {
         this.setState({
-          status: 1
+          loading: true
         });
         await this.camera
           .takePictureAsync(options)
           .then(data => {
             this.setState(prevState => ({
-              status: 0
+              loading: false
             }));
             this.props.addReview(data);
             this.imgCounter--;
@@ -55,7 +52,7 @@ export class Camera extends Component {
           .catch(err => {
             console.log(err);
             this.setState({
-              status: 0
+              loading: false
             });
             this.camera.resumePreview();
           });
@@ -63,32 +60,29 @@ export class Camera extends Component {
     }
   };
 
-  handleReview = (isAccepted, img, offset, size) => {
+  handleReview = (isAccepted, img, offsetPercentage, sizePercentage) => {
     if (isAccepted) {
-      console.log(
-        img,
-        { x: img.width * offset.x, y: img.height * offset.y },
-        {
-          width: img.width * size.width,
-          height: img.height * size.height
-        }
-      );
+      const offset = {
+        x: Math.round(img.width * offsetPercentage.x),
+        y: Math.round(img.height * offsetPercentage.y)
+      };
+      const size = {
+        width: Math.round(img.width * sizePercentage.width),
+        height: Math.round(img.height * sizePercentage.height)
+      };
+      let displaySize = {
+        width: Math.min(IMAGE_MAX_WIDTH, size.width)
+      };
+      displaySize.height = displaySize.width * ___BOOK_IMG_RATIO___;
+
+      console.log(img, offset, size, displaySize);
       const uri = img.uri;
       ImageEditor.cropImage(
         uri,
         {
-          offset: {
-            x: Math.round(img.width * offset.x),
-            y: Math.round(img.height * offset.y)
-          },
-          size: {
-            width: Math.round(img.width * size.width),
-            height: Math.round(img.height * size.height)
-          },
-          displaySize: {
-            width: 300,
-            height: 400
-          }
+          offset,
+          size,
+          displaySize
         },
         uri => {
           ImageStore.getBase64ForTag(
@@ -107,10 +101,6 @@ export class Camera extends Component {
         }
       );
     }
-
-    this.setState(prevState => ({
-      status: 0
-    }));
     this.props.removeReview();
   };
 
@@ -142,7 +132,7 @@ export class Camera extends Component {
 
   render() {
     const isReviewing = !_.isEmpty(this.props.checking);
-    const { flashMode, loaded } = this.state;
+    const { flashMode, loading } = this.state;
     const { previews, previewsOrder } = this.props;
 
     return (
@@ -157,6 +147,7 @@ export class Camera extends Component {
               takePicture={this.takePicture}
               changeFlashMode={this.changeFlashMode}
               openImagePicker={this.openImagePicker}
+              loading={loading}
             />
           )}
           <CameraHeader
@@ -170,7 +161,7 @@ export class Camera extends Component {
           />
           <View style={{ flex: 1 }}>
             {isReviewing && (
-              <NewImageReviewr
+              <ImageReviewer
                 data={this.props.checking[0]}
                 setReviewOptions={this.setReviewOptions}
                 handleReview={this.handleReview}
@@ -244,3 +235,6 @@ const options = {
   //width: 1080,
   //skipProcessing: true
 };
+
+const IMAGE_MAX_HEIGHT = 1280;
+const IMAGE_MAX_WIDTH = 960;

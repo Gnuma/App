@@ -9,7 +9,8 @@ import {
   Dimensions,
   FlatList,
   ToastAndroid,
-  PermissionsAndroid
+  PermissionsAndroid,
+  StatusBar
 } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
@@ -208,7 +209,7 @@ export class ImagePicker extends Component {
     }
 
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingTop: StatusBar.currentHeight }}>
         <PickerHeader
           complete={this.complete}
           goBack={this.exitPicker}
