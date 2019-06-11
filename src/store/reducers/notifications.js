@@ -3,19 +3,14 @@ import { updateObject } from "../utility";
 import update from "immutability-helper";
 
 const initialState = {
-  notifications: {},
-  idSubscription: null
+  data: null,
+  orderedData: null,
+  error: null
 };
 
 const notificationsUpdate = (state, action) => {
   return updateObject(state, {
-    notifications: action.payload.notifications
-  });
-};
-
-const notificationsSubscribe = (state, action) => {
-  return updateObject(state, {
-    idSubscription: action.payload.idSubscription
+    data: action.payload.notifications
   });
 };
 
@@ -35,11 +30,9 @@ const notificationViewItem = (state, action) => {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
+    
     case actionTypes.NOTIFICATIONS_UPDATE:
       return notificationsUpdate(state, action);
-
-    case actionTypes.NOTIFICATIONS_SUBSCRIBE:
-      return notificationsSubscribe(state, action);
 
     case actionTypes.NOTIFICATIONS_UNSUBSCRIBE:
       return notificationsUnsubscribe(state, action);

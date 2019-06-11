@@ -9,16 +9,15 @@ import { bottomBar as bottomBarStyle, generalStyle } from "./styles";
 
 export class CameraBottom extends Component {
   render() {
-    const {
-      takePicture,
-      changeFlashMode,
-      flashMode,
-      handleGoNext
-    } = this.props;
+    const { takePicture, changeFlashMode, flashMode, loading } = this.props;
     return (
       <View style={bottomBarStyle.container}>
         <View style={bottomBarStyle.leftBox}>
-          <Button style={generalStyle.p10} onPress={changeFlashMode}>
+          <Button
+            style={generalStyle.p10}
+            onPress={changeFlashMode}
+            disabled={loading}
+          >
             <Icon
               name="bolt"
               size={30}
@@ -35,14 +34,12 @@ export class CameraBottom extends Component {
           <Button style={bottomBarStyle.captureBtn} onPress={takePicture} />
         </View>
         <View style={bottomBarStyle.rightBox}>
-          <Button style={generalStyle.p10} onPress={handleGoNext}>
-            <Icon
-              name="arrow-circle-right"
-              size={40}
-              style={{
-                color: colors.secondary
-              }}
-            />
+          <Button
+            onPress={this.props.openImagePicker}
+            style={generalStyle.w}
+            disabled={loading}
+          >
+            <Icon name="paperclip" size={30} style={generalStyle.w} />
           </Button>
         </View>
       </View>

@@ -8,13 +8,49 @@ import { Header1, Header3 } from "../components/Text";
 import Picker from "../components/TextInputPicker";
 import axios from "axios";
 import { ___OFFICE_HINTS_ENDPOINT___ } from "../store/constants";
+import { Subject, of } from "rxjs";
+import { switchMap, map, catchError } from "rxjs/operators";
+import { ajax } from "rxjs/ajax";
 
 export class InitProfile extends Component {
+  constructor(props) {
+    super(props);
+    this.officeQuery = new Subject().pipe(
+      switchMap(value =>
+        ajax
+          .post(___OFFICE_HINTS_ENDPOINT___, {
+            keyword: value
+          })
+          .pipe(
+            map(res => res.response.results),
+            catchError(error => of([]))
+          )
+      )
+    );
+  }
+
   state = {
     options: [],
     office: undefined,
     officeQueryValue: ""
   };
+
+  componentDidMount() {
+    this.querySubscription = this.officeQuery.subscribe(
+      options => {
+        console.log(options);
+        this.setState({ options });
+      },
+      err => {
+        console.log(err);
+        this.setState({ options: [] });
+      }
+    );
+  }
+
+  componentWillUnmount() {
+    this.querySubscription && this.querySubscription.unsubscribe();
+  }
 
   _onSelectOffice = office => {
     this.setState({
@@ -34,16 +70,7 @@ export class InitProfile extends Component {
     this.setState({
       officeQueryValue: text
     });
-    axios
-      .post(___OFFICE_HINTS_ENDPOINT___, {
-        keyword: text
-      })
-      .then(res => {
-        this.setState({
-          options: res.data.results
-        });
-      })
-      .catch(err => console.log(err));
+    this.officeQuery.next(text);
   };
 
   render() {

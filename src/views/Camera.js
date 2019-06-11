@@ -1,71 +1,107 @@
 import React, { Component } from "react";
-import { View, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  ImageEditor,
+  ImageStore
+} from "react-native";
 import { connect } from "react-redux";
 import { RNCamera } from "react-native-camera";
-import { Header2 } from "../components/Text";
-import CameraBottom from "../components/Camera/CameraBottom";
 import CameraHeader from "../components/Camera/CameraHeader";
 import * as sellActions from "../store/actions/sell";
-
-const imgWidth = 720;
-const imgHeight = 1280;
+import colors from "../styles/colors";
+import _ from "lodash";
+import MainCamera from "../components/Camera/MainCamera";
+import { TransparentBar } from "../components/StatusBars";
+import { SafeAreaView } from "react-navigation";
+import ImageReviewer from "../components/Camera/ImageReviewer";
+import { ___BOOK_IMG_RATIO___ } from "../utils/constants";
 
 export class Camera extends Component {
+  imgCounter = 5;
+  camera = null;
+
   state = {
-    flashMode: RNCamera.Constants.FlashMode.off
+    flashMode: RNCamera.Constants.FlashMode.off,
+    loading: false,
+    cameraStatus: null,
+    loading: 0
   };
 
-  componentDidMount() {
-    const { navigation } = this.props;
-    navigation.addListener("willFocus", () =>
-      this.setState({ focusedScreen: true })
-    );
-    navigation.addListener("willBlur", () =>
-      this.setState({ focusedScreen: false })
-    );
-  }
+  openImagePicker = () => {
+    this.props.navigation.navigate("ImagePicker");
+  };
 
-  render() {
-    const { flashMode } = this.state;
-    if (!this.state.focusedScreen) return <Header2>Booo</Header2>;
+  takePicture = async () => {
+    if (this.camera && !this.state.loading) {
+      if (this.imgCounter > 0) {
+        this.setState({
+          loading: true
+        });
+        await this.camera
+          .takePictureAsync(options)
+          .then(data => {
+            this.setState(prevState => ({
+              loading: false
+            }));
+            this.props.addReview(data);
+            this.imgCounter--;
+            //setTimeout(() => this.camera.resumePreview(), 500);
+          })
+          .catch(err => {
+            console.log(err);
+            this.setState({
+              loading: false
+            });
+            this.camera.resumePreview();
+          });
+      }
+    }
+  };
 
-    return (
-      <RNCamera
-        style={{ flex: 1 }}
-        type={RNCamera.Constants.Type.back}
-        flashMode={flashMode}
-        permissionDialogTitle={"Can I use your camera por favor?"}
-        permissionDialogMessage={"PLIZZZZ"}
-        captureAudio={false}
-      >
-        {this.getOverlay}
-      </RNCamera>
-    );
-  }
+  handleReview = (isAccepted, img, offsetPercentage, sizePercentage) => {
+    if (isAccepted) {
+      const offset = {
+        x: Math.round(img.width * offsetPercentage.x),
+        y: Math.round(img.height * offsetPercentage.y)
+      };
+      const size = {
+        width: Math.round(img.width * sizePercentage.width),
+        height: Math.round(img.height * sizePercentage.height)
+      };
+      let displaySize = {
+        width: Math.min(IMAGE_MAX_WIDTH, size.width)
+      };
+      displaySize.height = displaySize.width * ___BOOK_IMG_RATIO___;
 
-  getOverlay = ({ camera, status }) => {
-    if (status !== "READY") return <Header2>Waiting for permission</Header2>;
-    const { previews, previewsOrder } = this.props;
-    return (
-      <View style={{ flex: 1 }}>
-        <CameraHeader
-          previews={previews}
-          previewsOrder={previewsOrder}
-          handleGoBack={this.handleGoBack}
-          _reorderPreviews={this._reorderPreviews}
-          deleteItem={this.deleteItem}
-          previewsOrder={previewsOrder}
-        />
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
-          <CameraBottom
-            takePicture={() => this.takePicture(camera)}
-            flashMode={this.state.flashMode}
-            changeFlashMode={this.changeFlashMode}
-            handleGoNext={this.handleGoNext}
-          />
-        </View>
-      </View>
-    );
+      console.log(img, offset, size, displaySize);
+      const uri = img.uri;
+      ImageEditor.cropImage(
+        uri,
+        {
+          offset,
+          size,
+          displaySize
+        },
+        uri => {
+          ImageStore.getBase64ForTag(
+            uri,
+            base64 => {
+              this.props.takePreviewRedux({ base64, uri });
+              //this.props.addReview({ base64, uri });
+            },
+            () => {
+              console.warn("Err base64");
+            }
+          );
+        },
+        () => {
+          console.warn("Error while cropping preview");
+        }
+      );
+    }
+    this.props.removeReview();
   };
 
   handleGoNext = () => {
@@ -73,14 +109,12 @@ export class Camera extends Component {
   };
 
   changeFlashMode = () => {
-    if (this.state.flashMode === RNCamera.Constants.FlashMode.off)
-      this.setState({
-        flashMode: RNCamera.Constants.FlashMode.on
-      });
-    else
-      this.setState({
-        flashMode: RNCamera.Constants.FlashMode.off
-      });
+    this.setState(prevState => ({
+      flashMode:
+        prevState.flashMode === RNCamera.Constants.FlashMode.off
+          ? RNCamera.Constants.FlashMode.on
+          : RNCamera.Constants.FlashMode.off
+    }));
   };
 
   handleGoBack = () => {
@@ -89,41 +123,91 @@ export class Camera extends Component {
 
   deleteItem = index => {
     this.props.deletePreviewRedux(index);
+    this.imgCounter++;
   };
 
   _reorderPreviews = nextOrder => {
     this.props.setPreviewsOrderRedux(nextOrder);
   };
 
-  takePicture = async camera => {
+  render() {
+    const isReviewing = !_.isEmpty(this.props.checking);
+    const { flashMode, loading } = this.state;
+    const { previews, previewsOrder } = this.props;
+
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.fullBlack }}>
+        <View style={{ flex: 1 }}>
+          <TransparentBar />
+          {!isReviewing && (
+            <MainCamera
+              flashMode={flashMode}
+              initCamera={this.initCamera}
+              cameraStatusChange={this.cameraStatusChange}
+              takePicture={this.takePicture}
+              changeFlashMode={this.changeFlashMode}
+              openImagePicker={this.openImagePicker}
+              loading={loading}
+            />
+          )}
+          <CameraHeader
+            previews={previews}
+            previewsOrder={previewsOrder}
+            handleGoBack={this.handleGoBack}
+            _reorderPreviews={this._reorderPreviews}
+            deleteItem={this.deleteItem}
+            previewsOrder={previewsOrder}
+            handleGoNext={this.handleGoNext}
+          />
+          <View style={{ flex: 1 }}>
+            {isReviewing && (
+              <ImageReviewer
+                data={this.props.checking[0]}
+                setReviewOptions={this.setReviewOptions}
+                handleReview={this.handleReview}
+              />
+            )}
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  renderLoader = () => {
+    return (
+      <View
+        style={[
+          StyleSheet.absoluteFill,
+          { justifyContent: "center", alignItems: "center" }
+        ]}
+      >
+        <ActivityIndicator size="large" color={colors.secondary} />
+      </View>
+    );
+  };
+
+  initCamera = camera => {
     if (camera) {
-      const options = {
-        quality: 0.8,
-        base64: true,
-        width: imgWidth,
-        height: imgHeight,
-        orientation: "portrait",
-        fixOrientation: true,
-        forceUpOrientation: true
-      };
-      if (this.imgCounter !== -1) {
-        await camera
-          .takePictureAsync(options)
-          .then(data => {
-            console.log(data);
-            this.props.takePreviewRedux(data);
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      }
+      if (!this.camera)
+        this.setState({
+          cameraStatus: camera.getStatus()
+        });
+
+      this.camera = camera;
     }
+  };
+
+  cameraStatusChange = ({ cameraStatus }) => {
+    this.setState({
+      cameraStatus
+    });
   };
 }
 
 const mapStateToProps = state => ({
   previews: state.sell.previews,
-  previewsOrder: state.sell.previewsOrder
+  previewsOrder: state.sell.previewsOrder,
+  checking: state.sell.checking
 });
 
 const mapDispatchToProps = dispatch => {
@@ -131,7 +215,9 @@ const mapDispatchToProps = dispatch => {
     takePreviewRedux: data => dispatch(sellActions.takePreview(data)),
     setPreviewsOrderRedux: nextOrder =>
       dispatch(sellActions.setPreviewsOrder(nextOrder)),
-    deletePreviewRedux: index => dispatch(sellActions.deletePreview(index))
+    deletePreviewRedux: index => dispatch(sellActions.deletePreview(index)),
+    addReview: data => dispatch(sellActions.sellAddReview(data)),
+    removeReview: () => dispatch(sellActions.sellRemoveReview())
   };
 };
 
@@ -139,3 +225,16 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Camera);
+
+const options = {
+  quality: 1,
+  orientation: "portrait",
+  fixOrientation: true,
+  forceUpOrientation: true,
+  pauseAfterCapture: true
+  //width: 1080,
+  //skipProcessing: true
+};
+
+const IMAGE_MAX_HEIGHT = 1280;
+const IMAGE_MAX_WIDTH = 960;

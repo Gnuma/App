@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Keyboard } from "react-native";
+import { View, Keyboard, ToastAndroid, StyleSheet } from "react-native";
 import PropTypes from "prop-types";
 import CommentComposer from "./CommentComposer";
 import { Header2 } from "../Text";
@@ -11,12 +11,14 @@ import uuid from "uuid";
 import axios from "axios";
 import { ___CREATE_COMMENT___ } from "../../store/constants";
 import protectedAction from "../../utils/protectedAction";
+import NetInfo from "@react-native-community/netinfo";
 
 class QuipuComment extends Component {
   static propTypes = {
     data: PropTypes.array,
     sellerPK: PropTypes.number,
-    scrollTo: PropTypes.func
+    scrollTo: PropTypes.func,
+    newComments: PropTypes.object
   };
 
   constructor(props) {
@@ -39,19 +41,27 @@ class QuipuComment extends Component {
     const { value } = this.state;
     return (
       <View>
-        <CommentComposer
-          value={value}
-          onTextChange={this._handleComposing}
-          onSend={this._onSend}
-        />
-
+        {this.props.user.id !== this.props.sellerPK && (
+          <CommentComposer
+            value={value}
+            onTextChange={this._handleComposing}
+            onSend={() => this.send("question")}
+          />
+        )}
         <View>{this.state.data.map(this._renderMainComment)}</View>
       </View>
     );
   }
 
   _renderMainComment = (mainComment, index) => {
+    const hasNews = this.props.newComments[mainComment.pk];
     const isFocused = this.state.answeringComment === mainComment.pk;
+    let style = {};
+    if (isFocused) {
+      style = styles.focusedComment;
+    } else if (hasNews) {
+      style = styles.newComment;
+    }
     return (
       <View
         key={mainComment.pk}
@@ -62,28 +72,20 @@ class QuipuComment extends Component {
             isFocused && this.state.moveTo
           )
         }
-        style={
-          isFocused
-            ? {
-                borderColor: colors.secondary,
-                borderWidth: 2,
-                padding: 4,
-                borderRadius: 6
-              }
-            : null
-        }
+        style={style}
       >
         <Comment
           {...mainComment}
           isFather
           sellerPK={this.props.sellerPK}
           onAnswer={this._onAnswer}
+          userID={this.props.user.id}
         />
         {isFocused ? (
           <CommentComposer
             value={this.state.answeringValue}
             onTextChange={this._handleAnswereComposing}
-            onSend={this._onSendAnswer}
+            onSend={() => this.send("answer")}
           />
         ) : null}
         {index !== this.state.data.length - 1 ? (
@@ -95,8 +97,30 @@ class QuipuComment extends Component {
     );
   };
 
+  send = type => {
+    NetInfo.isConnected
+      .fetch()
+      .then(isConnected => {
+        if (isConnected) {
+          if (type === "question") this._onSend();
+          else this._onSendAnswer();
+        } else {
+          ToastAndroid.show(
+            "Nessuna connessione ad internet... Riporva più tardi",
+            ToastAndroid.SHORT
+          );
+        }
+      })
+      .catch(err => {
+        ToastAndroid.show(
+          "Nessuna connessione ad internet... Riporva più tardi",
+          ToastAndroid.SHORT
+        );
+      });
+  };
+
   _onAnswer = pk => {
-    //console.log(this.commentsPosition);
+    console.log("Position", this.commentsPosition, pk);
     if (this.commentsPosition[pk]) {
       this.setState({
         answeringComment: pk,
@@ -186,41 +210,52 @@ class QuipuComment extends Component {
     const content = this.state.value;
     protectedAction()
       .then(() => {
-        this.mainCommentQueue++;
-        //console.log(this.mainCommentQueue);
-        this.setState(
-          prevState => ({
-            value: "",
-            data: update(prevState.data, {
-              $unshift: [this.composeComment(prevState.value)]
-            })
-          }),
-          () => {
-            //send validation
-
-            axios
-              .post(___CREATE_COMMENT___, {
+        if (this.props.user.id === this.props.sellerPK) {
+          ToastAndroid.show(
+            "Non puoi creare delle domande alle tue inserzioni",
+            ToastAndroid.SHORT
+          );
+        } else {
+          this.mainCommentQueue++;
+          //console.log(this.mainCommentQueue);
+          this.setState(
+            prevState => ({
+              value: "",
+              data: update(prevState.data, {
+                $unshift: [this.composeComment(prevState.value)]
+              })
+            }),
+            () => {
+              //send validation
+              console.log("Creating Comment: ", {
                 type: "comment",
                 item: this.props.itemPK,
                 content: content
-              })
-              .then(res => {
-                console.log(res);
-                this.sendingConfirmation(0, null, {
-                  pk: res.data.pk,
-                  created_at: res.data.timestamp
-                  //content
-                });
-              })
-              .catch(err => {
-                console.warn(err);
-                console.log(err.response);
               });
+              axios
+                .post(___CREATE_COMMENT___, {
+                  type: "comment",
+                  item: this.props.itemPK,
+                  content: content
+                })
+                .then(res => {
+                  console.log(res);
+                  this.sendingConfirmation(0, null, {
+                    pk: res.data.pk,
+                    created_at: res.data.timestamp
+                    //content
+                  });
+                })
+                .catch(err => {
+                  console.warn(err);
+                  console.log(err.response);
+                });
 
-            this.commentsCreated++;
-            Keyboard.dismiss();
-          }
-        );
+              this.commentsCreated++;
+              Keyboard.dismiss();
+            }
+          );
+        }
       })
       .catch(() => {
         console.log("Not logged in");
@@ -276,3 +311,17 @@ class QuipuComment extends Component {
 }
 
 export default QuipuComment;
+
+const styles = StyleSheet.create({
+  focusedComment: {
+    borderColor: colors.secondary,
+    borderWidth: 2,
+    padding: 4,
+    borderRadius: 6
+  },
+  newComment: {
+    borderColor: colors.darkRed,
+    borderLeftWidth: 2,
+    padding: 2
+  }
+});

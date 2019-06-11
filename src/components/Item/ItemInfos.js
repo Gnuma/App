@@ -50,7 +50,7 @@ export const SecondaryInfo = props => {
       </View>
       <View style={styles.rightAlign}>
         <Header3 color={"black"}>{book.isbn}</Header3>
-        <Header3 color={"black"}>{book.subject}</Header3>
+        <Header3 color={"black"}>{book.subject.title}</Header3>
         <Header3 color={"black"}>{book.year}</Header3>
       </View>
     </View>

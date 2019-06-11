@@ -1,8 +1,7 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
 import NavigatorService from "../../navigator/NavigationService";
-import { setItem, getItem, removeItem, multiGet } from "../utility";
-import { connect as msgConnect } from "./messaging";
+import { setItem, removeItem, multiGet } from "../utility";
 import {
   ___LOGIN_ENDPOINT___,
   ___WHOAMI_ENDPOINT___,
@@ -10,10 +9,13 @@ import {
   ___SIGNUP_ENDPOINT___,
   ___INITUSER_ENDPOINT___
 } from "../constants";
-import {
-  notificationsSubscribe,
-  notificationsUnsubscribe
-} from "./notifications";
+import { notificationsUnsubscribe } from "./notifications";
+import WS from "../../utils/WebSocket";
+import { AutoStart } from "../../utils/constants";
+import CookieManager from "react-native-cookies";
+import { commentsClear } from "./comments";
+import { messagingClear } from "../actions/messaging";
+import { chatClear } from "./chat";
 
 const isOffline = false;
 
@@ -33,6 +35,12 @@ export const authAppInit = (office, isSaving) => {
 export const authStart = () => {
   return {
     type: actionTypes.AUTH_START
+  };
+};
+
+export const authCompleted = () => {
+  return {
+    type: actionTypes.AUTH_COMPLETED
   };
 };
 
@@ -72,21 +80,10 @@ export const authFail = error => {
   };
 };
 
-export const authLogin = (username, password, resolve) => {
-  return dispatch => {
-    dispatch(authStart());
-    if (isOffline) {
-      //Offline
-      if (username === "Test" && password === "testuserpwd") {
-        const token = "tokenTest";
-        dispatch(loginSuccess(token));
-        resolve ? resolve(token) : null;
-        NavigatorService.goBack(null);
-      } else {
-        dispatch(authFail("Invalid authentication"));
-      }
-    } else {
-      //Online
+export const authLogin = (username, password) => {
+  return (dispatch, getState) => {
+    return new Promise(function(resolve, reject) {
+      dispatch(authStart());
       axios
         .post(___LOGIN_ENDPOINT___, {
           username,
@@ -94,64 +91,76 @@ export const authLogin = (username, password, resolve) => {
         })
         .then(res => {
           const token = res.data.key;
-          console.log(res);
-          dispatch(loginSuccess(token));
-          dispatch(notificationsSubscribe());
-          resolve ? resolve(token) : null;
-          NavigatorService.navigate("App");
-
+          axios
+            .get(___WHOAMI_ENDPOINT___, {
+              headers: {
+                Authorization: "Token " + token
+              }
+            })
+            .then(res => {
+              if (!res.data.gnuma_user) throw "Gnuma User not initialized";
+              login({ dispatch, token, resolve, data: res.data });
+            })
+            .catch(err => {
+              console.log("Error -> ", err);
+              dispatch(authFail(err));
+              reject(err);
+            });
         })
         .catch(err => {
+          console.log(err);
           dispatch(authFail(err));
+          reject(err);
         });
-    }
+    });
   };
 };
 
 export const autoLogin = () => {
-  return dispatch => {
-    dispatch(authStart());
-    multiGet([tokenKey, officeKey]).then(userInfos => {
-      //console.log(userInfos);
-      const token = userInfos[0][1];
-      const office = userInfos[1][1];
+  return (dispatch, getState) => {
+    return new Promise(function(resolve, reject) {
+      if (getState().auth.token) return resolve(AutoStart.logged);
+      dispatch(authStart());
+      multiGet([tokenKey, officeKey])
+        .then(userInfos => {
+          //console.log(userInfos);
+          const token = userInfos[0][1];
+          const office = userInfos[1][1];
 
-      if (token !== null) {
-        axios
-          .get(___WHOAMI_ENDPOINT___, {
-            headers: {
-              Authorization: "Token " + token
+          if (token !== null) {
+            axios
+              .get(___WHOAMI_ENDPOINT___, {
+                headers: {
+                  Authorization: "Token " + token
+                }
+              })
+              .then(res => {
+                if (!res.data.gnuma_user) throw "Gnuma User not initialized";
+                login({ dispatch, token, resolve, data: res.data });
+              })
+              .catch(err => {
+                console.log("Error -> ", err);
+                dispatch(authFail(err));
+                reject(AutoStart.anonymous);
+              });
+          } else {
+            dispatch(authFail("Token not found"));
+            if (office !== null) {
+              //Office Set but no login
+              dispatch(authAppInit(office, false));
+              reject(AutoStart.anonymous);
+            } else {
+              //No Login And no Office: First time start
+              dispatch(authFail("Office not set"));
+              reject(AutoStart.firstTime);
             }
-          })
-          .then(res => {
-            if (!res.data.gnuma_user) throw "Gnuma User not initialized";
-            dispatch(
-              loginSuccess(
-                token,
-                res.data.username,
-                res.data.gnuma_user,
-                res.data.pk
-              )
-            );
-            dispatch(msgConnect(res.data.pk));
-            dispatch(notificationsSubscribe());
-          })
-          .catch(err => {
-            dispatch(authFail(err));
-          });
-        NavigatorService.navigate("Home");
-      } else {
-        dispatch(authFail("Token not found"));
-        if (office !== null) {
-          //Office Set but no login
-          dispatch(authAppInit(office, false));
-          NavigatorService.navigate("Home");
-        } else {
-          //No Login And no Office: First time start
-          dispatch(authFail("Office not set"));
-          NavigatorService.navigate("InitProfile");
-        }
-      }
+          }
+        })
+        .catch(err => {
+          console.log("Error in storage: ", err);
+          dispatch(authFail(err));
+          reject(AutoStart.firstTime);
+        });
     });
   };
 };
@@ -159,57 +168,80 @@ export const autoLogin = () => {
 export const authLogout = () => {
   return dispatch => {
     //dispatch(authStart());
-    dispatch(logoutSuccess());
     axios
       .post(___LOGOUT_ENDPOINT___)
-      .then(() => {
-        dispatch(notificationsUnsubscribe());
-        dispatch(logoutSuccess());
+      .then(res => {
+        console.log(res);
       })
       .catch(err => {
-        //dispatch(authFail(err));
+        dispatch(authFail(err));
       });
+
+    dispatch(commentsClear());
+    dispatch(chatClear());
+    messagingClear();
+    WS.close();
+    dispatch(logoutSuccess());
   };
 };
 
-export const authSignup = (username, email, password1, password2, resolve) => {
+export const authSignup = (username, email, password1, password2) => {
   return dispatch => {
-    dispatch(authStart());
-    console.log("INIZIO");
-    if (isOffline) {
-      console.log(username, email, password1, password2);
-    } else {
-      axios
-        .post(___SIGNUP_ENDPOINT___, {
-          username: username,
-          email: email,
-          password1: password1,
-          password2: password2
-        })
-        .then(res => {
-          const token = res.data.key;
-          axios
-            .post(___INITUSER_ENDPOINT___, {
-              key: token,
-              classM: "5B",
-              office: "J. Von Neumann"
-            })
-            .then(res => {
-              dispatch(loginSuccess(token));
-              dispatch(notificationsSubscribe());
-              resolve ? resolve(token) : null;
-              NavigatorService.goBack(null);
-
-            })
-            .catch(err => {
-              dispatch(authFail(err));
-              console.log("DENTRO");
-            });
-        })
-        .catch(err => {
-          dispatch(authFail(err));
-          console.log("FUORI");
-        });
-    }
+    return new Promise(function(resolve, reject) {
+      dispatch(authStart());
+      console.log("INIZIO");
+      if (isOffline) {
+        console.log(username, email, password1, password2);
+      } else {
+        axios
+          .post(___SIGNUP_ENDPOINT___, {
+            username: username,
+            email: email,
+            password1: password1,
+            password2: password2
+          })
+          .then(res => {
+            const token = res.data.key;
+            axios
+              .post(___INITUSER_ENDPOINT___, {
+                key: token,
+                classM: "5B",
+                office: "J. Von Neumann"
+              })
+              .then(res => {
+                login({ dispatch, resolve, token });
+                //NavigatorService.goBack(null);
+              })
+              .catch(err => {
+                dispatch(authFail(err));
+                console.log("DENTRO");
+                reject(err);
+              });
+          })
+          .catch(err => {
+            dispatch(authFail(err));
+            console.log("FUORI");
+            reject(err);
+          });
+      }
+    });
   };
+};
+
+const login = async ({ dispatch, resolve, token, data }) => {
+  await CookieManager.clearAll();
+
+  console.log("Logging in...", token);
+  if (!token) {
+    console.log("ERROR NOT SET IN LOGIN");
+    throw "Error not set in login";
+  }
+
+  if (data) {
+    dispatch(loginSuccess(token, data.username, data.gnuma_user, data.pk));
+  } else {
+    dispatch(loginSuccess(token));
+  }
+
+  WS.init(token, resolve);
 };

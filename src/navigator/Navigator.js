@@ -11,16 +11,17 @@ import HomeScreen from "../views/Home";
 import ItemScreen from "../views/Item";
 import VendiScreen from "../views/Vendi";
 import AppLoaderScreen from "../views/AppLoader";
-//import LoginScreen from "../views/Auth/Login";
-//import SignupScreen from "../views/Auth/Signup";
 import Auth from "../views/Auth/Auth";
 import CameraScreen from "../views/Camera";
 import SelectBookScreen from "../views/SelectBook";
 import VendiInfosScreen from "../views/VendiInfos";
-import ChatHomeScreen from "../views/ChatHome";
-import SingleChatScreen from "../views/SingleChat";
 import InitProfileScreen from "../views/InitProfile";
 import CreateBookScreen from "../views/CreateBook";
+import SalesListScreen from "../views/SalesList";
+import ChatScreen from "../views/Chat";
+import BookOffertScreen from "../views/BookOffert";
+import ShoppingListScreen from "../views/ShoppingList";
+import ImagePickerScreen from "../views/ImagePicker";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -44,37 +45,7 @@ const SearchNavigator = {
   })
 };
 
-const VendiNavigator = {
-  screen: createStackNavigator(
-    {
-      Camera: {
-        screen: CameraScreen,
-        path: "/vendi/camera"
-      },
-      SelectBook: {
-        screen: SelectBookScreen,
-        path: "/vendi/selectbook"
-      },
-      VendiInfos: {
-        screen: VendiInfosScreen,
-        path: "/vendi/vendiinfos"
-      },
-      CreateBook: {
-        screen: CreateBookScreen,
-        path: "/vendi/createbook"
-      }
-    },
-    {
-      defaultNavigationOptions: {
-        header: null
-      }
-    }
-  ),
-  navigationOptions: {
-    tabBarVisible: false
-  }
-};
-
+/*
 const ChatNavigator = {
   screen: createStackNavigator(
     {
@@ -104,6 +75,7 @@ ChatNavigator.navigationOptions = ({ navigation }) => {
 
   return navigationOptions;
 };
+*/
 
 const InitProfileNavigator = {
   screen: createStackNavigator(
@@ -121,38 +93,125 @@ const InitProfileNavigator = {
   )
 };
 
-/*
-const AuthNavigator = {
+const VendiNavigator = {
   screen: createStackNavigator(
     {
-      Signup: {
-        screen: SignupScreen,
-        path: "/signup"
+      Camera: {
+        screen: CameraScreen,
+        path: "/vendi/camera"
       },
-      Login: {
-        screen: LoginScreen,
-        path: "/login"
+      ImagePicker: {
+        screen: ImagePickerScreen,
+        path: "/vendi/imagepicker"
+      },
+      SelectBook: {
+        screen: SelectBookScreen,
+        path: "/vendi/selectbook"
+      },
+      VendiInfos: {
+        screen: VendiInfosScreen,
+        path: "/vendi/vendiinfos"
+      },
+      CreateBook: {
+        screen: CreateBookScreen,
+        path: "/vendi/createbook"
       }
     },
     {
       defaultNavigationOptions: {
         header: null
-      },
-      initialRouteName: "Signup",
-      initialRouteKey: "startingAuth"
+      }
     }
-  ),
-  navigationOptions: {
-    tabBarVisible: false
-  }
+  )
 };
-*/
+
+const ChatNavigator = createStackNavigator(
+  {
+    Chat: ChatScreen,
+    BookOffert: BookOffertScreen
+  },
+  {
+    defaultNavigationOptions: {
+      header: null
+    }
+  }
+);
+
+const SalesNavigator = createStackNavigator(
+  {
+    SalesList: SalesListScreen,
+    SaleChat: {
+      screen: ChatNavigator,
+      path: "/sales/:chatID"
+    }
+  },
+  {
+    defaultNavigationOptions: {
+      header: null
+    }
+  }
+);
+
+const SalesStack = createStackNavigator(
+  {
+    SalesList: SalesNavigator,
+    Vendi: VendiNavigator
+  },
+  {
+    backBehavior: "order",
+    resetOnBlur: false,
+    defaultNavigationOptions: {
+      header: null
+    }
+  }
+);
+
+SalesStack.navigationOptions = ({ navigation }) => {
+  const { routeName, routes, index } = navigation.state.routes[
+    navigation.state.index
+  ];
+  console.log(navigation.state.routes[navigation.state.index]);
+  //console.log(key, navigation.state.routes[navigation.state.index]);
+  let navigationOptions = {};
+  if (routeName === "Vendi" || routes[index].routeName === "SaleChat") {
+    navigationOptions.tabBarVisible = false;
+  }
+
+  return navigationOptions;
+};
+
+const ShoppingNavigator = createStackNavigator(
+  {
+    ShoppingList: ShoppingListScreen,
+    ShoppingChat: {
+      screen: ChatNavigator,
+      path: "/shopping/:chatID"
+    }
+  },
+  {
+    defaultNavigationOptions: {
+      header: null
+    }
+  }
+);
+
+ShoppingNavigator.navigationOptions = ({ navigation }) => {
+  const focus = navigation.state.routes[navigation.state.index];
+
+  let navigationOptions = {};
+  if (focus.routeName === "ShoppingChat") {
+    navigationOptions.tabBarVisible = false;
+  }
+
+  return navigationOptions;
+};
 
 const AppStack = createBottomTabNavigator(
   {
     SEARCH: SearchNavigator,
-    VENDI: VendiNavigator,
-    CHAT: ChatNavigator
+    SALES: SalesStack,
+    SHOPPING: ShoppingNavigator
+    //CHAT: ShoppingNavigator
   },
   {
     tabBarComponent: TabBar

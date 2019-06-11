@@ -1,5 +1,6 @@
 import { NavigationActions } from "react-navigation";
 import store from "../store/store";
+
 let _navigator;
 
 function setTopLevelNavigator(navigatorRef) {
@@ -14,6 +15,10 @@ function navigate(routeName, params, key) {
       key
     })
   );
+}
+
+function dispatch(action) {
+  _navigator.dispatch(action);
 }
 
 function goBack(key) {
@@ -48,5 +53,6 @@ export default {
   navigate,
   setTopLevelNavigator,
   protectedNavigation,
-  goBack
+  goBack,
+  dispatch
 };

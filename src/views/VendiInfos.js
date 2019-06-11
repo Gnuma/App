@@ -5,8 +5,8 @@ import { connect } from "react-redux";
 import ItemHeader from "../components/Item/ItemHeader";
 import MainSell from "../components/Sell/MainSell";
 import * as sellActions from "../store/actions/sell";
-import { Header2 } from "../components/Text";
 import colors from "../styles/colors";
+import protectedAction from "../utils/protectedAction";
 
 export class VendiInfos extends Component {
   state = {
@@ -62,8 +62,28 @@ export class VendiInfos extends Component {
   };
 
   _handleComplete = () => {
-    if (this.props.price && this.props.description && this.props.conditions !== undefined) {
-      this.props.submitRedux();
+    if (
+      this.props.price &&
+      this.props.description &&
+      this.props.conditions !== undefined
+    ) {
+      protectedAction()
+        .then(() => {
+          this.props
+            .submitRedux()
+            .then(() => {
+              //this.props.navigation.dispatch(StackActions.popToTop());
+              //console.log(SwitchActions.jumpTo({ routeName: "SalesList" }));
+              //this.props.navigation.dispatch(
+              //  SwitchActions.jumpTo({ routeName: "SalesList" })
+              //);
+              this.props.navigation.navigate("SalesList");
+            })
+            .catch(err => {
+              console.log("Nope.", err);
+            });
+        })
+        .catch(() => console.log("Need to be logged in"));
     }
   };
 }

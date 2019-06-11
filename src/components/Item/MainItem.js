@@ -1,24 +1,43 @@
 import React, { Component } from "react";
-import { View, StyleSheet, ScrollView, InteractionManager } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  InteractionManager,
+  Animated,
+  Dimensions
+} from "react-native";
 import { MainItemStyles as styles } from "./styles";
 import { PrimaryInfo, DescriptionInfo, SecondaryInfo } from "./ItemInfos";
 import SellerInfo from "./SellerInfo";
 import ImageSlider from "./ImageSlider";
 import Divider from "../Divider";
 import QuipuComment from "../Comments/QuipuComment";
+import ContactButton from "./ContactButton";
 
 export class MainItem extends Component {
-  componentDidMount() {
-    console.log(this.props.goToComment());
-    if (this.props.goToComment && this.props.goToComment()) {
-      InteractionManager.runAfterInteractions(() => {
-        this.comments._onAnswer(this.props.goToComment());
-      });
+  state = {
+    scrollY: new Animated.Value(0),
+    viewHeight: this.props.viewHeight,
+    contactButtonHeight: 50,
+    contactSnapY: 1500
+  };
+
+  scrollEvent = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: this.state.scrollY } } }],
+    {
+      useNativeDriver: true
     }
-  }
+  );
+
+  setContactButtonHeight = contactButtonHeight => {
+    this.setState({
+      contactButtonHeight
+    });
+  };
 
   render() {
-    const { data, user } = this.props;
+    const { data, user, newComments } = this.props;
     const primaryData = {
       price: data.price,
       conditions: data.condition,
@@ -28,17 +47,35 @@ export class MainItem extends Component {
     const secondaryData = {
       book: data.book
     };
+    console.log(data.seller);
 
     return (
-      <ScrollView
+      <Animated.ScrollView
         style={styles.scrollView}
         keyboardShouldPersistTaps={"handled"}
         ref={component => (this.scrollView = component)}
+        onScroll={this.scrollEvent}
+        onLayout={event =>
+          this.setState({
+            viewHeight: event.nativeEvent.layout.height
+          })
+        }
+        scrollEventThrottle={1}
       >
         <ImageSlider style={styles.imageSlider} data={data.image_ad} />
         <View style={styles.content} onLayout={this._setContainerOffset}>
           <PrimaryInfo data={primaryData} />
           <SellerInfo data={sellerData} />
+          <View
+            style={{
+              height: this.state.contactButtonHeight,
+              marginVertical: 10
+            }}
+            onLayout={event => {
+              this.setState({ contactSnapY: event.nativeEvent.layout.y });
+              console.log(event.nativeEvent);
+            }}
+          />
           <Divider style={styles.bigDivider} />
           <DescriptionInfo data={data.description} />
           <Divider style={styles.smallDivider} />
@@ -47,15 +84,23 @@ export class MainItem extends Component {
           {/*data.comments*/ true ? (
             <QuipuComment
               data={data.comment_ad}
-              sellerPK={data.seller.user.pk}
+              sellerPK={data.seller._id}
               scrollTo={this._scrollTo}
               ref={comments => (this.comments = comments)}
               user={user}
               itemPK={data.pk}
+              newComments={newComments}
             />
           ) : null}
         </View>
-      </ScrollView>
+        <ContactButton
+          onContact={this.props.onContact}
+          scrollY={this.state.scrollY}
+          viewHeight={this.state.viewHeight}
+          setContactButtonHeight={this.setContactButtonHeight}
+          contactSnapY={this.containerOffset + this.state.contactSnapY}
+        />
+      </Animated.ScrollView>
     );
   }
 
@@ -63,7 +108,7 @@ export class MainItem extends Component {
     //console.log(y);
     console.log(y);
     y += this.containerOffset;
-    this.scrollView.scrollTo({ x: 0, y, animated: true });
+    this.scrollView.getNode().scrollTo({ x: 0, y, animated: true });
   };
 
   _setContainerOffset = event => {

@@ -13,14 +13,6 @@ import colors from "../../styles/colors";
 const IS_IOS = Platform.OS === "ios";
 
 export class ImageSlider extends Component {
-  data = [
-    require("../../media/imgs/matematicaVerde.jpeg"),
-    require("../../media/imgs/CorsaroNero.jpeg"),
-    require("../../media/imgs/sezioneAurea.jpeg"),
-    require("../../media/imgs/GuerraMondiale.jpeg"),
-    require("../../media/imgs/mockHomeBook.png")
-  ];
-
   _renderItem = ({ item, index }, parallaxProps) => {
     return (
       <View
@@ -31,7 +23,7 @@ export class ImageSlider extends Component {
         }}
       >
         <ParallaxImage
-          source={{ uri: item }}
+          source={/*mockData[0]*/ { uri: item }}
           containerStyle={{
             flex: 1,
             marginBottom: IS_IOS ? 0 : -1, // Prevent a random Android rendering issue
@@ -58,7 +50,7 @@ export class ImageSlider extends Component {
       <View style={[this.props.style]}>
         <Carousel
           ref={c => (this.slider = c)}
-          data={data}
+          data={data /*mockData*/}
           renderItem={this._renderItem}
           sliderWidth={sliderWidth}
           itemWidth={itemWidth}
@@ -101,3 +93,11 @@ const styles = StyleSheet.create({
     );
   };
 */
+
+const mockData = [
+  require("../../media/imgs/matematicaVerde.jpeg"),
+  require("../../media/imgs/CorsaroNero.jpeg"),
+  require("../../media/imgs/sezioneAurea.jpeg"),
+  require("../../media/imgs/GuerraMondiale.jpeg"),
+  require("../../media/imgs/mockHomeBook.png")
+];

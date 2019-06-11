@@ -1,90 +1,105 @@
 import React, { Component } from "react";
-import { View, Dimensions, FlatList } from "react-native";
+import {
+  View,
+  Dimensions,
+  FlatList,
+  TouchableWithoutFeedback,
+  StyleSheet
+} from "react-native";
 import colors from "../../styles/colors";
-import { Header2, Header3 } from "../Text";
+import { Header2, Header3, Header4 } from "../Text";
 import memoize from "memoize-one";
 import SolidButton from "../SolidButton";
+import Button from "../Button";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { ChatType } from "../../utils/constants";
+import { TouchableNativeFeedback } from "react-native-gesture-handler";
+
 export default class NotificationCenter extends Component {
   filter = memoize(data => this.formatNotifications(data));
 
-  formatNotifications = data => {
-    return Object.keys(data).map(function(key) {
-      return data[key];
-    });
-  };
-
   _keyExtractor = item => {
-    return item.itemPK.toString();
+    return item.toString();
   };
 
   _renderItem = ({ item, index }) => {
-    const singleComment = item.commentPK !== null;
-    const text = singleComment
-      ? "Nuova domanda su " + item.book
-      : "Nuove domande su " + item.book;
+    const data = this.props.data[item];
+
+    const text = "Hai dei nuovi commenti su ";
+    const bookTitle = data.item.book.title;
     return (
       <SolidButton
         style={{
-          margin: 4
+          marginHorizontal: 10,
+          marginVertical: 5
         }}
         icon="chevron-circle-right"
         iconSize={20}
         iconStyle={{
-          color: colors.darkRed
+          color: colors.secondary
         }}
-        onPress={() =>
-          this.props.commentHandler(item.itemPK, item.book, item.commentPK)
-        }
+        onPress={() => this.props.commentHandler(data.item.pk, data.item.book)}
       >
-        <Header3 color="black" style={{ fontSize: 17 }}>
+        <Header3 color="black" style={{ fontSize: 17 }} numberOfLines={1}>
           {text}
+          <Header3 color="secondary">{bookTitle}</Header3>
         </Header3>
       </SolidButton>
     );
   };
 
   render() {
-    const data = this.props.data;
-    const arrayData = this.filter(data);
+    const { data, orderedData, isActive, show } = this.props;
 
     return (
-      <View
-        style={{
-          marginHorizontal: 20,
-          marginBottom: 10
-        }}
-      >
-        <Header2 color={"primary"} style={{ marginLeft: 20 }}>
-          Notifiche
-        </Header2>
-        <FlatList
-          contentContainerStyle={{
-            backgroundColor: colors.white
-          }}
-          renderItem={this._renderItem}
-          data={arrayData}
-          keyExtractor={this._keyExtractor}
-        />
+      <View>
+        <View style={{ alignItems: "center" }}>
+          <Button
+            style={{
+              padding: 10,
+              borderRadius: 6,
+              borderBottom: 0,
+              backgroundColor: colors.white,
+              elevation: 2
+            }}
+            onPress={show}
+          >
+            <Icon name={"bell"} size={24} style={{ color: colors.darkRed }} />
+          </Button>
+        </View>
+        {isActive ? (
+          <View>
+            <View
+              style={{
+                position: "absolute",
+                marginTop: -10
+              }}
+            >
+              <View
+                style={{
+                  elevation: 2,
+                  paddingVertical: 3,
+                  marginHorizontal: 20,
+                  marginVertical: 4,
+                  backgroundColor: colors.white,
+                  borderRadius: 6,
+                  maxHeight: 300
+                }}
+              >
+                <TouchableWithoutFeedback style={StyleSheet.absoluteFill}>
+                  <FlatList
+                    renderItem={this._renderItem}
+                    data={orderedData}
+                    extraData={data}
+                    keyExtractor={this._keyExtractor}
+                    onStartShouldSetResponderCapture={() => true}
+                  />
+                </TouchableWithoutFeedback>
+              </View>
+            </View>
+          </View>
+        ) : null}
       </View>
     );
   }
 }
-
-/*
-    console.log(batch);
-    let data = {};
-    for (let i = 0; i < batch.length; i++) {
-      const fatherPK =
-        batch[i].fatherPK !== undefined ? batch[i].fatherPK : batch[i].pk;
-      //data[fatherPK][batch[i].pk] = batch[i];
-
-      if (data[fatherPK]) {
-        data[fatherPK][batch[i].pk] = batch[i];
-      } else {
-        data[fatherPK] = {};
-        data[fatherPK][batch[i].pk] = batch[i];
-      }
-    }
-    console.log(data);
-    return data;
-    */

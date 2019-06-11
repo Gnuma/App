@@ -1,235 +1,90 @@
-import firebase from "react-native-firebase";
-import * as actionTypes from "./actionTypes";
-import { mockChatLink, mockMessages } from "../../mockData/Chat";
-const isOffline = false;
+import { ChatType } from "../../utils/constants";
+import NetInfo from "@react-native-community/netinfo";
+import {
+  shoppingConfirmMsg,
+  shoppingSendMsg,
+  shoppingRetrieveData,
+  shoppingStartGlobalAction
+} from "./shopping";
+import uuid from "uuid";
+import {
+  salesConfirmMsg,
+  salesSendMsg,
+  salesRetrieveData,
+  salesStartGlobalAction
+} from "./sales";
+import { chatConfirmMsg, chatSendMsg, chatStartGlobalAction } from "./chat";
+import { sellerChatList, buyerChatList2 } from "../../mockData/Chat2";
+import axios from "axios";
+import { ___SEND_MESSAGE___ } from "../constants";
 
-export const msgConnect = userID => {
-  return {
-    type: actionTypes.MSG_CONNECT,
-    payload: {
-      userID
-    }
-  };
-};
-/*
-export const msgListenToChats = (chatRef, type) => {
-  return {
-    type: actionTypes.MSG_LISTENTOCHATS,
-    payload: {
-      chatRef,
-      type
-    }
-  };
-};
-*/
-//Test
-export const msgChatUpdate = (chatID, chatData, type) => {
-  return {
-    type: actionTypes.MSG_CHATUPDATE,
-    payload: {
-      chatID,
-      chatData,
-      type
-    }
-  };
-};
+let queue = [];
 
-export const msgMessagesUpdate = (chatID, messages) => {
-  return {
-    type: actionTypes.MSG_MESSAGESUPDATE,
-    payload: {
-      chatID,
-      messages
-    }
-  };
-};
-
-export const msgDisconnect = () => {
-  return {
-    type: actionTypes.MSG_DISCONNECT,
-    payload: {}
-  };
-};
-
-export const msgFail = error => {
-  return {
-    type: actionTypes.MSG_FAIL,
-    payload: {
-      error
-    }
-  };
-};
-
-export const msgSend = (content, chatID) => {};
-
-const _subscribeChats = (ref, type, dispatch) => {
-  ref.onSnapshot(chatsSnapshot => {
-    chatsSnapshot.forEach(chat => {
-      console.log("Subscribing to chat");
-      dispatch(msgChatUpdate(chat.id, chat.data(), type));
-    });
-  });
-};
-
-const _subscribeMessages = (ref, dispatch) => {
-  ref.get().then(chatsSnapshot => {
-    chatsSnapshot.forEach(chatDoc => {
-      const users = {
-        buyer: chatDoc.data().buyer,
-        seller: chatDoc.data().seller
-      };
-      chatDoc.ref
-        .collection("messages")
-        .orderBy("timestamp", "ASC")
-        .onSnapshot(messagesSnapshot => {
-          let messages = [];
-          messagesSnapshot.forEach(newMessage => {
-            messages.unshift(parseMessage(newMessage, users));
-          });
-          dispatch(msgMessagesUpdate(chatDoc.id, messages));
-        });
-    });
-  });
-};
-
-export const contact = (itemID, toID, toUsername) => {
+export const sendMessage = (type, objectID, chatID) => {
   return (dispatch, getState) => {
-    const { id, username } = getState().auth;
-    const db = firebase.firestore().collection("chats");
-    db.doc().set({
-      buyer: {
-        id,
-        name: username
-      },
-      seller: {
-        id: toID,
-        name: toUsername
-      },
-      status: "pending",
-      item: itemID
-    });
-  };
-};
+    const myID = getState().auth.id;
+    const content = getState().chat.data[objectID].chats[chatID].composer;
+    const msg = createMsg(content, myID);
 
-export const connect = userID => {
-  return dispatch => {
-    if (isOffline) {
-      dispatch(msgChatUpdate("AAA", mockChatLink, "buyerChats"));
-      dispatch(msgMessagesUpdate("AAA", mockMessages));
-    } else {
-      console.log("Connecting with fb with " + userID);
-      dispatch(msgConnect(userID));
-
-      const db = firebase.firestore().collection("chats");
-
-      const buyerChatsRef = db.where("buyer.id", "==", userID);
-      const sellerChatsRef = db.where("seller.id", "==", userID);
-
-      _subscribeChats(buyerChatsRef, "buyerChats", dispatch);
-      _subscribeChats(sellerChatsRef, "sellerChats", dispatch);
-      //dispatch(msgConnect(c_buyerUnsubscriber.toString(), "buyerChats"));
-      //dispatch(msgConnect(c_sellerUnsubscriber.toString(), "sellerChats"));
-      _subscribeMessages(buyerChatsRef, dispatch);
-      _subscribeMessages(sellerChatsRef, dispatch);
-    }
-  };
-};
-
-const onNewChats = (query, type, dispatch) => {};
-
-const parseMessage = (snapshot, users) => {
-  const { timestamp: strTimestamp, content, sender } = snapshot.data();
-  const { id: _id } = snapshot;
-  const timestamp = new Date(strTimestamp);
-  return {
-    _id,
-    createdAt: timestamp,
-    text: content,
-    user: {
-      _id: users[sender].id,
-      name: users[sender].name
-    }
-  };
-};
-
-/*
-    buyerChatsRef.onSnapshot(chats => {
-      //dispatch(updateChats(chat, "buyer"));
-      console.log("Updading Chats => " + chats.size);
-      chats.forEach(chat => {
-        console.log("Updating Chat => " + chat.id);
-        chat.ref
-          .collection("messages")
-          .limit(10)
-          .onSnapshot(messages => {
-            console.log("Updating Messages => " + messages.size);
-            messages.forEach(message => console.log(message.data()));
+    console.log(type, objectID, chatID);
+    dispatch(chatSendMsg(objectID, chatID, msg, type));
+    //Connection check
+    NetInfo.isConnected.fetch().then(isConnected => {
+      if (isConnected) {
+        //API
+        axios
+          .post(___SEND_MESSAGE___, {
+            chat: chatID,
+            content: content
+          })
+          .then(res => {
+            console.log(res);
+            dispatch(
+              chatConfirmMsg(objectID, chatID, msg._id, {
+                isSending: false,
+                _id: uuid.v4()
+              })
+            );
+          })
+          .catch(err => {
+            console.log(err);
           });
-      });
-    });
-    
-    buyerChatsRef.get().then(chats => {
-      chats.forEach(chat => {
-        chat.ref
-          .collection("messages")
-          .orderBy("date", "desc")
-          .limit(5)
-          .get()
-          .then(messagesRefs => {
-            messagesRefs.forEach(message => console.log(message.data()));
-          });
-      });
-    });
-    */
-//sellerChatsRef.onSnapshot(chats => {
-//dispatch(updateChats(chat, "seller"));
-//  chats.forEach(chat => console.log(chat.data()));
-//});
-
-/*
-  query.get().then(chats => {
-    chats.forEach(chat => {
-      chat.ref
-        .collection("messages")
-        .orderBy("date", "desc")
-        .limit(5)
-        .get()
-        .then(messagesRefs => {
-          let initialMessages = [];
-          messagesRefs.forEach(msgSnapshot => {
-            initialMessages.unshift(parseMessage(msgSnapshot));
-          });
-          return initialMessages;
-        })
-        .finally(initialMessages => {
-          dispatch(msgAddChat(chat.id, chat.data(), initialMessages, type));
+      } else {
+        queue.push({
+          objectID,
+          chatID,
+          msg
         });
+      }
     });
-  });
-  */
-
-/*
-    return {
-    type: actionTypes.MSG_ADDCHAT,
-    payload: {
-      chatID,
-      chatData,
-      initialMessages,
-      type
-    }
   };
-  */
+};
 
-//newChat(buyerChatsRef, "buyer", dispatch);
-//newChat(sellerChatsRef, "seller", dispatch);
+export const messagingClear = () => (queue = []);
 
-//dispatch(msgConnect(buyerUnsubscriber, "buyerChats"));
+const confirmMessage = (type, objectID, chatID, msg) => {
+  return type === ChatType.shopping
+    ? //Shopping
+      shoppingConfirmMsg(objectID, chatID, msg._id, {
+        isSending: false,
+        _id: uuid.v4()
+      })
+    : //Sales
+      salesConfirmMsg(objectID, chatID, msg._id, {
+        isSending: false,
+        _id: uuid.v4()
+      });
+};
 
-/*
-    const sellerUnsubscriber = sellerChatsRef.onSnapshot(chatsSnapshot => {
-      chatsSnapshot.forEach(chat =>
-        dispatch(msgChatUpdate(chat.id, chat.data(), "sellerChats"))
-      );
-    });
-    //dispatch(msgConnect(sellerUnsubscriber, "sellerChats"));
-*/
+const createMsg = (content, userID) => {
+  return {
+    _id: uuid.v4(),
+    text: content,
+    createdAt: new Date(),
+    user: {
+      _id: userID
+    },
+    isRead: true,
+    isSending: true
+  };
+};

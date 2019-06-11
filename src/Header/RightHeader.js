@@ -21,7 +21,7 @@ export class RightHeader extends Component {
         <View style={styles.rightHeaderContainer}>
           <Button
             onPress={isAuthenticated ? this.props.onLogout : this._goAuth}
-            style={{ marginRight: 10 }}
+            style={{ marginRight: 4, padding: 10, borderRadius: 6 }}
           >
             <Icon name="gear" size={24} style={styles.icon} />
           </Button>
@@ -37,7 +37,7 @@ export class RightHeader extends Component {
     //  console.log("WORKING")
     //);
     protectedAction()
-      .then(() => console.log("Super Logged In"))
+      .then(() => NavigationService.navigate("App"))
       .catch(() => console.log("User went out"));
   };
 }

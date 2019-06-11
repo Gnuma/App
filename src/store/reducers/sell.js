@@ -1,6 +1,7 @@
 import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
 import update from "immutability-helper";
+import _ from "lodash";
 
 const initialState = {
   previews: {
@@ -11,7 +12,7 @@ const initialState = {
     4: null
   },
   previewsOrder: [0, 1, 2, 3, 4],
-
+  checking: [],
   book: null,
   isbn: "",
   title: "",
@@ -117,6 +118,21 @@ const sellFail = (state, action) => {
   });
 };
 
+const sellAddReview = (state, action) => {
+  const data = _.isArray(action.payload.data)
+    ? action.payload.data
+    : [action.payload.data];
+  return update(state, {
+    checking: { $push: data }
+  });
+};
+
+const sellRemoveReview = (state, action) => {
+  return update(state, {
+    checking: { $splice: [[0, 1]] }
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SELL_START:
@@ -151,6 +167,12 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SELL_SET_DESCRIPTION:
       return setDescription(state, action);
+
+    case actionTypes.SELL_ADD_REVIEW:
+      return sellAddReview(state, action);
+
+    case actionTypes.SELL_REMOVE_REVIEW:
+      return sellRemoveReview(state, action);
 
     default:
       return state;

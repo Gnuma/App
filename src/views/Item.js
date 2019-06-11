@@ -10,18 +10,37 @@ import colors from "../styles/colors";
 import NavigatorService from "../navigator/NavigationService";
 import axios from "axios";
 import { ___GET_AD___ } from "../store/constants";
-import * as msgActions from "../store/actions/messaging";
+import * as commentActions from "../store/actions/comments";
+import * as chatActions from "../store/actions/chat";
 import { notificationsViewItem } from "../store/actions/notifications";
 import protectedAction from "../utils/protectedAction";
 import NavigationService from "../navigator/NavigationService";
+import { mockContactItem } from "../mockData/Chat2";
+import { WhiteBar, GreyBar } from "../components/StatusBars";
 
 export class Item extends Component {
-  state = {
-    data: undefined,
-    bookName: this.props.navigation.getParam("name", "Undesfineds"),
-    bookAuthors: this.props.navigation.getParam("authors", "Undesfineds"),
-    keyboardOpen: false
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: undefined,
+      bookName: props.navigation.getParam("name", "Undesfineds"),
+      bookAuthors: props.navigation.getParam("authors", "Undesfineds"),
+      keyboardOpen: false
+    };
+
+    this.newComments =
+      props.commentsData[props.navigation.getParam("itemID", "Undefined")];
+    if (this.newComments) {
+      this.newComments = this.newComments.commentsList;
+      this.hasNewComments = true;
+    } else {
+      this.newComments = {};
+      this.hasNewComments = false;
+    }
+
+    this.viewHeight = 1000;
+  }
 
   componentDidMount() {
     console.log("Mounted");
@@ -40,7 +59,7 @@ export class Item extends Component {
     ];
 
     const { navigation } = this.props;
-    const id = navigation.getParam("itemID", "Undesfineds");
+    const id = navigation.getParam("itemID", "Undefined");
 
     axios
       .get(___GET_AD___ + `${id}/`)
@@ -48,26 +67,27 @@ export class Item extends Component {
         this.setState({
           data: this.formatData(res.data)
         });
+        console.log(res.data);
+        console.log(this.formatData(res.data));
+        this.props.readComments(id);
       })
       .catch(err => {
         console.log("ERROR", err);
       });
 
-    //this.setState({
-    //  data: itemData
-    //});
-
-    //To be put in then
-    this.props.notificationViewItemRedux(id);
+    /*this.setState({
+      data: this.formatData(itemData)
+    });*/
   }
 
   formatData = data => {
     let comments = data.comment_ad;
+
+    console.log("NativeComments", comments);
     let formattedComments = [];
     for (let i = 0; i < comments.length; i++) {
       formattedComments.push(this.formatComment(comments[i]));
     }
-
     return {
       ...data,
       comment_ad: formattedComments
@@ -76,19 +96,19 @@ export class Item extends Component {
 
   formatComment = comment => {
     formattedComment = {
-      content: comment.content,
-      created_at: comment.created,
+      content: comment.text,
+      created_at: comment.createdAt,
       pk: comment.pk,
-      user: comment.user.user,
+      user: { _id: comment.user._id, ...comment.user.user },
       answers: []
     };
     for (let i = 0; i < comment.parent_child.length; i++) {
       const answer = comment.parent_child[i];
       formattedComment.answers.push({
-        content: answer.content,
-        created_at: answer.created,
+        content: answer.text,
+        created_at: answer.createdAt,
         pk: answer.id,
-        user: answer.user.user
+        user: { _id: answer.user._id, ...answer.user.user }
       });
     }
     return formattedComment;
@@ -113,26 +133,30 @@ export class Item extends Component {
 
     return (
       <View style={{ flex: 1 }}>
+        <GreyBar />
         <ItemHeader
           handleGoBack={this._handleGoBack}
           title={bookName}
           authors={bookAuthors}
+          hasNewComments={this.hasNewComments}
         />
         {isLoading ? (
-          <View style={styles.container}>
+          <View
+            style={styles.container}
+            onLayout={event =>
+              (this.viewHeight = event.nativeEvent.layout.height)
+            }
+          >
             <ActivityIndicator size="large" color={colors.secondary} />
           </View>
         ) : (
-          <View style={{ flex: 1 }}>
-            <MainItem
-              data={data}
-              goToComment={this._goToComment}
-              user={this.props.user}
-            />
-            {!this.state.keyboardOpen ? (
-              <ContactButton onContact={this._handleContact} />
-            ) : null}
-          </View>
+          <MainItem
+            data={data}
+            user={this.props.user}
+            newComments={this.newComments}
+            onContact={this._handleContact}
+            viewHeight={this.viewHeight}
+          />
         )}
       </View>
     );
@@ -152,14 +176,10 @@ export class Item extends Component {
         this.state.data.seller.user.username
       )
     );*/
-    protectedAction().then(() => {
+    /*protectedAction().then(() => {
       this.props.contactRedux();
-      NavigationService.navigate("CHAT");
-    });
-  };
-
-  _goToComment = () => {
-    return this.props.navigation.getParam("goToComment", null);
+    });*/
+    this.props.contactRedux(this.state.data);
   };
 }
 
@@ -167,14 +187,16 @@ const mapStateToProps = state => ({
   user: {
     username: state.auth.username,
     id: state.auth.id
-  }
+  },
+  commentsData: state.comments.data
 });
 
 const mapDispatchToProps = dispatch => {
   return {
-    contactRedux: (itemID, toID, toUsername) =>
-      dispatch(msgActions.contact(itemID, toID, toUsername)),
-    notificationViewItemRedux: itemPK => dispatch(notificationsViewItem(itemPK))
+    contactRedux: item => dispatch(chatActions.chatContactUser(item)),
+    notificationViewItemRedux: itemPK =>
+      dispatch(notificationsViewItem(itemPK)),
+    readComments: item => dispatch(commentActions.commentsRead(item))
   };
 };
 

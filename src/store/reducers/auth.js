@@ -28,10 +28,15 @@ const loginSuccess = (state, action) => {
   return updateObject(state, {
     token: action.payload.token,
     error: null,
-    loading: false,
     gnumaUser: action.payload.gnumaUser,
     username: action.payload.username,
     id: action.payload.id
+  });
+};
+
+const authCompleted = (state, action) => {
+  return updateObject(state, {
+    loading: false
   });
 };
 
@@ -42,15 +47,7 @@ const authFail = (state, action) => {
   });
 };
 
-const logoutSuccess = (state, action) => {
-  return updateObject(state, {
-    token: null,
-    error: null,
-    loading: false,
-    gnumaUser: null,
-    username: null
-  });
-};
+const logoutSuccess = (state, action) => initialState;
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -59,6 +56,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.AUTH_START:
       return authStart(state, action);
+
+    case actionTypes.AUTH_COMPLETED:
+      return authCompleted(state, action);
 
     case actionTypes.LOGIN_SUCCESS:
       return loginSuccess(state, action);

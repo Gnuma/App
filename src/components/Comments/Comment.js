@@ -16,7 +16,7 @@ export default class Comment extends Component {
   };
 
   render() {
-    const { isFather, answers } = this.props;
+    const { isFather, answers, userID, sellerPK } = this.props;
     //console.log(this.props);
     return (
       <View>
@@ -30,7 +30,8 @@ export default class Comment extends Component {
                   {...answer}
                   key={answer.pk}
                   isFather={false}
-                  sellerPK={this.props.sellerPK}
+                  sellerPK={sellerPK}
+                  userID={userID}
                 />
               );
             })}
@@ -41,7 +42,7 @@ export default class Comment extends Component {
   }
 
   _renderHeader = () => {
-    const { user, isFather, sellerPK, pk, isPending } = this.props;
+    const { user, isFather, sellerPK, pk, isPending, userID } = this.props;
     let created_at = new Date(this.props.created_at);
     if (created_at.getTime() > 0)
       created_at =
@@ -61,7 +62,7 @@ export default class Comment extends Component {
         }}
       >
         <Header3
-          color={sellerPK === user.id ? "secondary" : "black"}
+          color={sellerPK === user._id ? "secondary" : "black"}
           style={{ fontSize: 20, maxWidth: 100 }}
           numberOfLines={1}
         >
@@ -69,7 +70,9 @@ export default class Comment extends Component {
         </Header3>
         <Divider style={{ width: 20, height: 1, marginHorizontal: 4 }} />
         <Header5>{isPending ? "Inviando..." : created_at}</Header5>
-        {isFather && !isPending ? (
+        {isFather &&
+        (user._id == userID || userID == sellerPK) &&
+        !isPending ? (
           <Button
             style={{
               marginHorizontal: 2,

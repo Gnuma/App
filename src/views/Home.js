@@ -1,5 +1,11 @@
 import React, { Component } from "react";
-import { View, ScrollView } from "react-native";
+import {
+  View,
+  ScrollView,
+  TouchableWithoutFeedback,
+  SafeAreaView,
+  StatusBar
+} from "react-native";
 import { withNavigation } from "react-navigation";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
@@ -9,21 +15,36 @@ import * as searchActions from "../store/actions/search";
 import BookShelf from "../components/Home/BookShelf";
 import SearchLink from "../components/Home/SearchLink";
 import { AndroidBackHandler } from "react-navigation-backhandler";
-import { singleResults } from "../mockData/SearchResults";
+import { singleResults, multiResults } from "../mockData/SearchResults";
 import Button from "../components/Button";
 import protectedAction from "../utils/protectedAction";
 import NotificationCenter from "../components/Home/NotificationCenter";
 import _ from "lodash";
+import MainHome from "../components/Home/MainHome";
+import { GreenBar } from "../components/StatusBars";
+import colors from "../styles/colors";
 
 export class Home extends Component {
   static propTypes = {
     results: PropTypes.object,
     isSearchActive: PropTypes.bool,
-    suggestions: PropTypes.array,
+    suggestions: PropTypes.array, // take out
+    commentsData: PropTypes.object,
+    commentsOrder: PropTypes.array,
     searchRedux: PropTypes.func,
     showResults: PropTypes.bool,
     isLoading: PropTypes.bool
   };
+
+  componentDidMount() {
+    this._navListener = this.props.navigation.addListener("willFocus", () => {
+      StatusBar.setBackgroundColor(colors.darkGreen);
+    });
+  }
+
+  componentWillUnmount() {
+    this._navListener.remove();
+  }
 
   render() {
     return (
@@ -48,33 +69,22 @@ export class Home extends Component {
       );
     } else {
       return (
-        <ScrollView contentContainerStyle={{ justifyContent: "center" }}>
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              paddingVertical: 25
-            }}
-          >
-            <SearchLink onPress={this._openSearchBar} />
-          </View>
-          {this.props.notifications && !_.isEmpty(this.props.notifications) ? (
-            <NotificationCenter
-              data={this.props.notifications}
-              commentHandler={this._onCommentNotificationPress}
-            />
-          ) : null}
-          <BookShelf onPress={this._searchOption} />
-        </ScrollView>
+        <MainHome
+          openSearchBar={this._openSearchBar}
+          commentsOrdered={this.props.commentsOrder}
+          commentsData={this.props.commentsData}
+          goComment={this._onCommentNotificationPress}
+          searchOption={this._searchOption}
+        />
       );
     }
   };
 
-  _onCommentNotificationPress = (itemPK, bookTitle, commentPK) => {
+  _onCommentNotificationPress = (itemPK, book) => {
     this.props.navigation.navigate("Item", {
       itemID: itemPK,
-      bookTitle: bookTitle,
-      goToComment: commentPK
+      name: book.title,
+      authors: book.authors
     });
   };
 
@@ -104,7 +114,9 @@ const mapStateToProps = state => ({
   suggestions: state.search.suggestions,
   showResults: state.search.showResults,
   isLoading: state.search.loading,
-  notifications: state.notifications.notifications
+  notifications: state.notifications.notifications, //TAke out
+  commentsData: state.comments.data,
+  commentsOrder: state.comments.orderedData
 });
 
 const mapDispatchToProps = dispatch => {

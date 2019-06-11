@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { GiftedChat } from "react-native-gifted-chat";
 import { chats } from "../mockData/Chat";
-import ChatHeader from "../components/Chat/ChatHeader";
-import Chat from "../components/Chat/Chat";
+import ChatHeader from "../components/Chat_Deprecated/ChatHeader";
+import Chat from "../components/Chat_Deprecated/Chat";
 
 export class SingleChat extends Component {
   constructor(props) {
@@ -69,15 +69,7 @@ export class SingleChat extends Component {
 
 const mapStateToProps = (state, props) => {
   const navProps = props.navigation.getParam("data", "null");
-  return {
-    userID: state.auth.id,
-    userUsername: state.auth.username,
-    messages: state.messaging.messages[navProps.id],
-    status:
-      state.messaging[
-        navProps.userType === "buyer" ? "buyerChats" : "sellerChats"
-      ][navProps.id].status
-  };
+  return {};
 };
 
 const mapDispatchToProps = {};

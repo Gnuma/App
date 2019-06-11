@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Text, View, Image } from "react-native";
-import { withNavigation } from "react-navigation";
+import NavigationService from "../../navigator/NavigationService";
 import Button from "../Button";
 import PropTypes from "prop-types";
 import styles from "./styles";
@@ -14,14 +14,15 @@ export class ListMultiItem extends Component {
   };
 
   render() {
-    const { book } = this.props.data;
+    const { data, isSingle, pk, navigation } = this.props;
+    const { book } = data;
     return (
       <Button
         onPress={() =>
-          this.props.navigation.navigate("Item", {
+          NavigationService.navigate("Item", {
             itemID: this.props.pk,
-            name: name,
-            authors: authors
+            name: book.title,
+            authors: book.author
           })
         }
         style={styles.itemButton}
@@ -30,10 +31,10 @@ export class ListMultiItem extends Component {
           <Header2 color={"primary"}>{book.title}</Header2>
           <Header5>{book.author}</Header5>
         </View>
-        <Item data={this.props.data} isSingle={this.props.isSingle} />
+        <Item data={data} isSingle={isSingle} />
       </Button>
     );
   }
 }
 
-export default withNavigation(ListMultiItem);
+export default ListMultiItem;

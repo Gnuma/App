@@ -16,16 +16,18 @@ export class Header extends Component {
     setActiveRedux: PropTypes.func,
     searchQuery: PropTypes.string,
     isActive: PropTypes.bool,
-    handleSearchQueryChange: PropTypes.func
+    handleSearchQueryChange: PropTypes.func,
+    showResults: PropTypes.bool
   };
 
   render() {
-    const { isActive, searchQuery } = this.props;
+    const { isActive, searchQuery, showResults } = this.props;
     const isItem =
       this.props.navigation &&
       this.props.navigation.state.routes[
         this.props.navigation.state.routes.length - 1
       ].routeName === "Item";
+    const showSearchBar = !!(searchQuery || showResults);
     return (
       <View style={styles.header}>
         <LeftHeader
@@ -35,18 +37,20 @@ export class Header extends Component {
         />
         <CenterHeader
           isActive={isActive}
+          showSearchBar={showSearchBar}
           searchQuery={searchQuery}
           onChangeText={this.handleChangeText}
           onSubmitEditing={this.search}
           resetToHome={this.resetToHome}
           onFocus={this.setActive}
           setRef={this.setSearchRef}
+          //focus={this.focus}
         />
         <RightHeader
           setActive={this.openSearchField}
           onLogout={this.props.logoutRedux}
           isAuthenticated={this.props.isAuthenticated}
-          visible={!isActive && !searchQuery}
+          visible={!isActive && !showSearchBar}
         />
       </View>
     );
@@ -70,7 +74,7 @@ export class Header extends Component {
 
   setActive = () => {
     this.props.setActiveRedux(true);
-    this.searchField.focus();
+    //this.searchField.focus();
   };
 
   setInactive = () => {
@@ -86,7 +90,8 @@ export class Header extends Component {
 const mapStateToProps = state => ({
   searchQuery: state.search.searchQuery,
   isActive: state.search.isActive,
-  isAuthenticated: state.auth.token !== null
+  isAuthenticated: state.auth.token !== null,
+  showResults: state.search.showResults
 });
 
 const mapDispatchToProps = dispatch => {
@@ -96,7 +101,7 @@ const mapDispatchToProps = dispatch => {
     setActiveRedux: isActive =>
       dispatch(searchActions.searchSetActive(isActive)),
     handleSearchQueryChange: searchQuery =>
-      dispatch(searchActions.handleSearchQueryChange(searchQuery)),
+      dispatch(searchActions.searchSetSearchQuery(searchQuery)),
     logoutRedux: () => dispatch(authActions.authLogout()),
     goHomeRedux: () => dispatch(searchActions.searchGoHome())
   };

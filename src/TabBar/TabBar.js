@@ -71,26 +71,26 @@ export class TabBar extends Component {
         >
           <SellIcon
             style={{ marginBottom: 5 }}
-            color={focus === "VENDI" ? colors.secondary : colors.grey}
+            color={focus === "SALES" ? colors.secondary : colors.grey}
           />
-          <Header4 color={focus === "VENDI" ? "secondary" : "grey"}>
+          <Header4 color={focus === "SALES" ? "secondary" : "grey"}>
             Vendi
           </Header4>
         </Button>
         <Button
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          onPress={this._goChat}
+          onPress={this._goShopping}
         >
           <Icon
-            name="paper-plane"
+            name="tags"
             size={20}
             style={{
               marginBottom: 5,
-              color: focus === "CHAT" ? colors.secondary : colors.grey
+              color: focus === "SHOPPING" ? colors.secondary : colors.grey
             }}
           />
-          <Header4 color={focus === "CHAT" ? "secondary" : "grey"}>
-            Chat
+          <Header4 color={focus === "SHOPPING" ? "secondary" : "grey"}>
+            Acquisti
           </Header4>
         </Button>
       </View>
@@ -106,12 +106,10 @@ export class TabBar extends Component {
     this.props.navigation.navigate("SEARCH");
   };
   _goVendi = () => {
-    this.props.navigation.navigate("VENDI");
+    this.props.navigation.navigate("SALES");
   };
-  _goChat = () => {
-    protectedAction()
-      .then(() => NavigationService.navigate("CHAT"))
-      .catch(() => {});
+  _goShopping = () => {
+    this.props.navigation.navigate("SHOPPING");
   };
 }
 

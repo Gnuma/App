@@ -1,5 +1,10 @@
 import * as actionTypes from "./actionTypes";
 import axios from "axios";
+import { ofType } from "redux-observable";
+import { map, mergeMap, catchError, switchMap } from "rxjs/operators";
+import { ajax } from "rxjs/ajax";
+import { of } from "rxjs";
+
 import { singleResults, multiResults } from "../../mockData/SearchResults";
 import { Keyboard } from "react-native";
 import {
@@ -119,26 +124,41 @@ export const search = (search_query, cap) => {
   };
 };
 
+/*
 export const handleSearchQueryChange = search_query => {
   return dispatch => {
     dispatch(searchSetSearchQuery(search_query));
-    if (isOffline) {
-      let suggestions = [];
-      for (let i = 0; i < 10; i++) {
-        suggestions.push(search_query + " " + i);
-      }
-      dispatch(searchSuggest(suggestions));
-    } else {
-      axios
-        .post(___BOOK_HINTS_ENDPOINT___, {
-          keyword: search_query
-        })
-        .then(res => {
-          dispatch(searchSuggest(res.data.results));
-        })
-        .catch(err => {
-          dispatch(searchFail(err));
-        });
-    }
+    axios
+      .post(___BOOK_HINTS_ENDPOINT___, {
+        keyword: search_query
+      })
+      .then(res => {
+        dispatch(searchSuggest(res.data.results));
+      })
+      .catch(err => {
+        dispatch(searchFail(err));
+      });
   };
 };
+*/
+
+//Epics
+const searchChangeEpic = action$ =>
+  action$.pipe(
+    ofType(actionTypes.SEARCH_SET_SEARCHQUERY),
+    switchMap(action =>
+      ajax
+        .post(___BOOK_HINTS_ENDPOINT___, {
+          keyword: action.payload.search_query
+        })
+        .pipe(
+          map(({ response }) => {
+            console.log(response);
+            return searchSuggest(response.results);
+          }),
+          catchError(error => of(searchFail(error)))
+        )
+    )
+  );
+
+export const searchEpics = [searchChangeEpic];

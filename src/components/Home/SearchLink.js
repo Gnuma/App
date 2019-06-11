@@ -9,13 +9,16 @@ import colors from "../../styles/colors";
 export default props => {
   return (
     <SolidButton
-      style={{
-        minWidth: 320,
-        padding: 8,
-        elevation: 4,
-        backgroundColor: "white",
-        borderRadius: 6
-      }}
+      style={[
+        {
+          minWidth: 320,
+          padding: 8,
+          elevation: 4,
+          backgroundColor: "white",
+          borderRadius: 6
+        },
+        props.style
+      ]}
       icon="search"
       iconSize={20}
       onPress={props.onPress}

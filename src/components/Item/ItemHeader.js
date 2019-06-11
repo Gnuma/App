@@ -11,7 +11,8 @@ export default class ItemHeader extends Component {
   static propTypes = {
     handleGoBack: PropTypes.func,
     title: PropTypes.string,
-    authors: PropTypes.string
+    authors: PropTypes.string,
+    hasNewComments: PropTypes.bool
   };
 
   render() {
@@ -20,9 +21,16 @@ export default class ItemHeader extends Component {
         <Button onPress={this.props.handleGoBack} style={styles.goBack}>
           <Icon name="chevron-left" size={24} style={{ color: colors.black }} />
         </Button>
-        <View style={styles.content}>
-          <Header2 color={"primary"}>{this.props.title}</Header2>
-          <Header5 style={styles.authors}>di {this.props.authors}</Header5>
+        <View style={styles.contentContainer}>
+          <View style={styles.content}>
+            <Header2 color={"primary"}>{this.props.title}</Header2>
+            <Header5 style={styles.authors}>di {this.props.authors}</Header5>
+          </View>
+          {this.props.hasNewComments ? (
+            <Button style={styles.notificationButton} disabled>
+              <Icon name={"bell"} size={24} style={{ color: colors.darkRed }} />
+            </Button>
+          ) : null}
         </View>
       </View>
     );

@@ -69,7 +69,7 @@ export default class ImagePreview extends Component {
           <ImageBackground
             style={cameraPreviewStyle.imagePreview}
             source={item}
-            resizeMode="stretch"
+            resizeMode="cover"
           >
             <Button
               style={cameraPreviewStyle.deletePreviewBtn}
