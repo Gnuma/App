@@ -10,6 +10,7 @@ import colors from "../../styles/colors";
 import { ___BOOK_IMG_RATIO___ } from "../../utils/constants";
 import Button from "../Button";
 import Icon from "react-native-vector-icons/FontAwesome";
+import ImageSize from "react-native-image-size";
 
 export default class NewImageReviewr extends Component {
   static propTypes = {
@@ -44,7 +45,7 @@ export default class NewImageReviewr extends Component {
 
   updateLayout = async () => {
     const margin = 0.2;
-
+    console.log(this.props.data);
     this.lastPan = { x: 0, y: 0 };
     this.pan.setValue(this.lastPan);
     this.pan.setOffset(this.lastPan);
@@ -57,7 +58,18 @@ export default class NewImageReviewr extends Component {
 
     const { data } = this.props;
     const { container } = this.state;
-    const { width: imgWidth, height: imgHeight } = await getImageSize(data.uri);
+    //const { width: imgWidth, height: imgHeight } =
+    //  !this.props.data.width || !this.props.data.height
+    //    ? await getImageSize(data.uri)
+    //    : data;
+    let { width: imgWidth, height: imgHeight } =
+      !this.props.data.width || !this.props.data.height
+        ? await ImageSize.getSize(data.uri)
+        : data;
+
+    console.log(imgWidth, imgHeight);
+
+    //console.log(Image.resolveAssetSource(data.uri));
 
     const imgRatio = imgHeight / imgWidth;
     let layoutHeight, layoutWidth;
@@ -127,14 +139,28 @@ export default class NewImageReviewr extends Component {
 
       const fullWidth = layoutWidth * this.lastScale;
       const fullHeight = layoutHeight * this.lastScale;
-      const scale = cropperWidth / fullWidth;
 
-      const xOffset = this.lastPan.x / this.lastScale;
-      const yOffset = this.lastPan.y / this.lastScale;
+      const widthPercentage = cropperWidth / fullWidth;
+      const heightPercentage = cropperHeight / fullHeight;
 
-      console.log(xOffset, yOffset);
+      const xOffset = (fullWidth - cropperWidth) / 2 - this.lastPan.x;
+      const yOffset = (fullHeight - cropperHeight) / 2 - this.lastPan.y;
 
-      this.props.handleReview(true);
+      const xPercentage = xOffset / fullWidth;
+      const yPercentage = yOffset / fullHeight;
+
+      console.log(
+        this.state.img,
+        { x: xPercentage, y: yPercentage },
+        { width: widthPercentage, height: heightPercentage }
+      );
+
+      this.props.handleReview(
+        true,
+        this.state.img,
+        { x: xPercentage, y: yPercentage },
+        { width: widthPercentage, height: heightPercentage }
+      );
     } else {
       this.props.handleReview(false);
     }
@@ -210,15 +236,6 @@ export default class NewImageReviewr extends Component {
     this.setState({
       scale_c: this.lastScale * scaleOffsetConstraint
     });
-
-    const fullWidth = layoutWidth * this.lastScale;
-    const fullHeight = layoutHeight * this.lastScale;
-    const scale = cropperWidth / fullWidth;
-
-    const xOffset = this.lastPan.x / fullWidth;
-    const yOffset = this.lastPan.y / fullHeight;
-
-    console.log(xOffset);
   };
 
   updateTranslationConstaints = () => {
@@ -334,6 +351,7 @@ export default class NewImageReviewr extends Component {
                         }
                       ]
                     }}
+                    resizeMode="contain"
                     source={{ uri: img.uri }}
                   />
                 </View>

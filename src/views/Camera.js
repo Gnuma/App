@@ -63,29 +63,31 @@ export class Camera extends Component {
     }
   };
 
-  handleReview = (isAccepted, img, offsetPercentage, sizePercentage) => {
+  handleReview = (isAccepted, img, offset, size) => {
     if (isAccepted) {
-      /*
-      console.log("Offset:", {
-        x: img.width * offsetPercentage.x,
-        y: img.height * offsetPercentage.y
-      });
-      console.log("Size:", {
-        width: img.width * sizePercentage.width,
-        height: img.height * sizePercentage.height
-      });
-      console.log("Image:", img);
-      const uri = img.uri ? img.uri : img.path;
+      console.log(
+        img,
+        { x: img.width * offset.x, y: img.height * offset.y },
+        {
+          width: img.width * size.width,
+          height: img.height * size.height
+        }
+      );
+      const uri = img.uri;
       ImageEditor.cropImage(
         uri,
         {
           offset: {
-            x: img.width * offsetPercentage.x,
-            y: img.height * offsetPercentage.y
+            x: Math.round(img.width * offset.x),
+            y: Math.round(img.height * offset.y)
           },
           size: {
-            width: img.width * sizePercentage.width,
-            height: img.height * sizePercentage.height
+            width: Math.round(img.width * size.width),
+            height: Math.round(img.height * size.height)
+          },
+          displaySize: {
+            width: 300,
+            height: 400
           }
         },
         uri => {
@@ -104,7 +106,6 @@ export class Camera extends Component {
           console.warn("Error while cropping preview");
         }
       );
-      */
     }
 
     this.setState(prevState => ({
@@ -237,9 +238,9 @@ export default connect(
 const options = {
   quality: 1,
   orientation: "portrait",
-  //fixOrientation: true,
-  //forceUpOrientation: true,
-  pauseAfterCapture: true,
+  fixOrientation: true,
+  forceUpOrientation: true,
+  pauseAfterCapture: true
   //width: 1080,
-  skipProcessing: true
+  //skipProcessing: true
 };
