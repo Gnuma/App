@@ -8,7 +8,8 @@ import {
   ___READ_CHAT___,
   ___CONTACT_USER___,
   ___SEND_MESSAGE___,
-  ___RETRIEVE_CHATS___
+  ___RETRIEVE_CHATS___,
+  ___LOAD_EARLIER_CHAT___
 } from "../constants";
 import { loadMockNew } from "../../mockData/Chat2";
 import protectedAction from "../../utils/protectedAction";
@@ -27,7 +28,7 @@ export const chatInit = (salesData, shoppingData) => ({
   }
 });
 
-export const chatClear = () => ({ type: actionTypes.SALES_CLEAR });
+export const chatClear = () => ({ type: actionTypes.CHAT_CLEAR });
 
 export const chatStartGlobalAction = () => ({
   type: actionTypes.CHAT_START_GLOBAL_ACTION
@@ -220,19 +221,30 @@ export const chatRequestContact = (objectID, chatID) => dispatch => {
   }, 1000);
 };
 
-export const chatLoadEarlier = (objectID, chatID) => dispatch => {
-  dispatch(chatStartChatAction(objectID, chatID));
-  //API
-  setTimeout(() => {
-    dispatch({
-      type: actionTypes.CHAT_LOAD_EARLIER,
-      payload: {
-        objectID,
-        chatID,
-        data: loadMockNew()
-      }
-    });
-  }, 2000);
+export const chatLoadEarlier = (objectID, chatID) => (dispatch, getState) => {
+  const chat = getState().chat.data[objectID].chats[chatID];
+  const messages = chat.messages;
+  if (messages.length > 0 && !chat.loading && chat.toload) {
+    dispatch(chatStartChatAction(objectID, chatID));
+    const last = messages[messages.length - 1]._id;
+    axios
+      .post(___LOAD_EARLIER_CHAT___, {
+        chat: chatID,
+        last
+      })
+      .then(res => {
+        dispatch({
+          type: actionTypes.CHAT_LOAD_EARLIER,
+          payload: {
+            objectID,
+            chatID,
+            data: res.data.messages,
+            toload: res.data.toload
+          }
+        });
+      })
+      .catch(err => console.log({ err }));
+  }
 };
 
 export const chatContactUser = item => dispatch => {

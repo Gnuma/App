@@ -22,60 +22,56 @@ import ChatScreen from "../views/Chat";
 import BookOffertScreen from "../views/BookOffert";
 import ShoppingListScreen from "../views/ShoppingList";
 import ImagePickerScreen from "../views/ImagePicker";
+import UserSettingsScreen from "../views/UserSettings";
+import UserInfoScreen from "../views/UserInfo";
+import OfficeChangeScreen from "../views/OfficeChange";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
 
-const SearchNavigator = {
-  screen: createStackNavigator({
-    Home: {
-      screen: HomeScreen,
-      path: "/home",
-      navigationOptions: () => ({
-        header: <Header />
-      })
-    },
-    Item: {
-      screen: ItemScreen,
-      path: "/item/:itemid",
-      navigationOptions: () => ({
-        header: null
-      })
+const UserSettingsNavigator = createStackNavigator(
+  {
+    UserSettings: UserSettingsScreen,
+    UserInfo: UserInfoScreen,
+    OfficeChange: OfficeChangeScreen
+  },
+  {
+    defaultNavigationOptions: {
+      header: null
     }
-  })
-};
+  }
+);
 
-/*
-const ChatNavigator = {
-  screen: createStackNavigator(
-    {
-      ChatHome: {
-        screen: ChatHomeScreen,
-        path: "/chat"
-      },
-      ChatSingle: {
-        screen: SingleChatScreen,
-        path: "/chat/:chatid"
-      }
-    },
-    {
-      defaultNavigationOptions: {
-        header: null
-      }
-    }
-  )
-};
+const SearchNavigator = createStackNavigator({
+  Home: {
+    screen: HomeScreen,
+    path: "/home",
+    navigationOptions: () => ({
+      header: <Header />
+    })
+  },
+  Item: {
+    screen: ItemScreen,
+    path: "/item/:itemid",
+    navigationOptions: { header: null }
+  },
+  UserSettings: {
+    screen: UserSettingsNavigator,
+    path: "/usersettings",
+    navigationOptions: { header: null }
+  }
+});
 
-ChatNavigator.navigationOptions = ({ navigation }) => {
-  let { routeName } = navigation.state.routes[navigation.state.index];
+SearchNavigator.navigationOptions = ({ navigation }) => {
+  const { routeName } = navigation.state.routes[navigation.state.index];
+
   let navigationOptions = {};
-  if (routeName === "Chat") {
+  if (routeName === "UserSettings") {
     navigationOptions.tabBarVisible = false;
   }
 
   return navigationOptions;
 };
-*/
 
 const InitProfileNavigator = {
   screen: createStackNavigator(
@@ -211,7 +207,6 @@ const AppStack = createBottomTabNavigator(
     SEARCH: SearchNavigator,
     SALES: SalesStack,
     SHOPPING: ShoppingNavigator
-    //CHAT: ShoppingNavigator
   },
   {
     tabBarComponent: TabBar

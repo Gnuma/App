@@ -148,7 +148,9 @@ export default class Chat extends Component {
   renderNull = () => null;
 
   onScroll = ({ nativeEvent }) => {
-    this.isCloseToTop(nativeEvent) && this.loadEarlier();
+    this.isCloseToTop(nativeEvent) &&
+      !this.props.data.loading &&
+      this.loadEarlier();
   };
 
   listViewProps = {

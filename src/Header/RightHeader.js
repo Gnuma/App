@@ -11,16 +11,15 @@ import protectedAction from "../utils/protectedAction";
 export class RightHeader extends Component {
   static propTypes = {
     setActive: PropTypes.func,
-    onLogout: PropTypes.func,
-    isAuthenticated: PropTypes.bool
+    openSettings: PropTypes.func
   };
   render() {
-    const { setActive, visible, isAuthenticated } = this.props;
+    const { setActive, visible } = this.props;
     if (visible) {
       return (
         <View style={styles.rightHeaderContainer}>
           <Button
-            onPress={isAuthenticated ? this.props.onLogout : this._goAuth}
+            onPress={this.props.openSettings}
             style={{ marginRight: 4, padding: 10, borderRadius: 6 }}
           >
             <Icon name="gear" size={24} style={styles.icon} />
@@ -31,15 +30,6 @@ export class RightHeader extends Component {
       return null;
     }
   }
-
-  _goAuth = () => {
-    //NavigationService.protectedNavigation("Home", null, () =>
-    //  console.log("WORKING")
-    //);
-    protectedAction()
-      .then(() => NavigationService.navigate("App"))
-      .catch(() => console.log("User went out"));
-  };
 }
 
 export default RightHeader;

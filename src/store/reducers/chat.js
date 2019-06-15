@@ -243,7 +243,8 @@ const chatNewChat = (state, { payload: { objectID, chatID, data } }) => {
     messages: [],
     loading: false,
     composer: "",
-    offerts: []
+    offerts: [],
+    toload: false
   };
   const item = {
     _id: objectID,
@@ -299,14 +300,18 @@ const chatStartStatusAction = (state, { payload: { objectID, chatID } }) =>
     }
   });
 
-const chatLoadEarlier = (state, { payload: { objectID, chatID, data } }) =>
+const chatLoadEarlier = (
+  state,
+  { payload: { objectID, chatID, data, toload } }
+) =>
   update(state, {
     data: {
       [objectID]: {
         chats: {
           [chatID]: {
             messages: { $push: data },
-            loading: { $set: false }
+            loading: { $set: false },
+            toload: { $set: toload }
           }
         }
       }

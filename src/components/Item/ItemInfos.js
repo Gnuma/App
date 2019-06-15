@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { View } from "react-native";
 import { ItemInfoStyles as styles } from "./styles";
 import { Header1, Header3, Header2 } from "../Text";
-import ConditionCircle from "../ConditionCircle";
+import CircleValue from "../CircleValue";
 
 export const PrimaryInfo = props => {
   const { price, conditions, office } = props.data;
@@ -18,7 +18,7 @@ export const PrimaryInfo = props => {
       </View>
       <View style={styles.conditionOfficeContainer}>
         <View>
-          <ConditionCircle conditions={conditions} radius={45} />
+          <CircleValue value={conditions} radius={45} />
         </View>
         <View style={styles.rightAlign}>
           <Header2 color={"secondary"}>{office.name}</Header2>

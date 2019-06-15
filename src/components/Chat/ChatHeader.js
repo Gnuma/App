@@ -5,7 +5,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { Header1, Header2, Header5, Header3, Header4 } from "../Text";
 import colors from "../../styles/colors";
 import { CachedImage } from "react-native-cached-image";
-import ConditionCircle from "../ConditionCircle";
+import CircleValue from "../CircleValue";
 import {
   Svg,
   Defs,
@@ -226,7 +226,7 @@ export default class ChatHeader extends Component {
                     </Header4>
                   </View>
                   <View>
-                    <ConditionCircle conditions={item.condition} radius={40} />
+                    <CircleValue value={item.condition} radius={40} />
                   </View>
                 </View>
                 <View>

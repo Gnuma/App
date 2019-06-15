@@ -168,7 +168,7 @@ export class Auth extends Component {
   }
 
   _renderFooter = () => {
-    if (!this.state.showFooter) return null;
+    //    if (!this.state.showFooter) return null;
 
     return (
       <View

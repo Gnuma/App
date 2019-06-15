@@ -3,7 +3,7 @@ import { Text, View, Image } from "react-native";
 import PropTypes from "prop-types";
 import styles from "./styles";
 import { Header1, Header3, Header4, Header5 } from "../../components/Text";
-import ConditionCircle from "../ConditionCircle";
+import CircleValue from "../CircleValue";
 import { CachedImage } from "react-native-cached-image";
 import { ___BASE_ENDPOINT___ } from "../../store/constants";
 
@@ -51,11 +51,7 @@ export default class Item extends Component {
               <Header1 color="primary">EUR {price}</Header1>
             </View>
             <View style={styles.m10}>
-              <ConditionCircle
-                conditions={condition}
-                radius={35}
-                style={styles.m10}
-              />
+              <CircleValue value={condition} radius={40} />
             </View>
           </View>
           <View style={styles.itemBottomContent}>

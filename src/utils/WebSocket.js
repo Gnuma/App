@@ -48,12 +48,17 @@ class WS {
     this.token = token;
     this.retries = 5;
 
+    this.connectionSubscription = NetInfo.isConnected.addEventListener(
+      "connectionChange",
+      isConnected => {
+        if (isConnected && this.ws) store.dispatch(chatOnline());
+      }
+    );
+
     axios
       .get(___RETRIEVE_CHATS___)
       .then(res => {
         console.log(res);
-        //store.dispatch(shoppingInit(res.data.shopping));
-        //store.dispatch(salesInit(res.data.sales));
         store.dispatch(chatInit(res.data.sales, res.data.shopping));
         store.dispatch(authCompleted());
         this.startConnection();
@@ -64,13 +69,6 @@ class WS {
         store.dispatch(authFail(err));
         resolve(token);
       });
-
-    this.connectionSubscription = NetInfo.isConnected.addEventListener(
-      "connectionChange",
-      isConnected => {
-        if(isConnected) store.dispatch(chatOnline())
-      }
-    );
   }
 
   restart = isConnected => {

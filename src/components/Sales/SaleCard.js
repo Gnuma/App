@@ -5,7 +5,7 @@ import { CachedImage as Image } from "react-native-cached-image";
 import { itemWidth, itemHorizontalMargin, imgHeight } from "./styles";
 import { Header1, Header3, Header2, Header5 } from "../Text";
 import colors from "../../styles/colors";
-import ConditionCircle from "../ConditionCircle";
+import CircleValue from "../CircleValue";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Button from "../Button";
 import NavigationService from "../../navigator/NavigationService";
@@ -61,7 +61,7 @@ export default class SaleCard extends Component {
                   </Header2>
                 </View>
               </View>
-              <ConditionCircle conditions={data.condition} radius={35} />
+              <CircleValue value={data.condition} radius={35} />
             </View>
           </View>
         </Button>

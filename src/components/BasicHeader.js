@@ -7,20 +7,23 @@ import { Header1 } from "./Text";
 import colors from "./../styles/colors";
 import NavigationService from "../navigator/NavigationService";
 
-export default class HomeHeader extends Component {
+class HomeHeader extends Component {
   static propTypes = {
-    title: PropTypes.string
+    title: PropTypes.string,
+    icon: PropTypes.string
   };
 
   render() {
-    const { title } = this.props;
+    const { title, icon } = this.props;
     return (
-      <View style={styles.container}>
-        <Button onPress={this._local_handleGoBack} style={styles.goBackBtn}>
-          <Icon name="chevron-left" size={24} style={styles.backIcon} />
-        </Button>
-        <View>
-          <Header1 color={"primary"}>{title}</Header1>
+      <View style={{ elevation: 0 }}>
+        <View style={styles.container}>
+          <Button onPress={this._local_handleGoBack} style={styles.goBackBtn}>
+            <Icon name={icon} size={24} style={styles.backIcon} />
+          </Button>
+          <View>
+            <Header1 color={"primary"}>{title}</Header1>
+          </View>
         </View>
       </View>
     );
@@ -30,6 +33,11 @@ export default class HomeHeader extends Component {
     NavigationService.goBack(null);
   };
 }
+HomeHeader.defaultProps = {
+  icon: "chevron-left"
+};
+
+export default HomeHeader;
 
 const styles = StyleSheet.create({
   container: {

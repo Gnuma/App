@@ -9,6 +9,8 @@ import * as authActions from "../store/actions/auth";
 import LeftHeader from "./LeftHeader";
 import CenterHeader from "./CenterHeader";
 import RightHeader from "./RightHeader";
+import NavigationService from "../navigator/NavigationService";
+import protectedAction from "../utils/protectedAction";
 
 export class Header extends Component {
   static propTypes = {
@@ -19,42 +21,6 @@ export class Header extends Component {
     handleSearchQueryChange: PropTypes.func,
     showResults: PropTypes.bool
   };
-
-  render() {
-    const { isActive, searchQuery, showResults } = this.props;
-    const isItem =
-      this.props.navigation &&
-      this.props.navigation.state.routes[
-        this.props.navigation.state.routes.length - 1
-      ].routeName === "Item";
-    const showSearchBar = !!(searchQuery || showResults);
-    return (
-      <View style={styles.header}>
-        <LeftHeader
-          isActive={isActive}
-          isItem={isItem}
-          handleGoBack={this.setInactive}
-        />
-        <CenterHeader
-          isActive={isActive}
-          showSearchBar={showSearchBar}
-          searchQuery={searchQuery}
-          onChangeText={this.handleChangeText}
-          onSubmitEditing={this.search}
-          resetToHome={this.resetToHome}
-          onFocus={this.setActive}
-          setRef={this.setSearchRef}
-          //focus={this.focus}
-        />
-        <RightHeader
-          setActive={this.openSearchField}
-          onLogout={this.props.logoutRedux}
-          isAuthenticated={this.props.isAuthenticated}
-          visible={!isActive && !showSearchBar}
-        />
-      </View>
-    );
-  }
 
   setSearchRef = input => {
     this.searchField = input;
@@ -85,12 +51,50 @@ export class Header extends Component {
   openSearchField = () => {
     this.props.setActiveRedux(true);
   };
+
+  openSettings = () => {
+    protectedAction().then(() => NavigationService.navigate("UserSettings"));
+  };
+
+  render() {
+    const { isActive, searchQuery, showResults } = this.props;
+    const isItem =
+      this.props.navigation &&
+      this.props.navigation.state.routes[
+        this.props.navigation.state.routes.length - 1
+      ].routeName === "Item";
+    const showSearchBar = !!(searchQuery || showResults);
+    return (
+      <View style={styles.header}>
+        <LeftHeader
+          isActive={isActive}
+          isItem={isItem}
+          handleGoBack={this.setInactive}
+        />
+        <CenterHeader
+          isActive={isActive}
+          showSearchBar={showSearchBar}
+          searchQuery={searchQuery}
+          onChangeText={this.handleChangeText}
+          onSubmitEditing={this.search}
+          resetToHome={this.resetToHome}
+          onFocus={this.setActive}
+          setRef={this.setSearchRef}
+          //focus={this.focus}
+        />
+        <RightHeader
+          setActive={this.openSearchField}
+          openSettings={this.openSettings}
+          visible={!isActive && !showSearchBar}
+        />
+      </View>
+    );
+  }
 }
 
 const mapStateToProps = state => ({
   searchQuery: state.search.searchQuery,
   isActive: state.search.isActive,
-  isAuthenticated: state.auth.token !== null,
   showResults: state.search.showResults
 });
 
@@ -102,7 +106,6 @@ const mapDispatchToProps = dispatch => {
       dispatch(searchActions.searchSetActive(isActive)),
     handleSearchQueryChange: searchQuery =>
       dispatch(searchActions.searchSetSearchQuery(searchQuery)),
-    logoutRedux: () => dispatch(authActions.authLogout()),
     goHomeRedux: () => dispatch(searchActions.searchGoHome())
   };
 };
