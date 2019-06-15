@@ -45,7 +45,8 @@ export default class OutlinedInput extends Component {
       <View
         style={[
           {
-            margin: 8
+            margin: 8,
+            flexDirection: "row"
           },
           containerStyle
         ]}
@@ -87,16 +88,6 @@ export default class OutlinedInput extends Component {
             <Icon name={icon} size={22} />
           </Button>
         </View>
-        {borderFocus && (
-          <View
-            style={{
-              ...StyleSheet.absoluteFill,
-              borderWidth: 1,
-              borderColor: colors.primary,
-              borderRadius: 6
-            }}
-          />
-        )}
       </View>
     );
   }
