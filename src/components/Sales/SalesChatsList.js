@@ -9,6 +9,7 @@ import Divider from "../Divider";
 import BooleanButton from "../BooleanButton";
 import helper from "../../utils/helper";
 import _ from "lodash";
+import { ChatStatus } from "../../utils/constants";
 
 export default class SalesChatsList extends Component {
   static propTypes = {
@@ -95,7 +96,7 @@ export class ChatLink extends Component {
 
   renderFooter = () => {
     const { data } = this.props;
-    if (data.status === "pending" || data.status === "loadingDecision") {
+    if (data.status === ChatStatus.PENDING) {
       return (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Header4

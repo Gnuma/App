@@ -9,7 +9,10 @@ import {
   ___CONTACT_USER___,
   ___SEND_MESSAGE___,
   ___RETRIEVE_CHATS___,
-  ___LOAD_EARLIER_CHAT___
+  ___LOAD_EARLIER_CHAT___,
+  ___REQUEST_CONTACT___,
+  ___ACCEPT_CHAT___,
+  ___REJECT_CHAT___
 } from "../constants";
 import { loadMockNew } from "../../mockData/Chat2";
 import protectedAction from "../../utils/protectedAction";
@@ -19,6 +22,7 @@ import { map, filter, retryWhen, concatMap } from "rxjs/operators";
 import { ofType } from "redux-observable";
 import { ajax } from "rxjs/ajax";
 import { of, timer, interval, fromEvent } from "rxjs";
+import { ChatStatus } from "../../utils/constants";
 
 export const chatInit = (salesData, shoppingData) => ({
   type: actionTypes.CHAT_INIT,
@@ -45,6 +49,15 @@ export const chatStartChatAction = (objectID, chatID) => ({
 export const chatFail = error => ({
   type: actionTypes.CHAT_FAIL,
   payload: { error }
+});
+
+export const chatSingleFail = (objectID, chatID, error) => ({
+  type: actionTypes.CHAT_SINGLE_FAIL,
+  payload: {
+    objectID,
+    chatID,
+    error
+  }
 });
 
 export const chatSetSalesListFocus = focus => ({
@@ -133,11 +146,12 @@ export const chatRemoveOffert = (objectID, chatID) => ({
   }
 });
 
-export const chatOffertFail = (objectID, chatID) => ({
+export const chatOffertFail = (objectID, chatID, error) => ({
   type: actionTypes.CHAT_OFFERT_FAIL,
   payload: {
     objectID,
-    chatID
+    chatID,
+    error
   }
 });
 
@@ -146,7 +160,7 @@ export const chatNewItem = item => ({
   payload: { item }
 });
 
-const chatSettleAction = (objectID, chatID, status) => ({
+export const chatSettleAction = (objectID, chatID, status) => ({
   type: actionTypes.CHAT_SETTLE,
   payload: {
     objectID,
@@ -157,6 +171,14 @@ const chatSettleAction = (objectID, chatID, status) => ({
 
 export const chatOnline = () => ({
   type: actionTypes.CHAT_ONLINE
+});
+
+export const chatSetOffertAccepted = (objectID, chatID) => ({
+  type: actionTypes.CHAT_ACCEPT_OFFERT,
+  payload: {
+    objectID,
+    chatID
+  }
 });
 
 // ---THUNK---
@@ -203,22 +225,38 @@ export const chatRead = (objectID, chatID) => (dispatch, getState) => {
 
 export const chatSettle = (objectID, chatID, isAccepting) => dispatch => {
   dispatch(chatStartChatAction(objectID, chatID));
-  //API
-  setTimeout(() => {
-    if (isAccepting) {
-      dispatch(chatSettleAction(objectID, chatID, "active"));
-    } else {
-      dispatch(chatSettleAction(objectID, chatID, "rejected"));
-    }
-  }, 1000);
+  if (isAccepting) {
+    axios
+      .post(___ACCEPT_CHAT___, {
+        chat: chatID
+      })
+      .then(res =>
+        dispatch(chatSettleAction(objectID, chatID, ChatStatus.PROGRESS))
+      )
+      .catch(err => dispatch(chatSingleFail(objectID, chatID, err)));
+  } else {
+    axios
+      .post(___REJECT_CHAT___, {
+        chat: chatID
+      })
+      .then(res =>
+        dispatch(chatSettleAction(objectID, chatID, ChatStatus.REJECTED))
+      )
+      .catch(err => dispatch(chatSingleFail(objectID, chatID, err)));
+  }
 };
 
 export const chatRequestContact = (objectID, chatID) => dispatch => {
   dispatch(chatStartChatAction(objectID, chatID));
   //API
-  setTimeout(() => {
-    dispatch(chatSettleAction(objectID, chatID, "pending"));
-  }, 1000);
+  axios
+    .post(___REQUEST_CONTACT___, {
+      chat: chatID
+    })
+    .then(res =>
+      dispatch(chatSettleAction(objectID, chatID, ChatStatus.PENDING))
+    )
+    .catch(err => dispatch(chatSingleFail(objectID, chatID, err)));
 };
 
 export const chatLoadEarlier = (objectID, chatID) => (dispatch, getState) => {
@@ -294,8 +332,7 @@ export const chatCreateOffert = (objectID, chatID, price) => (
       );
     })
     .catch(err => {
-      console.log({ err });
-      dispatch(chatOffertFail(objectID, chatID));
+      dispatch(chatOffertFail(objectID, chatID, err));
     });
 };
 
@@ -319,8 +356,7 @@ export const chatRejectOffert = (objectID, chatID) => (dispatch, getState) => {
       dispatch(chatRemoveOffert(objectID, chatID));
     })
     .catch(err => {
-      console.log({ err });
-      dispatch(chatOffertFail(objectID, chatID));
+      dispatch(chatOffertFail(objectID, chatID, err));
     });
 };
 
@@ -333,17 +369,10 @@ export const chatAcceptOffert = (objectID, chatID) => (dispatch, getState) => {
     })
     .then(res => {
       console.log(res);
-      dispatch({
-        type: actionTypes.CHAT_ACCEPT_OFFERT,
-        payload: {
-          objectID,
-          chatID
-        }
-      });
+      dispatch(chatSetOffertAccepted(objectID, chatID));
     })
     .catch(err => {
-      console.log({ err });
-      dispatch(chatOffertFail(objectID, chatID));
+      dispatch(chatOffertFail(objectID, chatID, err));
     });
 };
 

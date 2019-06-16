@@ -1,4 +1,5 @@
 import uuid from "uuid";
+import { ChatStatus, ChatType } from "../utils/constants";
 
 export const myID = 1;
 
@@ -37,7 +38,7 @@ export const sellerChatList = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: true,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -76,7 +77,7 @@ export const sellerChatList = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: false,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -127,7 +128,7 @@ export const sellerChatList = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: true,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -178,7 +179,7 @@ export const sellerChatList = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: false,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: []
       }
     ]
@@ -201,7 +202,7 @@ export const sellerChatList = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: true,
-        status: "pending",
+        status: ChatStatus.PENDING,
         messages: [
           {
             _id: uuid.v4(),
@@ -247,7 +248,7 @@ export const single = {
     lastVisit: new Date(2019, 2, 4, 12, 0)
   },
   hasNews: true,
-  status: "progress",
+  status: ChatStatus.PROGRESS,
   messages: [
     {
       _id: uuid.v4(),
@@ -324,7 +325,7 @@ export const buyerChatList = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: true,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -373,7 +374,7 @@ export const buyerChatList = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: true,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -422,7 +423,7 @@ export const buyerChatList = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: false,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -469,7 +470,7 @@ export const buyerChatList = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: true,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -525,7 +526,7 @@ export const buyerChatList = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: false,
-        status: "local",
+        status: ChatStatus.LOCAL,
         messages: []
       }
     ]
@@ -642,7 +643,7 @@ export const newSellerMsg = {
 
 export const newBuyerMsg = {
   type: "newMessage",
-  for: "shopping",
+  for: ChatType.shopping,
   msg: {
     msg: {
       _id: uuid.v4(),
@@ -748,7 +749,7 @@ export const buyerChatList2 = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: true,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -804,7 +805,7 @@ export const buyerChatList2 = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: true,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -853,7 +854,7 @@ export const buyerChatList2 = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: true,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -902,7 +903,7 @@ export const buyerChatList2 = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: false,
-        status: "progress",
+        status: ChatStatus.PROGRESS,
         messages: [
           {
             _id: uuid.v4(),
@@ -949,7 +950,7 @@ export const buyerChatList2 = [
           lastVisit: new Date(2019, 2, 4, 12, 0)
         },
         hasNews: false,
-        status: "local",
+        status: ChatStatus.LOCAL,
         messages: []
       }
     ]

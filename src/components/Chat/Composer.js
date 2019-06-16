@@ -13,6 +13,7 @@ import { Header4, Header3 } from "../Text";
 import { AudioRecorder, AudioUtils } from "react-native-audio";
 import NativeButton from "../NativeButton";
 import Sound from "react-native-sound";
+import { ChatStatus, ChatType } from "../../utils/constants";
 
 const audioPath = AudioUtils.CachesDirectoryPath + "/AAA.aac";
 
@@ -92,7 +93,8 @@ export default class Composer extends Component {
   render() {
     const { text, onSend, onComposerTextChanged, data, type } = this.props;
     const { recording, currentTime } = this.state;
-    const showPendingWarning = type === "shopping" && data.status === "pending";
+    const showPendingWarning =
+      type === ChatType.shopping && data.status === ChatStatus.PENDING;
     return (
       <View
         style={{

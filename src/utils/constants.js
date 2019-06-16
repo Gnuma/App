@@ -1,6 +1,7 @@
 import colors from "../styles/colors";
 
 export const ___BOOK_IMG_RATIO___ = 4 / 3;
+
 export const ChatType = {
   sales: "sales",
   shopping: "shopping"
@@ -41,4 +42,14 @@ export const CONDITIONS_DATA = {
     percentage: 45,
     color: colors.red
   }
+};
+
+export const ChatStatus = {
+  LOCAL: 0,
+  PENDING: 1,
+  PROGRESS: 2,
+  EXCHANGE: 3,
+  FEEDBACK: 4,
+  COMPLETED: 5,
+  REJECTED: 6
 };

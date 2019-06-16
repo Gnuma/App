@@ -8,7 +8,7 @@ import { single } from "../mockData/Chat2";
 import * as chatActions from "../store/actions/chat";
 import * as messagingAction from "../store/actions/messaging";
 import ContactReview from "../components/Chat/ContactReview";
-import { ChatType } from "../utils/constants";
+import { ChatType, ChatStatus } from "../utils/constants";
 
 export class Chat extends Component {
   constructor(props) {
@@ -110,8 +110,9 @@ export class Chat extends Component {
           goBookOffert={this.goBookOffert}
         />
         <View style={{ flex: 1, marginTop: 120 }}>
-          {chatData.status === "local" ||
-          (chatData.status === "pending" && this.type === ChatType.sales) ? (
+          {chatData.status === ChatStatus.LOCAL ||
+          (chatData.status === ChatStatus.PENDING &&
+            this.type === ChatType.sales) ? (
             <ContactReview
               objectID={objectID}
               chatID={chatID}

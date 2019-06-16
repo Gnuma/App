@@ -12,7 +12,7 @@ import BasicHeader from "../components/BasicHeader";
 import { Header3, Header2, Header1 } from "../components/Text";
 import FullButton from "../components/FullButton";
 import { ListMultiItem } from "../components/ListItem/ListMultiItem";
-import { ChatType } from "../utils/constants";
+import { ChatType, ChatStatus } from "../utils/constants";
 import Card from "../components/Card";
 import PriceInput from "../components/Sell/PriceInput";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -386,7 +386,7 @@ const mockData = {
     },
     createdAt: "06/05/2019-12:02:14",
     value: 15,
-    status: "pending"
+    status: ChatStatus.PENDING
   }
 };
 

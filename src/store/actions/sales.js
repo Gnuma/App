@@ -12,6 +12,7 @@ import {
   ___READ_CHAT___
 } from "../constants";
 import { sendReadNotification } from "../../utils/chatUtility";
+import { ChatStatus } from "../../utils/constants";
 
 export const salesInit = data => {
   return {
@@ -265,9 +266,9 @@ export const salesSettle = (itemID, chatID, isAccepting) => {
     //API
     setTimeout(() => {
       if (isAccepting) {
-        dispatch(salesSettleChat(itemID, chatID, "progress"));
+        dispatch(salesSettleChat(itemID, chatID, ChatStatus.PROGRESS));
       } else {
-        dispatch(salesSettleChat(itemID, chatID, "rejected"));
+        dispatch(salesSettleChat(itemID, chatID, ChatStatus.REJECTED));
       }
     }, 1000);
   };

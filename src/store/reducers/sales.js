@@ -12,6 +12,7 @@ import {
 } from "../../utils/chatUtility";
 import { newChat } from "../../mockData/Chat2";
 import { OffertStatus } from "../../views/BookOffert";
+import { ChatStatus } from "../../utils/constants";
 
 const initialState = {
   data: null,
@@ -257,7 +258,7 @@ const salesNewChat = (state, action) => {
       username: data.buyer.user.username
     },
     hasNews: 1,
-    status: "pending",
+    status: ChatStatus.PENDING,
     messages: [],
     loading: false,
     composer: "",

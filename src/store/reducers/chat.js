@@ -10,7 +10,7 @@ import {
   createOffert
 } from "../../utils/chatUtility";
 import { OffertStatus } from "../../views/BookOffert";
-import { ChatType } from "../../utils/constants";
+import { ChatType, ChatStatus } from "../../utils/constants";
 
 const initialState = {
   data: {},
@@ -62,7 +62,22 @@ const chatStartChatAction = (state, { payload: { objectID, chatID } }) =>
 
 const chatFail = (state, { payload: { error } }) =>
   update(state, {
-    error: { $set: error }
+    error: { $set: error },
+    loading: { $set: false }
+  });
+
+const chatSingleFail = (state, { payload: { objectID, chatID, error } }) =>
+  update(state, {
+    error: { $set: error },
+    data: {
+      [objectID]: {
+        chats: {
+          [chatID]: {
+            loading: { $set: false }
+          }
+        }
+      }
+    }
   });
 
 const chatSetSalesListFocus = (state, { payload: { focus } }) =>
@@ -239,7 +254,7 @@ const chatNewChat = (state, { payload: { objectID, chatID, data } }) => {
       username: data.buyer.user.username
     },
     hasNews: 1,
-    status: "pending",
+    status: ChatStatus.PENDING,
     messages: [],
     loading: false,
     composer: "",
@@ -325,7 +340,7 @@ const chatContactUser = (state, { payload: { item, chatID } }) => {
     item: item,
     UserTO: item.seller.user,
     hasNews: false,
-    status: "local",
+    status: ChatStatus.LOCAL,
     messages: [],
     offerts: []
   };
@@ -452,7 +467,7 @@ const chatAcceptOffert = (state, { payload: { objectID, chatID } }) =>
     }
   });
 
-const chatOffertFail = (state, { payload: { objectID, chatID } }) =>
+const chatOffertFail = (state, { payload: { objectID, chatID, error } }) =>
   update(state, {
     data: {
       [objectID]: {
@@ -462,7 +477,8 @@ const chatOffertFail = (state, { payload: { objectID, chatID } }) =>
           }
         }
       }
-    }
+    },
+    error: { $set: error }
   });
 
 export default (state = initialState, action) => {
@@ -481,6 +497,9 @@ export default (state = initialState, action) => {
 
     case actionTypes.CHAT_FAIL:
       return chatFail(state, action);
+
+    case actionTypes.CHAT_SINGLE_FAIL:
+      return chatSingleFail(state, action);
 
     case actionTypes.CHAT_SET_SALES_LIST_FOCUS:
       return chatSetSalesListFocus(state, action);

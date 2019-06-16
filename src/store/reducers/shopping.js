@@ -16,6 +16,7 @@ import {
 import _ from "lodash";
 import uuid from "uuid";
 import { OffertStatus } from "../../views/BookOffert";
+import { ChatStatus } from "../../utils/constants";
 
 const initialState = {
   data: null,
@@ -259,7 +260,7 @@ const shoppingContactUser = (state, action) => {
     item: item,
     UserTO: item.seller.user,
     hasNews: false,
-    status: "local",
+    status: ChatStatus.LOCAL,
     messages: [],
     offerts: []
   };

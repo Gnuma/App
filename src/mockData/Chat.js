@@ -1,4 +1,5 @@
 import uuid from "uuid";
+import { ChatStatus } from "../utils/constants";
 
 export const mockChatLink = {
   buyer: {
@@ -9,7 +10,7 @@ export const mockChatLink = {
     id: 2,
     name: "Alice"
   },
-  status: "active"
+  status: ChatStatus.PROGRESS
 };
 
 export const mockMessages = [

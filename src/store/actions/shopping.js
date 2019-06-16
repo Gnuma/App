@@ -12,6 +12,7 @@ import {
 } from "../constants";
 import NavigationService from "../../navigator/NavigationService";
 import { sendReadNotification } from "../../utils/chatUtility";
+import { ChatStatus } from "../../utils/constants";
 
 export const shoppingInit = data => ({
   type: actionTypes.SHOPPING_INIT,
@@ -252,7 +253,7 @@ export const shoppingRequestContact = (subjectID, chatID, itemID) => {
     dispatch(shoppingStartAction(subjectID, chatID));
     //API
     setTimeout(() => {
-      dispatch(shoppingSettleChat(subjectID, chatID, "pending"));
+      dispatch(shoppingSettleChat(subjectID, chatID, ChatStatus.PENDING));
     }, 1000);
   };
 };

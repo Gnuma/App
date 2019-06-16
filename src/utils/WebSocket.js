@@ -21,7 +21,7 @@ import {
 } from "../store/actions/comments";
 import NetInfo from "@react-native-community/netinfo";
 import { AppState } from "react-native";
-import { ChatType } from "./constants";
+import { ChatType, ChatStatus } from "./constants";
 import { restart } from "../store/actions/messaging";
 import axios from "axios";
 import {
@@ -29,7 +29,9 @@ import {
   chatNewChat,
   chatReceiveMessage,
   chatNewOffert,
-  chatOnline
+  chatOnline,
+  chatRemoveOffert,
+  chatSetOffertAccepted
 } from "../store/actions/chat";
 
 class WS {
@@ -122,6 +124,32 @@ class WS {
             )
           );
 
+        case DataType.ACCEPTED_CHAT:
+          return store.dispatch(
+            chatSettleAction("s" + data.objectID, data._id, ChatStatus.PROGRESS)
+          );
+
+        case DataType.REJECTED_CHAT:
+          return store.dispatch(
+            chatSettleAction("s" + data.objectID, data._id, ChatStatus.REJECTED)
+          );
+
+        case DataType.ACCEPTED_OFFERT:
+          return store.dispatch(
+            chatSetOffertAccepted(
+              (data.for === "sale" ? "" : "s") + data.objectID,
+              data._id
+            )
+          );
+
+        case DataType.REJECTED_OFFERT:
+          return store.dispatch(
+            chatRemoveOffert(
+              (data.for === "sale" ? "" : "s") + data.objectID,
+              data._id
+            )
+          );
+
         default:
           throw `Type ${data.type} not valid`;
       }
@@ -197,7 +225,11 @@ const DataType = {
   NEW_COMMENT: "newComment",
   NEW_ANSWER: "newAnswer",
   RETRIEVE_NOTIFICATIONS: "retrieveNotifications",
-  NEW_OFFERT: "newOffert"
+  NEW_OFFERT: "newOffert",
+  ACCEPTED_CHAT: "acceptChat",
+  REJECTED_CHAT: "rejectChat",
+  ACCEPTED_OFFERT: "acceptOffert",
+  REJECTED_OFFERT: "rejectOffert"
 };
 
 formatMsg = msg => {

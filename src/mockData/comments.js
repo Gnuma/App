@@ -1,4 +1,5 @@
 import uuid from "uuid";
+import { ChatType } from "../utils/constants";
 
 export const newCommentsSingle = [
   {
@@ -142,7 +143,7 @@ export const comment = {
 
 export const answer = {
   type: "newAnswer",
-  for: "shopping",
+  for: ChatType.shopping,
   answer: {
     pk: 2,
     parent: {
@@ -196,7 +197,7 @@ const item2comment2ID = uuid.v4();
 export const commentList = {
   [item1ID]: {
     pk: item1ID,
-    type: "shopping",
+    type: ChatType.shopping,
     book: {
       title: "Matematica Verde 3",
       authors: "tu ca ri to ta"
