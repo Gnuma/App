@@ -18,7 +18,6 @@ import LevelList from "../components/UserSettings/LevelList";
 import SolidButton from "../components/SolidButton";
 import Card from "../components/Card";
 import ActionsList from "../components/UserSettings/ActionsList";
-import { BlurView } from "@react-native-community/blur";
 import CircleValue from "../components/CircleValue";
 import Button from "../components/Button";
 import * as authActions from "../store/actions/auth";
@@ -53,16 +52,14 @@ export class UserSettings extends Component {
   };
 
   goUserInfo = () => {
-    setTimeout(() => {
-      this.props.navigation.navigate("UserInfo");
-    }, 100);
+    this.props.navigation.navigate("UserInfo");
   };
 
   goChangeOffice = () => {
-    setTimeout(() => {
-      this.props.navigation.navigate("OfficeChange");
-    }, 100);
+    this.props.navigation.navigate("OfficeChange");
   };
+
+  goChangePhone = () => {};
 
   render() {
     return (
@@ -70,13 +67,22 @@ export class UserSettings extends Component {
         <BasicHeader title="Il Tuo Profilo" />
         <View style={{ flex: 1 }}>
           <ScrollView>
-            <View style={{ marginHorizontal: marginHorizontal, marginTop: 15 }}>
-              <UserInfoPanel />
-            </View>
+            <UserInfoPanel onPress={this.goUserInfo} />
             <Divider
               style={{
-                marginHorizontal: marginHorizontal,
-                marginTop: 15
+                marginHorizontal: marginHorizontal
+              }}
+            />
+            <UserOfficePanel onPress={this.goChangeOffice} />
+            <Divider
+              style={{
+                marginHorizontal: marginHorizontal
+              }}
+            />
+            <UserPhonePanel onPress={this.goChangePhone} />
+            <Divider
+              style={{
+                marginHorizontal: marginHorizontal
               }}
             />
             <View style={{ marginHorizontal: marginHorizontal, marginTop: 5 }}>
@@ -138,11 +144,7 @@ export class UserSettings extends Component {
                 marginVertical: 15
               }}
             />
-            <ActionsList
-              logout={this.logout}
-              goUserInfo={this.goUserInfo}
-              goChangeOffice={this.goChangeOffice}
-            />
+            <ActionsList logout={this.logout} />
           </ScrollView>
         </View>
         {this.state.showLevelInfo && (
@@ -218,37 +220,110 @@ const LevelSample = () => {
 };
 
 const UserInfoPanel = ({
+  onPress,
   username = "Francesco",
+  email = "Francesco@test.com",
+  emailStatus = "Non Validata"
+}) => {
+  return (
+    <Button
+      onPress={onPress}
+      style={{ paddingHorizontal: marginHorizontal, paddingVertical: 15 }}
+    >
+      <View style={styles.panelHeader}>
+        <Icon name={"user"} size={27} style={{ color: colors.secondary }} />
+        <Header1
+          style={{ flex: 1, marginLeft: 10 }}
+          color="black"
+          numberOfLines={1}
+        >
+          {username}
+        </Header1>
+        <Icon name={"pencil"} size={25} style={{ color: colors.primary }} />
+      </View>
+      <View
+        style={{ flexDirection: "row", marginTop: 10, alignItems: "flex-end" }}
+      >
+        <Header2 style={{ flex: 1 }} numberOfLines={1} color="black">
+          {email}
+        </Header2>
+        <Header3 style={{ color: colors.darkRed }} numberOfLines={1}>
+          {emailStatus}
+        </Header3>
+      </View>
+    </Button>
+  );
+};
+
+const UserOfficePanel = ({
+  onPress,
   office = "Liceo Giulio Cesare",
   address = "Via Giacomo Peroni"
 }) => {
   return (
-    <View>
-      <View style={{ flexDirection: "row" }}>
-        <Header1 style={{ flex: 1 }} color="primary" numberOfLines={1}>
-          {username}
-        </Header1>
-        <Icon name={"user"} size={30} style={{ color: colors.black }} />
+    <Button
+      onPress={onPress}
+      style={{ paddingHorizontal: marginHorizontal, paddingVertical: 15 }}
+    >
+      <View style={styles.panelHeader}>
+        <Icon
+          name={"university"}
+          size={23}
+          style={{ color: colors.secondary }}
+        />
+        <Header2
+          style={{ flex: 1, marginLeft: 10 }}
+          color="black"
+          numberOfLines={1}
+        >
+          {office}
+        </Header2>
+        <Icon name={"pencil"} size={25} style={{ color: colors.primary }} />
       </View>
       <View
-        style={{ alignItems: "center", marginTop: 13, flexDirection: "row" }}
+        style={{ flexDirection: "row", marginTop: 10, alignItems: "flex-end" }}
       >
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "flex-end",
-            flex: 4 / 5
-          }}
-        >
-          <Header2 numberOfLines={1} color="secondary">
-            {office}
-          </Header2>
-          <Header3 numberOfLines={1} color="secondary">
-            {address}
-          </Header3>
-        </View>
+        <Header2 style={{ flex: 1 }} numberOfLines={1} color="black">
+          {address}
+        </Header2>
       </View>
-    </View>
+    </Button>
+  );
+};
+
+UserPhonePanel = ({
+  phone = "1234567890",
+  phoneStatus = "Non Validato",
+  onPress
+}) => {
+  return (
+    <Button
+      onPress={onPress}
+      style={{ paddingHorizontal: marginHorizontal, paddingVertical: 15 }}
+    >
+      <View style={styles.panelHeader}>
+        <Icon name={"phone"} size={30} style={{ color: colors.secondary }} />
+        <Header2
+          style={{ flex: 1, marginLeft: 10 }}
+          color="black"
+          numberOfLines={1}
+        >
+          {phone}
+        </Header2>
+        <Icon name={"pencil"} size={25} style={{ color: colors.primary }} />
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "flex-end",
+          marginTop: 10
+        }}
+      >
+        <Header3 style={{ color: colors.darkRed }} numberOfLines={1}>
+          {phoneStatus}
+        </Header3>
+      </View>
+    </Button>
   );
 };
 
@@ -272,3 +347,10 @@ const LevelInfo = ({ dismiss }) => {
     </Card>
   );
 };
+
+const styles = StyleSheet.create({
+  panelHeader: {
+    flexDirection: "row",
+    alignItems: "center"
+  }
+});

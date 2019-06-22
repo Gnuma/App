@@ -47,7 +47,7 @@ const CreateOffert = ({
               onPress={focusPrice}
             >
               <Icon
-                name="edit"
+                name="pencil"
                 size={22}
                 style={{
                   color: colors.black

@@ -5,14 +5,18 @@ import Button from "./Button";
 import colors from "../styles/colors";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Header3 } from "./Text";
+import Divider from "./Divider";
+import NativeButton from "../components/NativeButton";
 
 export default class TextInputPicker extends Component {
   static propTypes = {
+    value: PropTypes.string,
     options: PropTypes.array,
-    onSelect: PropTypes.func,
-    onTextChange: PropTypes.func,
-    defaultValue: PropTypes.string,
-    value: PropTypes.string
+    placeholder: PropTypes.string,
+
+    onTextChange: PropTypes.func.isRequired,
+    onSelect: PropTypes.func.isRequired,
+    renderOption: PropTypes.func.isRequired
   };
 
   constructor(props) {
@@ -20,7 +24,7 @@ export default class TextInputPicker extends Component {
 
     this.state = {
       isActive: false,
-      selected: undefined
+      text: props.value
     };
   }
 
@@ -29,26 +33,33 @@ export default class TextInputPicker extends Component {
       isActive: true
     });
 
-  setInactive = () =>
+  _onBlur = () => {
     this.setState({
-      isActive: false
+      isActive: false,
+      text: this.props.value || ""
     });
-
-  _onChange = text => {
-    this.props.onTextChange(text);
   };
 
   _focusInput = () => {
-    this.input.focus();
+    this.input && this.input.focus();
   };
 
-  _setInputRef = input => {
-    this.input = input;
+  onSelection = item => {
+    this.setState({
+      isActive: false
+    });
+    this.props.onSelect(item);
+    Keyboard.dismiss();
+  };
+
+  onTextChange = text => {
+    this.setState({ text });
+    this.props.onTextChange(text);
   };
 
   render() {
-    const { isActive } = this.state;
-    const { options, style, value } = this.props;
+    const { isActive, text } = this.state;
+    const { options, style, placeholder } = this.props;
     return (
       <View style={[{ padding: 8 }, style]}>
         <View style={{ flexDirection: "row" }}>
@@ -63,11 +74,12 @@ export default class TextInputPicker extends Component {
               borderBottomLeftRadius: 6,
               borderTopLeftRadius: 6
             }}
-            placeholder={this.props.defaultValue}
+            placeholder={placeholder}
             onFocus={this.setActive}
-            onChangeText={this._onChange}
-            value={value}
-            ref={this._setInputRef}
+            onBlur={this._onBlur}
+            onChangeText={this.onTextChange}
+            value={text}
+            ref={input => (this.input = input)}
           />
           <View
             style={{
@@ -86,7 +98,7 @@ export default class TextInputPicker extends Component {
               }}
               onPress={this._focusInput}
             >
-              <Icon name="edit" size={22} />
+              <Icon name="pencil" size={22} />
             </Button>
           </View>
         </View>
@@ -96,13 +108,14 @@ export default class TextInputPicker extends Component {
               backgroundColor: "white",
               borderRadius: 6,
               elevation: 3,
-              maxheight: 140,
-              marginTop: -10
+              maxHeight: 140,
+              marginTop: -10,
+              overflow: "hidden",
+              flexDirection: "row"
             }}
           >
             <FlatList
               style={{
-                flex: 1,
                 marginTop: 10,
                 borderRadius: 6,
                 backgroundColor: "white"
@@ -122,28 +135,16 @@ export default class TextInputPicker extends Component {
     return index.toString();
   };
 
-  _renderOption = ({ item }) => {
-    console.log(this.state.selected, item);
-    const isSelected =
-      this.state.selected && this.state.selected.id === item.id;
+  _renderOption = ({ item, index }) => {
     return (
-      <Button
-        onPress={() => this.onSelection(item)}
-        style={{ paddingVertical: 6, paddingLeft: 10 }}
-      >
-        <Header3 color={isSelected ? "secondary" : "black"}>
-          {item.name}
-        </Header3>
-      </Button>
+      <View>
+        <NativeButton onPress={() => this.onSelection(item)}>
+          {this.props.renderOption(item)}
+        </NativeButton>
+        {index !== this.props.options.length - 1 && (
+          <Divider style={{ marginHorizontal: 20 }} />
+        )}
+      </View>
     );
-  };
-
-  onSelection = item => {
-    this.setState({
-      selected: item,
-      isActive: false
-    });
-    Keyboard.dismiss();
-    this.props.onSelect ? this.props.onSelect(item) : null;
   };
 }

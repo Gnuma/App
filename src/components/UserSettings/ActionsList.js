@@ -7,7 +7,7 @@ import styles from "./styles";
 
 export default class ActionsList extends Component {
   render() {
-    const { logout, goUserInfo, goChangeOffice } = this.props;
+    const { logout, } = this.props;
 
     return (
       <View
@@ -17,16 +17,6 @@ export default class ActionsList extends Component {
           alignItems: "center"
         }}
       >
-        <SolidButton style={styles.actionButton} onPress={goUserInfo}>
-          <Header3 color="black" style={styles.actionText}>
-            Modifica Profilo
-          </Header3>
-        </SolidButton>
-        <SolidButton style={styles.actionButton} onPress={goChangeOffice}>
-          <Header3 color="black" style={styles.actionText}>
-            Cambia Università o Scuola
-          </Header3>
-        </SolidButton>
         <SolidButton style={styles.actionButton}>
           <Header3 color="black" style={styles.actionText}>
             Invita un amico

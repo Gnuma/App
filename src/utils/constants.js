@@ -53,3 +53,8 @@ export const ChatStatus = {
   COMPLETED: 5,
   REJECTED: 6
 };
+
+export const OfficeTypes = {
+  UNIVERSITY: "university",
+  SCHOOL: "school"
+};

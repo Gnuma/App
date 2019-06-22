@@ -1,17 +1,350 @@
 import React, { Component } from "react";
-import { Text, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View, Dimensions } from "react-native";
 import Picker from "./TextInputPicker";
+import PropTypes from "prop-types";
+import SolidButton from "./SolidButton";
+import { Header3 } from "./Text";
+import { StatusBar } from "./StatusBar";
+import update from "immutability-helper";
+import OutlinedInput from "./Form/OutlinedInput";
+import { OfficeTypes } from "../utils/constants";
+import { FlatList } from "react-native-gesture-handler";
+import colors from "../styles/colors";
+import Button from "../components/Button";
 
 export default class OfficePicker extends Component {
-  render() {
-    const { options, onSelect, onTextChange, value } = this.props;
+  static propTypes = {
+    office: PropTypes.any,
+    course: PropTypes.any,
+    year: PropTypes.any,
+    setOffice: PropTypes.func,
+    setCourse: PropTypes.func,
+    setYear: PropTypes.func,
+    complete: PropTypes.func
+  };
 
+  constructor(props) {
+    super(props);
+
+    console.log(props);
+    this.state = {
+      status: 0, //0: office, 1: course | class, 2: year,
+      office: props.office || {},
+      officeOptions: [],
+      course: props.course || {},
+      courseOptions: [],
+      year: props.year
+    };
+  }
+
+  continue = () => {
+    const { office, status, year, course } = this.state;
+    if (this.canStateContinue()) {
+      switch (status) {
+        case 0:
+          this.setState(_ => ({ status: _.status + 1 }));
+          break;
+        case 1:
+          this.setState(_ => ({ status: _.status + 1 }));
+          break;
+        default:
+          this.props.complete && this.props.complete();
+          break;
+      }
+    }
+  };
+
+  canStateContinue = () => {
+    const { office, status, year, course } = this.state;
+    switch (status) {
+      case 0:
+        return canOfficeContinue(office);
+      case 1:
+        return canCourseContinue(course);
+      default:
+        return canYearContinue(year);
+    }
+  };
+
+  goBack = () => {
+    this.setState(prevState => ({
+      status: Math.max(0, prevState.status - 1)
+    }));
+  };
+
+  changeOfficeText = text => {
+    //API
+    this.setState({
+      officeOptions: mockOfficeOptions
+    });
+  };
+
+  setOffice = office => {
+    this.setState({
+      office
+    });
+    this.props.setOffice && this.props.setOffice(office);
+  };
+
+  changeUnCourseText = text => {
+    //API
+    this.setState({
+      courseOptions: mockUnCourseOptions
+    });
+  };
+
+  changeScCourseText = text => {
+    this.setState({
+      course: {
+        name: text
+      }
+    });
+  };
+
+  setCourse = course => {
+    if (course) {
+      this.setState({
+        course
+      });
+      this.props.setCourse && this.props.setCourse(course);
+    } else {
+      this.props.setCourse && this.props.setCourse(this.state.course);
+    }
+  };
+
+  setYear = index => {
+    this.setState({ year: index });
+    this.props.setYear && this.props.setYear();
+  };
+
+  getContent = () => {
+    const {
+      status,
+      office,
+      officeOptions,
+      course,
+      courseOptions,
+      year
+    } = this.state;
+
+    switch (status) {
+      case 0:
+        return (
+          <OfficeState
+            value={office}
+            options={officeOptions}
+            onTextChange={this.changeOfficeText}
+            onSelect={this.setOffice}
+            renderOption={this.renderOfficeOption}
+          />
+        );
+      case 1:
+        return (
+          <CourseState
+            isUn={office.type == OfficeTypes.UNIVERSITY}
+            value={course}
+            options={courseOptions}
+            changeUnCourseText={this.changeUnCourseText}
+            changeScCourseText={this.changeScCourseText}
+            renderOption={this.renderUnCourseOption}
+            onSelect={this.setCourse}
+          />
+        );
+      case 2:
+        return (
+          <YearState
+            options={["I", "II", "III", "IV", "V"]}
+            setYear={this.setYear}
+            value={year}
+          />
+        );
+    }
+  };
+
+  render() {
+    const { status, office } = this.state;
+    const { containerStyle } = this.props;
+    const canContinue = this.canStateContinue();
     return (
-      <View>
-        <Picker defaultValue={"Istituto"} options={this.state.options} />
+      <View style={[{ flex: 1 }, containerStyle]}>
+        <StatusBar
+          status={status}
+          data={[
+            "Istituto o università",
+            office.type === OfficeTypes.UNIVERSITY
+              ? "Corso di laurea"
+              : "Classe",
+            "Anno di studi"
+          ]}
+          goBack={this.goBack}
+        />
+        <View>
+          <View style={{ height: 210 }}>{this.getContent()}</View>
+          <SolidButton
+            style={{ marginHorizontal: 8 }}
+            onPress={this.continue}
+            disabled={!canContinue}
+          >
+            <Header3
+              color={canContinue ? "secondary" : "black"}
+              style={{ flex: 1, textAlign: "center" }}
+            >
+              Continua
+            </Header3>
+          </SolidButton>
+        </View>
       </View>
     );
   }
+
+  renderOfficeOption = item => {
+    return (
+      <Header3 color={"black"} style={{ margin: 10 }}>
+        {item.name}
+      </Header3>
+    );
+  };
+
+  renderUnCourseOption = item => {
+    return (
+      <Header3 color={"black"} style={{ margin: 10 }}>
+        {item.name}
+      </Header3>
+    );
+  };
 }
 
+const OfficeState = ({ value, ...props }) => {
+  return (
+    <Picker
+      value={value.name}
+      {...props}
+      placeholder={"Seleziona la tua università o istituto"}
+    />
+  );
+};
+
+const CourseState = ({
+  value,
+  changeUnCourseText,
+  changeScCourseText,
+  isUn,
+  ...props
+}) => {
+  if (isUn) {
+    return (
+      <Picker
+        value={value.name}
+        {...props}
+        placeholder="Seleziona il tuo corso"
+        onTextChange={changeUnCourseText}
+      />
+    );
+  } else {
+    return (
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <OutlinedInput
+          value={value.name}
+          {...props}
+          placeholder="Classe (es: A)"
+          onTextChange={changeScCourseText}
+          containerStyle={{ width: 200 }}
+          autoCapitalize="characters"
+          inputStyle={{ textAlign: "center" }}
+        />
+      </View>
+    );
+  }
+};
+
+const yearBoxSize = ((Dimensions.get("window").width - 40) / 5) * (3 / 4);
+
+const YearState = ({ value, setYear, options }) => {
+  return (
+    <FlatList
+      numColumns={5}
+      columnWrapperStyle={{ flex: 1, justifyContent: "space-around" }}
+      data={options}
+      renderItem={({ item, index }) => {
+        return (
+          <Button
+            style={{
+              elevation: 3,
+              backgroundColor: colors.white,
+              width: yearBoxSize,
+              height: yearBoxSize,
+              borderRadius: 6,
+              margin: 3,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+            onPress={() => setYear(index)}
+          >
+            <Header3 color="black">{item}</Header3>
+            {value == index && (
+              <View
+                style={{
+                  ...StyleSheet.absoluteFill,
+                  borderWidth: 1,
+                  borderColor: colors.secondary,
+                  borderRadius: 6
+                }}
+              />
+            )}
+          </Button>
+        );
+      }}
+      keyExtractor={item => item}
+    />
+  );
+};
+
 const styles = StyleSheet.create({});
+
+const mockOfficeOptions = [
+  {
+    name: "UN I.I.S.S J. Von Neumann",
+    address: "Via dell'uno",
+    type: "university",
+    id: 1
+  },
+  {
+    name: "Liceo Scientifico Orazio",
+    address: "Via dell'uno",
+    type: "school",
+    id: 2
+  },
+  {
+    name: "Liceo Linguistico Nomentano",
+    address: "Via dell'uno",
+    type: "school",
+    id: 3
+  },
+  {
+    name: "UN Liceo Classico Nuova Sabina",
+    address: "Via dell'uno",
+    type: "university",
+    id: 4
+  },
+  {
+    name: "Liceo Classico Giulio Cesare",
+    address: "Via dell'uno",
+    type: "school",
+    id: 5
+  }
+];
+
+const mockUnCourseOptions = [
+  {
+    name: "Ingegneria Spaziale",
+    id: 1
+  },
+  {
+    name: "Lettere",
+    id: 2
+  }
+];
+
+const canOfficeContinue = office => office.id !== undefined;
+const canCourseContinue = course => course.name !== undefined;
+const canYearContinue = year => year !== undefined;

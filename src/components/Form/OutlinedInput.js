@@ -94,5 +94,5 @@ export default class OutlinedInput extends Component {
 }
 
 OutlinedInput.defaultProps = {
-  icon: "edit"
+  icon: "pencil"
 };
