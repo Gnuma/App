@@ -59,7 +59,9 @@ export class UserSettings extends Component {
     this.props.navigation.navigate("OfficeChange");
   };
 
-  goChangePhone = () => {};
+  goChangePhone = () => {
+    this.props.navigation.navigate("PhoneChange");
+  };
 
   render() {
     return (

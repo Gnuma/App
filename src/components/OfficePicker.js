@@ -16,11 +16,14 @@ export default class OfficePicker extends Component {
   static propTypes = {
     office: PropTypes.any,
     course: PropTypes.any,
-    year: PropTypes.any,
+    yeart: PropTypes.any,
     setOffice: PropTypes.func,
     setCourse: PropTypes.func,
     setYear: PropTypes.func,
-    complete: PropTypes.func
+
+    status: PropTypes.number,
+
+    renderGoBack: PropTypes.bool
   };
 
   constructor(props) {
@@ -28,43 +31,10 @@ export default class OfficePicker extends Component {
 
     console.log(props);
     this.state = {
-      status: 0, //0: office, 1: course | class, 2: year,
-      office: props.office || {},
       officeOptions: [],
-      course: props.course || {},
-      courseOptions: [],
-      year: props.year
+      courseOptions: []
     };
   }
-
-  continue = () => {
-    const { office, status, year, course } = this.state;
-    if (this.canStateContinue()) {
-      switch (status) {
-        case 0:
-          this.setState(_ => ({ status: _.status + 1 }));
-          break;
-        case 1:
-          this.setState(_ => ({ status: _.status + 1 }));
-          break;
-        default:
-          this.props.complete && this.props.complete();
-          break;
-      }
-    }
-  };
-
-  canStateContinue = () => {
-    const { office, status, year, course } = this.state;
-    switch (status) {
-      case 0:
-        return canOfficeContinue(office);
-      case 1:
-        return canCourseContinue(course);
-      default:
-        return canYearContinue(year);
-    }
-  };
 
   goBack = () => {
     this.setState(prevState => ({
@@ -80,9 +50,6 @@ export default class OfficePicker extends Component {
   };
 
   setOffice = office => {
-    this.setState({
-      office
-    });
     this.props.setOffice && this.props.setOffice(office);
   };
 
@@ -94,38 +61,20 @@ export default class OfficePicker extends Component {
   };
 
   changeScCourseText = text => {
-    this.setState({
-      course: {
-        name: text
-      }
-    });
+    this.props.setCourse && this.props.setCourse({ name: text });
   };
 
   setCourse = course => {
-    if (course) {
-      this.setState({
-        course
-      });
-      this.props.setCourse && this.props.setCourse(course);
-    } else {
-      this.props.setCourse && this.props.setCourse(this.state.course);
-    }
+    this.props.setCourse && this.props.setCourse(course);
   };
 
   setYear = index => {
-    this.setState({ year: index });
-    this.props.setYear && this.props.setYear();
+    this.props.setYear && this.props.setYear(index);
   };
 
   getContent = () => {
-    const {
-      status,
-      office,
-      officeOptions,
-      course,
-      courseOptions,
-      year
-    } = this.state;
+    const { officeOptions, courseOptions } = this.state;
+    const { status, office, course, year } = this.props;
 
     switch (status) {
       case 0:
@@ -162,9 +111,7 @@ export default class OfficePicker extends Component {
   };
 
   render() {
-    const { status, office } = this.state;
-    const { containerStyle } = this.props;
-    const canContinue = this.canStateContinue();
+    const { status, office, containerStyle, renderGoBack } = this.props;
     return (
       <View style={[{ flex: 1 }, containerStyle]}>
         <StatusBar
@@ -176,23 +123,9 @@ export default class OfficePicker extends Component {
               : "Classe",
             "Anno di studi"
           ]}
-          goBack={this.goBack}
+          goBack={renderGoBack && this.goBack}
         />
-        <View>
-          <View style={{ height: 210 }}>{this.getContent()}</View>
-          <SolidButton
-            style={{ marginHorizontal: 8 }}
-            onPress={this.continue}
-            disabled={!canContinue}
-          >
-            <Header3
-              color={canContinue ? "secondary" : "black"}
-              style={{ flex: 1, textAlign: "center" }}
-            >
-              Continua
-            </Header3>
-          </SolidButton>
-        </View>
+        {this.getContent()}
       </View>
     );
   }
@@ -348,3 +281,14 @@ const mockUnCourseOptions = [
 const canOfficeContinue = office => office.id !== undefined;
 const canCourseContinue = course => course.name !== undefined;
 const canYearContinue = year => year !== undefined;
+
+export const canStateContinue = ({ office, status, year, course }) => {
+  switch (status) {
+    case 0:
+      return canOfficeContinue(office);
+    case 1:
+      return canCourseContinue(course);
+    default:
+      return canYearContinue(year);
+  }
+};

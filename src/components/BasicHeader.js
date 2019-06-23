@@ -10,7 +10,8 @@ import NavigationService from "../navigator/NavigationService";
 class HomeHeader extends Component {
   static propTypes = {
     title: PropTypes.string,
-    icon: PropTypes.string
+    icon: PropTypes.string,
+    goBack: PropTypes.func
   };
 
   render() {
@@ -30,7 +31,7 @@ class HomeHeader extends Component {
   }
 
   _local_handleGoBack = () => {
-    NavigationService.goBack(null);
+    (this.props.goBack || NavigationService.goBack)(null);
   };
 }
 HomeHeader.defaultProps = {

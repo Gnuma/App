@@ -23,8 +23,9 @@ import BookOffertScreen from "../views/BookOffert";
 import ShoppingListScreen from "../views/ShoppingList";
 import ImagePickerScreen from "../views/ImagePicker";
 import UserSettingsScreen from "../views/UserSettings";
-import UserInfoScreen from "../views/UserInfo";
-import OfficeChangeScreen from "../views/OfficeChange";
+import UserInfoScreen from "../views/UserChanges/UserInfo";
+import OfficeChangeScreen from "../views/UserChanges/OfficeChange";
+import PhoneChangeScreen from "../views/UserChanges/PhoneChange";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -33,7 +34,8 @@ const UserSettingsNavigator = createStackNavigator(
   {
     UserSettings: UserSettingsScreen,
     UserInfo: UserInfoScreen,
-    OfficeChange: OfficeChangeScreen
+    OfficeChange: OfficeChangeScreen,
+    PhoneChange: PhoneChangeScreen
   },
   {
     defaultNavigationOptions: {

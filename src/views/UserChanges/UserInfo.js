@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import { View, Keyboard } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import BasicHeader from "../components/BasicHeader";
-import SolidButton from "../components/SolidButton";
-import { Header2 } from "../components/Text";
-import UserInfoForm from "../components/UserSettings/UserInfoForm";
-import { isEmpty, isInvalidEmail, submit } from "../utils/validator";
+import BasicHeader from "../../components/BasicHeader";
+import SolidButton from "../../components/SolidButton";
+import { Header2 } from "../../components/Text";
+import UserInfoForm from "../../components/UserSettings/UserInfoForm";
+import { isEmpty, isInvalidEmail, submit } from "../../utils/validator";
 import update from "immutability-helper";
 
 export class UserInfo extends Component {
