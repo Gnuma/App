@@ -5,12 +5,13 @@ import { connect } from "react-redux";
 import * as authActions from "../store/actions/auth";
 import Button from "../components/Button";
 import { Header1, Header3 } from "../components/Text";
-import Picker from "../components/TextInputPicker";
+import OfficePicker, { canStateContinue } from "../components/OfficePicker";
 import axios from "axios";
 import { ___OFFICE_HINTS_ENDPOINT___ } from "../store/constants";
 import { Subject, of } from "rxjs";
 import { switchMap, map, catchError } from "rxjs/operators";
 import { ajax } from "rxjs/ajax";
+import { AndroidBackHandler } from "react-navigation-backhandler";
 
 export class InitProfile extends Component {
   constructor(props) {
@@ -30,11 +31,52 @@ export class InitProfile extends Component {
   }
 
   state = {
-    options: [],
-    office: undefined,
-    officeQueryValue: ""
+    status: 0, //0: office, 1: course | class, 2: year,
+    office: {},
+    course: {},
+    year: undefined
   };
 
+  setItem = (key, value) => {
+    this.setState({
+      [key]: value
+    });
+  };
+
+  continue = () => {
+    const { status } = this.state;
+    if (canStateContinue(this.state)) {
+      switch (status) {
+        case 0:
+          this.setState(_ => ({ status: _.status + 1 }));
+          break;
+        case 1:
+          this.setState(_ => ({ status: _.status + 1 }));
+          break;
+        default:
+          this.complete();
+          break;
+      }
+    }
+  };
+
+  goBack = () => {
+    if (this.state.status === 0) {
+      this.props.navigation.goBack(null);
+    } else {
+      this.setState(prevState => ({
+        status: Math.max(0, prevState.status - 1)
+      }));
+    }
+    return true;
+  };
+
+  complete = () => {
+    console.log("complete");
+    this.props.navigation.goBack(null);
+  };
+
+  /*
   componentDidMount() {
     this.querySubscription = this.officeQuery.subscribe(
       options => {
@@ -73,48 +115,54 @@ export class InitProfile extends Component {
     this.officeQuery.next(text);
   };
 
+  */
   render() {
+    const { office, course, year, status } = this.state;
     return (
-      <ScrollView
-        style={{
-          flex: 1,
-          paddingVertical: 20,
-          paddingHorizontal: 18
-        }}
-      >
-        <Header1 color={"primary"} style={{ fontSize: 50 }}>
-          Ciao!
-        </Header1>
-        <Header3 color={"black"}>Benvenuto in Quipu</Header3>
-        <Header3 color={"black"}>
-          Per rendere la tua esperienza impeccabile abbiamo bisogno di sapere il
-          tuo istituto
-        </Header3>
-        <Picker
-          defaultValue={"Istituto"}
-          options={this.state.options}
-          style={{ marginVertical: 20 }}
-          onSelect={this._onSelectOffice}
-          value={this.state.officeQueryValue}
-          onTextChange={this._onOfficeQueryChange}
-        />
-        <Button
+      <AndroidBackHandler onBackPress={this.goBack}>
+        <ScrollView
           style={{
-            paddingVertical: 4,
-            backgroundColor: "white",
-            width: 200,
-            elevation: 4,
-            borderRadius: 6,
-            margin: 10,
-            alignSelf: "center"
+            flex: 1,
+            paddingVertical: 20,
+            paddingHorizontal: 18
           }}
-          onPress={this._onOpenApp}
         >
-          <Header3 style={{ textAlign: "center" }} color={"primary"}>
-            Continua
+          <Header1 color={"primary"} style={{ fontSize: 50 }}>
+            Ciao!
+          </Header1>
+          <Header3 color={"black"}>Benvenuto in Quipu</Header3>
+          <Header3 color={"black"}>
+            Per rendere la tua esperienza impeccabile abbiamo bisogno di sapere
+            il tuo istituto
           </Header3>
-        </Button>
-      </ScrollView>
+          <OfficePicker
+            office={office}
+            course={course}
+            year={year}
+            setOffice={office => this.setItem("office", office)}
+            setCourse={course => this.setItem("course", course)}
+            setYear={year => this.setItem("year", year)}
+            status={status}
+            goBack={this.goBack}
+          />
+          <Button
+            style={{
+              paddingVertical: 4,
+              backgroundColor: "white",
+              width: 200,
+              elevation: 4,
+              borderRadius: 6,
+              margin: 10,
+              alignSelf: "center"
+            }}
+            onPress={this.continue}
+          >
+            <Header3 style={{ textAlign: "center" }} color={"primary"}>
+              Continua
+            </Header3>
+          </Button>
+        </ScrollView>
+      </AndroidBackHandler>
     );
   }
 }
@@ -131,26 +179,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(InitProfile);
-
-const mockOptions = [
-  {
-    title: "I.I.S.S J. Von Neumann",
-    id: 1
-  },
-  {
-    title: "Liceo Scientifico Orazio",
-    id: 2
-  },
-  {
-    title: "Liceo Linguistico Nomentano",
-    id: 3
-  },
-  {
-    title: "Liceo Classico Nuova Sabina",
-    id: 4
-  },
-  {
-    title: "Liceo Classico Giulio Cesare",
-    id: 5
-  }
-];

@@ -23,7 +23,7 @@ export default class OfficePicker extends Component {
 
     status: PropTypes.number,
 
-    renderGoBack: PropTypes.bool
+    goBack: PropTypes.func
   };
 
   constructor(props) {
@@ -111,7 +111,7 @@ export default class OfficePicker extends Component {
   };
 
   render() {
-    const { status, office, containerStyle, renderGoBack } = this.props;
+    const { status, office, containerStyle, goBack } = this.props;
     return (
       <View style={[{ flex: 1 }, containerStyle]}>
         <StatusBar
@@ -123,7 +123,7 @@ export default class OfficePicker extends Component {
               : "Classe",
             "Anno di studi"
           ]}
-          goBack={renderGoBack && this.goBack}
+          goBack={goBack}
         />
         {this.getContent()}
       </View>
