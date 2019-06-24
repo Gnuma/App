@@ -14,7 +14,8 @@ export default class OutlinedInput extends Component {
     inputType: PropTypes.string,
     inputStyle: PropTypes.any,
     containerStyle: PropTypes.any,
-    borderFocus: PropTypes.bool
+    borderFocus: PropTypes.bool,
+    isPhone: PropTypes.bool
   };
 
   _onChange = text => {
@@ -32,7 +33,6 @@ export default class OutlinedInput extends Component {
   render() {
     const {
       style,
-      value,
       placeholder,
       icon,
       inputType,
@@ -41,6 +41,8 @@ export default class OutlinedInput extends Component {
       borderFocus,
       ...rest
     } = this.props;
+    let { value } = this.props;
+
     return (
       <View
         style={[
@@ -68,10 +70,10 @@ export default class OutlinedInput extends Component {
             ]}
             placeholder={placeholder}
             onChangeText={this._onChange}
-            value={value}
             ref={this._setInputRef}
             keyboardType={inputType}
             {...rest}
+            value={value}
           />
           <Button
             style={{

@@ -8,6 +8,22 @@ import Button from "./Button";
 export const StatusBar = ({ data, status, goBack }) => {
   let statusText = data[status];
   const showGoBack = goBack && status > 0;
+
+  const styles = StyleSheet.create({
+    activeStatus: {
+      flex: 1 / data.length,
+      borderBottomWidth: 1,
+      borderColor: colors.secondary,
+      margin: 5
+    },
+    inactiveStatus: {
+      flex: 1 / data.length,
+      borderBottomWidth: 1,
+      borderColor: colors.grey,
+      margin: 5
+    }
+  });
+
   return (
     <View style={{ marginVertical: 10 }}>
       <View
@@ -20,7 +36,7 @@ export const StatusBar = ({ data, status, goBack }) => {
       >
         <View
           style={{
-            width: 40
+            width: showGoBack ? 40 : 20
           }}
         >
           {showGoBack && (
@@ -53,18 +69,3 @@ export const StatusBar = ({ data, status, goBack }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  activeStatus: {
-    flex: 1 / 3,
-    borderBottomWidth: 1,
-    borderColor: colors.secondary,
-    margin: 5
-  },
-  inactiveStatus: {
-    flex: 1 / 3,
-    borderBottomWidth: 1,
-    borderColor: colors.grey,
-    margin: 5
-  }
-});
