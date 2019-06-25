@@ -58,3 +58,8 @@ export const OfficeTypes = {
   UNIVERSITY: "university",
   SCHOOL: "school"
 };
+
+export const SellType = {
+  NEW: "NEW",
+  MODIFY: "MODIFY"
+};

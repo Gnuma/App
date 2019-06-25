@@ -92,6 +92,6 @@ export default class BookItem extends Component {
   };
 
   _local_handleSelection = () => {
-    this.props.handleSelection(this.props.data.isbn);
+    this.props.handleSelection(this.props.data);
   };
 }

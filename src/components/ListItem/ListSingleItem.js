@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Text, View, Image } from "react-native";
-import { withNavigation } from "react-navigation";
+import { withNavigation, StackActions } from "react-navigation";
 import Button from "../Button";
 import PropTypes from "prop-types";
 import styles from "./styles";
@@ -13,23 +13,29 @@ export class ListSingleItem extends Component {
 
   render() {
     const { data } = this.props;
-    const { book, pk } = data;
-
     return (
-      <Button
-        onPress={() =>
-          this.props.navigation.navigate("Item", {
-            itemID: pk,
-            name: book.title,
-            authors: book.author
-          })
-        }
-        style={styles.itemButton}
-      >
+      <Button onPress={this.goItem} style={styles.itemButton}>
         <Item data={this.props.data} isSingle={this.props.isSingle} />
       </Button>
     );
   }
+
+  goItem = () => {
+    const {
+      data: { book, pk }
+    } = this.props;
+
+    const pushAction = StackActions.push({
+      routeName: "Item",
+      params: {
+        itemID: pk,
+        name: book.title,
+        authors: book.author
+      }
+    });
+
+    this.props.navigation.dispatch(pushAction);
+  };
 }
 
 export default withNavigation(ListSingleItem);

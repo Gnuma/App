@@ -16,7 +16,7 @@ import MainCamera from "../components/Camera/MainCamera";
 import { TransparentBar } from "../components/StatusBars";
 import { SafeAreaView } from "react-navigation";
 import ImageReviewer from "../components/Camera/ImageReviewer";
-import { ___BOOK_IMG_RATIO___ } from "../utils/constants";
+import { ___BOOK_IMG_RATIO___, SellType } from "../utils/constants";
 
 export class Camera extends Component {
   imgCounter = 5;
@@ -105,7 +105,11 @@ export class Camera extends Component {
   };
 
   handleGoNext = () => {
-    this.props.navigation.navigate("SelectBook");
+    if (this.props.type === SellType.NEW) {
+      this.props.navigation.navigate("SelectBook");
+    } else {
+      this.props.navigation.navigate("VendiInfos");
+    }
   };
 
   changeFlashMode = () => {
@@ -207,7 +211,8 @@ export class Camera extends Component {
 const mapStateToProps = state => ({
   previews: state.sell.previews,
   previewsOrder: state.sell.previewsOrder,
-  checking: state.sell.checking
+  checking: state.sell.checking,
+  type: state.sell.type
 });
 
 const mapDispatchToProps = dispatch => {

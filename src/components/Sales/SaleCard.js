@@ -9,6 +9,7 @@ import CircleValue from "../CircleValue";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Button from "../Button";
 import NavigationService from "../../navigator/NavigationService";
+import { StackActions } from "react-navigation";
 
 export default class SaleCard extends Component {
   render() {
@@ -70,10 +71,14 @@ export default class SaleCard extends Component {
   }
 
   goItem = () => {
-    NavigationService.navigate("Item", {
-      itemID: this.props.data._id,
-      name: this.props.data.book.title,
-      authors: this.props.data.book.author
+    const pushAction = StackActions.push({
+      routeName: "Item",
+      params: {
+        itemID: this.props.data._id,
+        name: this.props.data.book.title,
+        authors: this.props.data.book.author
+      }
     });
+    NavigationService.dispatch(pushAction);
   };
 }

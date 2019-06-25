@@ -5,18 +5,14 @@ import { connect } from "react-redux";
 import ItemHeader from "../components/Item/ItemHeader";
 import { itemData } from "../mockData/Item";
 import MainItem from "../components/Item/MainItem";
-import ContactButton from "../components/Item/ContactButton";
 import colors from "../styles/colors";
-import NavigatorService from "../navigator/NavigationService";
 import axios from "axios";
 import { ___GET_AD___ } from "../store/constants";
 import * as commentActions from "../store/actions/comments";
 import * as chatActions from "../store/actions/chat";
+import * as sellActions from "../store/actions/sell";
 import { notificationsViewItem } from "../store/actions/notifications";
-import protectedAction from "../utils/protectedAction";
-import NavigationService from "../navigator/NavigationService";
-import { mockContactItem } from "../mockData/Chat2";
-import { WhiteBar, GreyBar } from "../components/StatusBars";
+import { GreyBar } from "../components/StatusBars";
 
 export class Item extends Component {
   constructor(props) {
@@ -26,7 +22,8 @@ export class Item extends Component {
       data: undefined,
       bookName: props.navigation.getParam("name", "Undesfineds"),
       bookAuthors: props.navigation.getParam("authors", "Undesfineds"),
-      keyboardOpen: false
+      keyboardOpen: false,
+      isOwner: false
     };
 
     this.newComments =
@@ -65,7 +62,8 @@ export class Item extends Component {
       .get(___GET_AD___ + `${id}/`)
       .then(res => {
         this.setState({
-          data: this.formatData(res.data)
+          data: this.formatData(res.data),
+          isOwner: this.props.user.id == res.data.seller._id
         });
         console.log(res.data);
         console.log(this.formatData(res.data));
@@ -127,7 +125,7 @@ export class Item extends Component {
   setKeyboardOpen = value => () => this.setState({ keyboardOpen: value });
 
   render() {
-    const { data, bookName, bookAuthors } = this.state;
+    const { data, bookName, bookAuthors, isOwner } = this.state;
     const { navigation } = this.props;
     const isLoading = data === undefined;
 
@@ -156,6 +154,7 @@ export class Item extends Component {
             newComments={this.newComments}
             onContact={this._handleContact}
             viewHeight={this.viewHeight}
+            isOwner={isOwner}
           />
         )}
       </View>
@@ -179,7 +178,11 @@ export class Item extends Component {
     /*protectedAction().then(() => {
       this.props.contactRedux();
     });*/
-    this.props.contactRedux(this.state.data);
+    if (!this.state.isOwner) {
+      this.props.contactRedux(this.state.data);
+    } else {
+      this.props.sellStartMofifying(this.state.data);
+    }
   };
 }
 
@@ -196,7 +199,8 @@ const mapDispatchToProps = dispatch => {
     contactRedux: item => dispatch(chatActions.chatContactUser(item)),
     notificationViewItemRedux: itemPK =>
       dispatch(notificationsViewItem(itemPK)),
-    readComments: item => dispatch(commentActions.commentsRead(item))
+    readComments: item => dispatch(commentActions.commentsRead(item)),
+    sellStartMofifying: item => dispatch(sellActions.sellStartModifying(item))
   };
 };
 

@@ -22,6 +22,7 @@ import {
   State
 } from "react-native-gesture-handler";
 import NavigationService from "../../navigator/NavigationService";
+import { StackActions } from "react-navigation";
 
 const minHeight = 120;
 const maxHeight = 250;
@@ -56,11 +57,15 @@ export default class ChatHeader extends Component {
   };
 
   goItem = () => {
-    NavigationService.navigate("Item", {
-      itemID: this.props.item._id,
-      name: this.props.item.book.title,
-      authors: this.props.item.book.author
+    const pushAction = StackActions.push({
+      routeName: "Item",
+      params: {
+        itemID: this.props.item._id,
+        name: this.props.item.book.title,
+        authors: this.props.item.book.author
+      }
     });
+    NavigationService.dispatch(pushAction);
   };
 
   render() {

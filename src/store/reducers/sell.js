@@ -2,6 +2,7 @@ import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
 import update from "immutability-helper";
 import _ from "lodash";
+import { SellType } from "../../utils/constants";
 
 const initialState = {
   previews: {
@@ -21,7 +22,9 @@ const initialState = {
   conditions: null,
   description: "",
   loading: false,
-  error: null
+  error: null,
+  type: SellType.NEW,
+  itemModId: null
 };
 
 const takePreview = (state, action) => {
@@ -133,6 +136,28 @@ const sellRemoveReview = (state, action) => {
   });
 };
 
+const sellStartSelling = () => initialState;
+
+const sellStartModifying = (state, { payload: { item } }) => {
+  let previews = Object.assign({}, initialState.previews);
+  item.image_ad.forEach((value, index) => {
+    previews[index] = { uri: value };
+  });
+  const { pk, description, condition, price, book } = item;
+
+  return update(initialState, {
+    type: { $set: SellType.MODIFY },
+    $merge: {
+      previews,
+      itemModId: pk,
+      description,
+      conditions: condition,
+      price: price.toString(),
+      book: book.isbn
+    }
+  });
+};
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SELL_START:
@@ -173,6 +198,12 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SELL_REMOVE_REVIEW:
       return sellRemoveReview(state, action);
+
+    case actionTypes.SELL_START_SELLING:
+      return sellStartSelling(state, action);
+
+    case actionTypes.SELL_START_MODIFYING:
+      return sellStartModifying(state, action);
 
     default:
       return state;

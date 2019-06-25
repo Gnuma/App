@@ -53,8 +53,8 @@ export class Header extends Component {
   };
 
   openSettings = () => {
-    //protectedAction().then(() => NavigationService.navigate("UserSettings"));
-    NavigationService.navigate("UserSettings");
+    protectedAction().then(() => NavigationService.navigate("UserSettings"));
+    //NavigationService.navigate("UserSettings");
   };
 
   render() {

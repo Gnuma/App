@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, Animated } from "react-native";
+import { Text, View, Animated, StyleSheet } from "react-native";
 import Button from "../Button";
 import { Header2 } from "../Text";
 import colors from "../../styles/colors";
@@ -12,7 +12,8 @@ export class ContactButton extends Component {
       scrollY,
       viewHeight,
       setContactButtonHeight,
-      contactSnapY
+      contactSnapY,
+      isOwner
     } = this.props;
     console.log(contactSnapY);
     return (
@@ -51,19 +52,12 @@ export class ContactButton extends Component {
           }}
         >
           <Button
-            style={{
-              flex: 1,
-              backgroundColor: colors.secondary,
-              elevation: 1,
-              flexDirection: "row",
-              padding: 8,
-              justifyContent: "center",
-              borderRadius: 6
-              //marginBottom: 10
-            }}
+            style={isOwner ? styles.modifyButton : styles.contactButton}
             onPress={this.props.onContact}
           >
-            <Header2 color={"white"}>Contatta Ora</Header2>
+            <Header2 color={isOwner ? "primary" : "white"}>
+              {isOwner ? "Modifica Vendita" : "Contatta Ora"}
+            </Header2>
           </Button>
         </View>
       </Animated.View>
@@ -72,3 +66,24 @@ export class ContactButton extends Component {
 }
 
 export default ContactButton;
+
+const styles = StyleSheet.create({
+  contactButton: {
+    flex: 1,
+    backgroundColor: colors.secondary,
+    elevation: 1,
+    flexDirection: "row",
+    padding: 8,
+    justifyContent: "center",
+    borderRadius: 6
+  },
+  modifyButton: {
+    flex: 1,
+    backgroundColor: colors.white,
+    elevation: 3,
+    flexDirection: "row",
+    padding: 8,
+    justifyContent: "center",
+    borderRadius: 6
+  }
+});

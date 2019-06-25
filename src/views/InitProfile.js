@@ -72,8 +72,10 @@ export class InitProfile extends Component {
   };
 
   complete = () => {
-    console.log("complete");
-    this.props.navigation.goBack(null);
+    if (this.state.office !== undefined) {
+      //this.props.appInitRedux(this.state.office);
+      this.props.navigation.navigate("App");
+    }
   };
 
   /*

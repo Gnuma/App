@@ -124,8 +124,8 @@ export class SelectBook extends Component {
 
   resetSearchBar = () => this.handleChange("");
 
-  handleSelection = isbn => {
-    this.props.selectBookRedux(isbn);
+  handleSelection = book => {
+    this.props.selectBookRedux(book);
     this.props.navigation.navigate("VendiInfos");
   };
 

@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import SalesTab from "../components/Sales/SalesTab";
 import * as chatActions from "../store/actions/chat";
+import * as sellActions from "../store/actions/sell";
 import { Header3, Header2 } from "../components/Text";
 import SalesChatsList from "../components/Sales/SalesChatsList";
 import SellButton from "../components/Sales/SellButton";
@@ -18,6 +19,7 @@ export class SalesList extends Component {
     isAuthenticated: PropTypes.bool,
     focus: PropTypes.number,
     setSaleFocus: PropTypes.func,
+    startSelling: PropTypes.func,
     data: PropTypes.object,
     orderedData: PropTypes.array
   };
@@ -69,7 +71,7 @@ export class SalesList extends Component {
   }
 
   onGoSell = () => {
-    this.props.navigation.navigate("Vendi");
+    this.props.startSelling();
   };
 
   onGoChat = (itemID, chatID) => {
@@ -114,7 +116,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  setSaleFocus: focus => dispatch(chatActions.chatSetSalesListFocus(focus))
+  setSaleFocus: focus => dispatch(chatActions.chatSetSalesListFocus(focus)),
+  startSelling: () => dispatch(sellActions.sellStartSelling())
 });
 
 export default connect(

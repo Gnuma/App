@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   StatusBar
 } from "react-native";
-import { withNavigation } from "react-navigation";
+import { withNavigation, StackActions } from "react-navigation";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import MainList from "../components/List/MainList";
@@ -81,11 +81,16 @@ export class Home extends Component {
   };
 
   _onCommentNotificationPress = (itemPK, book) => {
-    this.props.navigation.navigate("Item", {
-      itemID: itemPK,
-      name: book.title,
-      authors: book.authors
+    const pushAction = StackActions.push({
+      routeName: "Item",
+      params: {
+        itemID: itemPK,
+        name: book.title,
+        authors: book.authors
+      }
     });
+
+    this.props.navigation.dispatch(pushAction);
   };
 
   _onBackButtonPressAndroid = () => {

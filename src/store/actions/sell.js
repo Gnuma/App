@@ -142,7 +142,7 @@ export const submit = () => {
       }
 
       if (book) {
-        data.append("isbn", book);
+        data.append("isbn", book.isbn);
       } else {
         data.append("isbn", isbn);
         data.append("title", title);
@@ -177,4 +177,21 @@ export const submit = () => {
       }
     });
   };
+};
+
+export const sellStartSelling = () => dispatch => {
+  dispatch({
+    type: actionTypes.SELL_START_SELLING
+  });
+  NavigatorService.navigate("Camera");
+};
+
+export const sellStartModifying = item => dispatch => {
+  dispatch({
+    type: actionTypes.SELL_START_MODIFYING,
+    payload: {
+      item
+    }
+  });
+  NavigatorService.navigate("Camera");
 };

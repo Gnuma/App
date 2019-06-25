@@ -37,7 +37,7 @@ export class MainItem extends Component {
   };
 
   render() {
-    const { data, user, newComments } = this.props;
+    const { data, user, newComments, isOwner } = this.props;
     const primaryData = {
       price: data.price,
       conditions: data.condition,
@@ -99,6 +99,7 @@ export class MainItem extends Component {
           viewHeight={this.state.viewHeight}
           setContactButtonHeight={this.setContactButtonHeight}
           contactSnapY={this.containerOffset + this.state.contactSnapY}
+          isOwner={isOwner}
         />
       </Animated.ScrollView>
     );

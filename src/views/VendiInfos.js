@@ -7,6 +7,7 @@ import MainSell from "../components/Sell/MainSell";
 import * as sellActions from "../store/actions/sell";
 import colors from "../styles/colors";
 import protectedAction from "../utils/protectedAction";
+import { GreyBar } from "../components/StatusBars";
 
 export class VendiInfos extends Component {
   state = {
@@ -16,9 +17,6 @@ export class VendiInfos extends Component {
   };
 
   render() {
-    const title = "Matematica Verde 3";
-    const authors = "Massimo Badonzia";
-
     const {
       price,
       conditions,
@@ -26,11 +24,14 @@ export class VendiInfos extends Component {
       setPriceRedux,
       setDescriptionRedux,
       setConditionsRedux,
-      loading
+      loading,
+      book
     } = this.props;
+    const { title, authors } = book || { title: "UNDEFINED" };
 
     return (
       <View style={{ flex: 1 }}>
+        <GreyBar />
         <ItemHeader
           handleGoBack={this._handleGoBack}
           title={title}
@@ -92,7 +93,8 @@ const mapStateToProps = state => ({
   price: state.sell.price,
   description: state.sell.description,
   conditions: state.sell.conditions,
-  loading: state.sell.loading
+  loading: state.sell.loading,
+  book: state.sell.book
 });
 
 const mapDispatchToProps = dispatch => {

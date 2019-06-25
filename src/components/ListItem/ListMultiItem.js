@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 import styles from "./styles";
 import { Header1, Header2, Header3, Header5 } from "../../components/Text";
 import Item from "./Item";
+import { StackActions } from "react-navigation";
 
 export class ListMultiItem extends Component {
   static propTypes = {
@@ -14,19 +15,10 @@ export class ListMultiItem extends Component {
   };
 
   render() {
-    const { data, isSingle, pk, navigation } = this.props;
+    const { data, isSingle } = this.props;
     const { book } = data;
     return (
-      <Button
-        onPress={() =>
-          NavigationService.navigate("Item", {
-            itemID: this.props.pk,
-            name: book.title,
-            authors: book.author
-          })
-        }
-        style={styles.itemButton}
-      >
+      <Button onPress={this.goItem} style={styles.itemButton}>
         <View style={styles.multiHeader}>
           <Header2 color={"primary"}>{book.title}</Header2>
           <Header5>{book.author}</Header5>
@@ -35,6 +27,22 @@ export class ListMultiItem extends Component {
       </Button>
     );
   }
+
+  goItem = () => {
+    const {
+      data: { book },
+      pk
+    } = this.props;
+    const pushAction = StackActions.push({
+      routeName: "Item",
+      params: {
+        itemID: pk,
+        name: book.title,
+        authors: book.author
+      }
+    });
+    NavigationService.dispatch(pushAction);
+  };
 }
 
 export default ListMultiItem;
