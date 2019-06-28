@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Text, View, Animated, StyleSheet } from "react-native";
 import Button from "../Button";
-import { Header2 } from "../Text";
+import { Header2, Header3 } from "../Text";
 import colors from "../../styles/colors";
 
 export class ContactButton extends Component {
@@ -55,9 +55,11 @@ export class ContactButton extends Component {
             style={isOwner ? styles.modifyButton : styles.contactButton}
             onPress={this.props.onContact}
           >
-            <Header2 color={isOwner ? "primary" : "white"}>
-              {isOwner ? "Modifica Vendita" : "Contatta Ora"}
-            </Header2>
+            {!isOwner ? (
+              <Header3 color={"white"}>Contatta Ora</Header3>
+            ) : (
+              <Header3 color="primary">Modifica Vendita</Header3>
+            )}
           </Button>
         </View>
       </Animated.View>

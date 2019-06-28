@@ -69,6 +69,7 @@ export class VendiInfos extends Component {
       this.props.conditions !== undefined
     ) {
       protectedAction()
+        /*
         .then(() => {
           this.props
             .submitRedux()
@@ -83,6 +84,11 @@ export class VendiInfos extends Component {
             .catch(err => {
               console.log("Nope.", err);
             });
+        })
+        .catch(() => console.log("Need to be logged in"));
+        */
+        .then(() => {
+          this.props.navigation.navigate("PreviewItem");
         })
         .catch(() => console.log("Need to be logged in"));
     }

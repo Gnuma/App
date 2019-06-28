@@ -153,7 +153,7 @@ const sellStartModifying = (state, { payload: { item } }) => {
       description,
       conditions: condition,
       price: price.toString(),
-      book: book.isbn
+      book: book
     }
   });
 };

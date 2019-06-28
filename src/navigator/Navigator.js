@@ -26,6 +26,7 @@ import UserSettingsScreen from "../views/UserSettings";
 import UserInfoScreen from "../views/UserChanges/UserInfo";
 import OfficeChangeScreen from "../views/UserChanges/OfficeChange";
 import PhoneChangeScreen from "../views/UserChanges/PhoneChange";
+import PreviewItemScreen from "../views/PreviewItem";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -113,6 +114,10 @@ const VendiNavigator = {
       CreateBook: {
         screen: CreateBookScreen,
         path: "/vendi/createbook"
+      },
+      PreviewItem: {
+        screen: PreviewItemScreen,
+        path: "/vendi/previewitem"
       }
     },
     {

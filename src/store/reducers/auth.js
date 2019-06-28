@@ -6,14 +6,19 @@ const initialState = {
   error: null,
   id: null,
   loading: false,
-  office: null,
   gnumaUser: null,
   username: null
 };
 
 export const authAppInit = (state, action) => {
   return updateObject(state, {
-    office: action.payload.office
+    gnumaUser: {
+      $set: {
+        classM: {
+          office: action.payload.office
+        }
+      }
+    }
   });
 };
 

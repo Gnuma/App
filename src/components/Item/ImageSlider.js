@@ -14,6 +14,8 @@ const IS_IOS = Platform.OS === "ios";
 
 export class ImageSlider extends Component {
   _renderItem = ({ item, index }, parallaxProps) => {
+    const uri = typeof item === "string" ? item : item.uri || item.base64;
+
     return (
       <View
         style={{
@@ -23,7 +25,7 @@ export class ImageSlider extends Component {
         }}
       >
         <ParallaxImage
-          source={/*mockData[0]*/ { uri: item }}
+          source={/*mockData[0]*/ { uri }}
           containerStyle={{
             flex: 1,
             marginBottom: IS_IOS ? 0 : -1, // Prevent a random Android rendering issue
