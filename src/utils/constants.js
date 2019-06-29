@@ -63,3 +63,18 @@ export const SellType = {
   NEW: "NEW",
   MODIFY: "MODIFY"
 };
+
+export const OffertStatus = {
+  PENDING: 0,
+  ACCEPTED: 1,
+  REJECTED: 2
+};
+
+export const OffertType = {
+  CREATE: "CREATE",
+  EDIT: "EDIT",
+  DECIDE: "DECIDE",
+  ACCEPTED: "ACCEPTED",
+  PAY: "PAY",
+  WAITPAYMENT: "WAITPAYMENT"
+};

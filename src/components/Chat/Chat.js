@@ -20,7 +20,7 @@ import Button from "../Button";
 import Composer from "./Composer";
 import Offert from "./Offert";
 import _ from "lodash";
-import { OffertStatus } from "../../views/BookOffert";
+import { OffertStatus } from "../../utils/constants";
 import LoadingOverlay from "../LoadingOverlay";
 
 export default class Chat extends Component {

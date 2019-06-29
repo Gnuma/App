@@ -15,8 +15,7 @@ import {
 } from "../../mockData/Chat2";
 import _ from "lodash";
 import uuid from "uuid";
-import { OffertStatus } from "../../views/BookOffert";
-import { ChatStatus } from "../../utils/constants";
+import { ChatStatus, OffertStatus } from "../../utils/constants";
 
 const initialState = {
   data: null,

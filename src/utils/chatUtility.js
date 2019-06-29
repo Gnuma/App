@@ -1,5 +1,5 @@
 import uuid from "uuid";
-import { OffertStatus } from "../views/BookOffert";
+import { OffertStatus } from "../utils/constants";
 import { ___READ_CHAT___ } from "../store/constants";
 import axios from "axios";
 

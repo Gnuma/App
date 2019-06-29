@@ -9,8 +9,7 @@ import {
   createSystemMessage,
   createOffert
 } from "../../utils/chatUtility";
-import { OffertStatus } from "../../views/BookOffert";
-import { ChatType, ChatStatus } from "../../utils/constants";
+import { ChatType, ChatStatus, OffertStatus } from "../../utils/constants";
 
 const initialState = {
   data: {},

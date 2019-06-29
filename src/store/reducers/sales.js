@@ -11,8 +11,7 @@ import {
   createSystemMessage
 } from "../../utils/chatUtility";
 import { newChat } from "../../mockData/Chat2";
-import { OffertStatus } from "../../views/BookOffert";
-import { ChatStatus } from "../../utils/constants";
+import { ChatStatus, OffertStatus } from "../../utils/constants";
 
 const initialState = {
   data: null,
