@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Animated } from "react-native";
+import { View, Animated, RefreshControl } from "react-native";
 import { MainItemStyles as styles } from "./styles";
 import { PrimaryInfo, DescriptionInfo, SecondaryInfo } from "./ItemInfos";
 import SellerInfo from "./SellerInfo";
@@ -30,7 +30,14 @@ export class MainItem extends Component {
   };
 
   render() {
-    const { data, user, newComments, isOwner } = this.props;
+    const {
+      data,
+      user,
+      newComments,
+      isOwner,
+      refreshing,
+      onRefresh
+    } = this.props;
     const primaryData = {
       price: data.price,
       conditions: data.condition,
@@ -48,12 +55,10 @@ export class MainItem extends Component {
         keyboardShouldPersistTaps={"handled"}
         ref={component => (this.scrollView = component)}
         onScroll={this.scrollEvent}
-        onLayout={event =>
-          this.setState({
-            viewHeight: event.nativeEvent.layout.height
-          })
-        }
         scrollEventThrottle={1}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <ImageSlider style={styles.imageSlider} data={data.image_ad} />
         <View style={styles.content} onLayout={this._setContainerOffset}>

@@ -403,6 +403,21 @@ const chatNewItem = (state, { payload: { item } }) => {
   });
 };
 
+const chatModifyItem = (state, { payload: { item } }) => {
+  console.log(item);
+  const { pk: _id, ...rest } = item;
+  return update(state, {
+    data: {
+      [_id]: {
+        $merge: {
+          _id,
+          ...rest
+        }
+      }
+    }
+  });
+};
+
 const chatNewOffert = (
   state,
   { payload: { objectID, chatID, price, pk, user } }
@@ -553,6 +568,9 @@ export default (state = initialState, action) => {
 
     case actionTypes.CHAT_NEW_ITEM:
       return chatNewItem(state, action);
+
+    case actionTypes.CHAT_MODIFY_ITEM:
+      return chatModifyItem(state, action);
 
     case actionTypes.CHAT_ONLINE:
       return chatStartGlobalAction(state, action);

@@ -2,14 +2,17 @@ import * as actionTypes from "./actionTypes";
 import NavigatorService from "../../navigator/NavigationService";
 import { setItem, getItem, removeItem } from "../utility";
 import axios from "axios";
+import { ImageStore } from "react-native";
 import RNFetchBlob from "rn-fetch-blob";
 import FormData from "form-data";
 import uuid from "uuid";
-import { ___BASE_UPLOAD_PICTURE___, ___CREATE_AD___ } from "../constants";
-import { ___BOOK_IMG_RATIO___ } from "../../utils/constants";
-import { chatNewItem } from "./chat";
-
-const isOffline = true;
+import {
+  ___BASE_UPLOAD_PICTURE___,
+  ___CREATE_AD___,
+  ___MODIFY_AD___
+} from "../constants";
+import { ___BOOK_IMG_RATIO___, SellType } from "../../utils/constants";
+import { chatNewItem, chatModifyItem } from "./chat";
 
 export const sellStart = () => {
   return {
@@ -118,7 +121,7 @@ export const sellRemoveReview = () => ({
 
 export const submit = () => {
   return (dispatch, getState) => {
-    return new Promise(function(resolve, reject) {
+    return new Promise(async function(resolve, reject) {
       const {
         previews,
         previewsOrder,
@@ -128,15 +131,24 @@ export const submit = () => {
         description,
         isbn,
         title,
-        loading
+        loading,
+        type
       } = getState().sell;
       if (loading) return reject("Running already");
       dispatch(sellStart());
       let data = new FormData();
       let counter = 0;
       for (let i = 0; i < previewsOrder.length; i++) {
-        if (previews[previewsOrder[i]] !== null) {
-          data.append(counter.toString(), previews[previewsOrder[i]].base64);
+        let img = previews[previewsOrder[i]];
+        if (img !== null) {
+          if (!img.base64) {
+            try {
+              img.base64 = await getBase64IP(img.uri);
+            } catch (err) {
+              console.log(err);
+            }
+          }
+          data.append(counter.toString(), img.base64);
           counter++;
         }
       }
@@ -151,9 +163,12 @@ export const submit = () => {
       data.append("condition", conditions);
       data.append("description", description);
 
+      const endpoint =
+        type === SellType.NEW ? ___CREATE_AD___ : ___MODIFY_AD___;
+
       if (counter > 0) {
         axios
-          .post(___CREATE_AD___, data, {
+          .post(endpoint, data, {
             headers: {
               accept: "application/json",
               "Accept-Language": "en-US,en;q=0.8",
@@ -162,7 +177,9 @@ export const submit = () => {
           })
           .then(res => {
             console.log(res);
-            dispatch(chatNewItem(res.data.item));
+            type === SellType.NEW
+              ? dispatch(chatNewItem(res.data.item))
+              : dispatch(chatModifyItem(res.data.item));
             dispatch(sellSuccess());
             resolve();
           })
@@ -195,3 +212,37 @@ export const sellStartModifying = item => dispatch => {
   });
   NavigatorService.navigate("Camera");
 };
+
+const getBase64FS = uri =>
+  new Promise(function(resolve, reject) {
+    ImageStore.getBase64ForTag(
+      uri,
+      base64 => {
+        resolve(base64);
+      },
+      err => {
+        reject(err);
+      }
+    );
+  });
+
+const getBase64IP = uri =>
+  new Promise((resolve, reject) => {
+    RNFetchBlob.config({
+      fileCache: true
+    })
+      .fetch("GET", uri)
+      // the image is now dowloaded to device's storage
+      .then(resp => {
+        // the image path you can use it directly with Image component
+        imagePath = resp.path();
+        return resp.readFile("base64");
+      })
+      .then(base64Data => {
+        // here's base64 encoded image
+        RNFetchBlob.fs.unlink(imagePath);
+        resolve(base64Data);
+        // remove the file from storage
+      })
+      .catch(err => reject(err));
+  });

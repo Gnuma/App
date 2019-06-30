@@ -69,24 +69,6 @@ export class VendiInfos extends Component {
       this.props.conditions !== undefined
     ) {
       protectedAction()
-        /*
-        .then(() => {
-          this.props
-            .submitRedux()
-            .then(() => {
-              //this.props.navigation.dispatch(StackActions.popToTop());
-              //console.log(SwitchActions.jumpTo({ routeName: "SalesList" }));
-              //this.props.navigation.dispatch(
-              //  SwitchActions.jumpTo({ routeName: "SalesList" })
-              //);
-              this.props.navigation.navigate("SalesList");
-            })
-            .catch(err => {
-              console.log("Nope.", err);
-            });
-        })
-        .catch(() => console.log("Need to be logged in"));
-        */
         .then(() => {
           this.props.navigation.navigate("PreviewItem");
         })

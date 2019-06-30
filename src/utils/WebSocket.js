@@ -31,7 +31,8 @@ import {
   chatNewOffert,
   chatOnline,
   chatRemoveOffert,
-  chatSetOffertAccepted
+  chatSetOffertAccepted,
+  chatSettleAction
 } from "../store/actions/chat";
 
 class WS {
@@ -197,11 +198,11 @@ class WS {
   };
 
   onClose = code => {
-    console.log("Closing: ", code);
-    console.log(this.retries);
+    //console.log("Closing: ", code);
+    //console.log(this.retries);
     if (this.retries > 0) {
       console.log("Restarting...");
-      setTimeout(this.startConnection, 100);
+      setTimeout(this.startConnection, 500);
       this.retries--;
     } else if (this.retries == 0) {
       console.log("Restarting in 5 sec");

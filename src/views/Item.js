@@ -23,7 +23,8 @@ export class Item extends Component {
       bookName: props.navigation.getParam("name", "Undesfineds"),
       bookAuthors: props.navigation.getParam("authors", "Undesfineds"),
       keyboardOpen: false,
-      isOwner: false
+      isOwner: false,
+      refreshing: false
     };
 
     this.newComments =
@@ -40,30 +41,28 @@ export class Item extends Component {
   }
 
   componentDidMount() {
-    console.log("Mounted");
-    /*
-    this.didFocusSubscription = this.props.navigation.addListener(
-      "didFocus",
-      payload => {
-        console.debug("didFocus", payload);
-      }
-    );
-    */
-
     this.keyboardEventListeners = [
       Keyboard.addListener("keyboardDidShow", this.setKeyboardOpen(true)),
       Keyboard.addListener("keyboardDidHide", this.setKeyboardOpen(false))
     ];
 
+    this.loadData();
+
+    /*this.setState({
+      data: this.formatData(itemData)
+    });*/
+  }
+
+  loadData = () => {
     const { navigation } = this.props;
     const id = navigation.getParam("itemID", "Undefined");
-
     axios
       .get(___GET_AD___ + `${id}/`)
       .then(res => {
         this.setState({
           data: this.formatData(res.data),
-          isOwner: this.props.user.id == res.data.seller._id
+          isOwner: this.props.user.id == res.data.seller._id,
+          refreshing: false
         });
         console.log(res.data);
         console.log(this.formatData(res.data));
@@ -72,16 +71,12 @@ export class Item extends Component {
       .catch(err => {
         console.log("ERROR", err);
       });
-
-    /*this.setState({
-      data: this.formatData(itemData)
-    });*/
-  }
+  };
 
   formatData = data => {
     let comments = data.comment_ad;
 
-    console.log("NativeComments", comments);
+    //console.log("NativeComments", comments);
     let formattedComments = [];
     for (let i = 0; i < comments.length; i++) {
       formattedComments.push(this.formatComment(comments[i]));
@@ -124,8 +119,15 @@ export class Item extends Component {
 
   setKeyboardOpen = value => () => this.setState({ keyboardOpen: value });
 
+  onRefresh = () => {
+    this.setState({
+      refreshing: true
+    });
+    this.loadData();
+  };
+
   render() {
-    const { data, bookName, bookAuthors, isOwner } = this.state;
+    const { data, bookName, bookAuthors, isOwner, refreshing } = this.state;
     const { navigation } = this.props;
     const isLoading = data === undefined;
 
@@ -155,6 +157,8 @@ export class Item extends Component {
             onContact={this._handleContact}
             viewHeight={this.viewHeight}
             isOwner={isOwner}
+            onRefresh={this.onRefresh}
+            refreshing={refreshing}
           />
         )}
       </View>

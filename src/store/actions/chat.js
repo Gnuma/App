@@ -160,6 +160,11 @@ export const chatNewItem = item => ({
   payload: { item }
 });
 
+export const chatModifyItem = item => ({
+  type: actionTypes.CHAT_MODIFY_ITEM,
+  payload: { item }
+});
+
 export const chatSettleAction = (objectID, chatID, status) => ({
   type: actionTypes.CHAT_SETTLE,
   payload: {

@@ -32,7 +32,7 @@ export default class MainSell extends Component {
         </ScrollView>
         <Button style={[styles.button]} onPress={handleComplete}>
           <Header3 style={styles.buttonText} color={"primary"}>
-            Conferma
+            Vai al riepilogo
           </Header3>
         </Button>
       </View>
