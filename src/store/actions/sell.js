@@ -132,7 +132,8 @@ export const submit = () => {
         isbn,
         title,
         loading,
-        type
+        type,
+        itemModId
       } = getState().sell;
       if (loading) return reject("Running already");
       dispatch(sellStart());
@@ -163,8 +164,13 @@ export const submit = () => {
       data.append("condition", conditions);
       data.append("description", description);
 
-      const endpoint =
-        type === SellType.NEW ? ___CREATE_AD___ : ___MODIFY_AD___;
+      let endpoint;
+      if (type === SellType.MODIFY) {
+        endpoint = ___MODIFY_AD___;
+        data.append("item", itemModId);
+      } else {
+        endpoint = ___CREATE_AD___;
+      }
 
       if (counter > 0) {
         axios
@@ -179,7 +185,7 @@ export const submit = () => {
             console.log(res);
             type === SellType.NEW
               ? dispatch(chatNewItem(res.data.item))
-              : dispatch(chatModifyItem(res.data.item));
+              : dispatch(chatModifyItem(res.data));
             dispatch(sellSuccess());
             resolve();
           })
