@@ -56,3 +56,5 @@ export const isNotISBN = value => {
   }
   return true;
 };
+
+export const notExist = object => !object;

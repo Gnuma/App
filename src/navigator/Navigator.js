@@ -209,6 +209,18 @@ ShoppingNavigator.navigationOptions = ({ navigation }) => {
   return navigationOptions;
 };
 
+const AuthNavigator = createStackNavigator(
+  {
+    AUTH: Auth,
+    OfficeChangeAuth: OfficeChangeScreen
+  },
+  {
+    defaultNavigationOptions: {
+      header: null
+    }
+  }
+);
+
 const AppStack = createBottomTabNavigator(
   {
     SEARCH: SearchNavigator,
@@ -223,7 +235,7 @@ const AppStack = createBottomTabNavigator(
 const MainStack = createStackNavigator(
   {
     App: AppStack,
-    AUTH: Auth
+    AuthStack: AuthNavigator
   },
   {
     mode: "modal",

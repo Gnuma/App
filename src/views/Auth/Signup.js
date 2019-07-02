@@ -5,42 +5,60 @@ import {
   submit,
   isEmpty,
   fieldCheck,
-  isInvalidEmail
+  isInvalidEmail,
+  notExist
 } from "../../utils/validator.js";
 import Button from "../../components/Button";
 import { Header3, Header2, Header1 } from "../../components/Text";
 import SolidButton from "../../components/SolidButton";
 import colors from "../../styles/colors";
 import ErrorMessage from "../../components/Form/ErrorMessage";
+import PhonePicker from "../../components/PhonePicker";
+import { StatusBar } from "../../components/StatusBar";
+import OfficeButton from "../../components/Form/OfficeButton";
 
 export default class Signup extends Component {
   constructor(props) {
     super(props);
 
-    this.validators[2].confirmPwd.functions.push(this.isDifferentPwd);
+    this.validators[SignupStatus.PASSWORD].confirmPwd.functions.push(
+      this.isDifferentPwd
+    );
     this.pwdValue = "";
   }
 
   state = {
     fields: {
-      0: {
+      [SignupStatus.USERNAME]: {
         uid: {
           value: "",
           errorMessage: ""
         }
       },
-      1: {
+      [SignupStatus.EMAIL]: {
         email: {
           value: "",
           errorMessage: ""
         }
       },
-      2: {
+      [SignupStatus.PASSWORD]: {
         pwd: {
           value: "",
           errorMessage: ""
         },
         confirmPwd: {
+          value: "",
+          errorMessage: ""
+        }
+      },
+      [SignupStatus.OFFICE]: {
+        office: {
+          value: "",
+          errorMessage: ""
+        }
+      },
+      [SignupStatus.PHONE]: {
+        phone: {
           value: "",
           errorMessage: ""
         }
@@ -51,22 +69,27 @@ export default class Signup extends Component {
 
   continue = () => {
     const { status } = this.props;
-    const stateFields = this.state.fields[status];
+    let stateFields;
+    if (status === SignupStatus.OFFICE) {
+      stateFields = { office: { value: this.props.office, errorMessage: "" } };
+    } else {
+      stateFields = this.state.fields[status];
+    }
     const stateValidators = this.validators[status];
 
     const result = submit(stateFields, stateValidators);
     if (result === true) {
       this.setState({ error: "" });
-      if (status !== 2) {
+      if (status < LASTSTEP) {
         this.props.goNext();
       } else {
         Keyboard.dismiss();
 
         const { fields } = this.state;
-        const uid = fields[0].uid.value;
-        const email = fields[1].email.value;
-        const pwd = fields[2].pwd.value;
-        const confirmPwd = fields[2].confirmPwd.value;
+        const uid = fields[SignupStatus.USERNAME].uid.value;
+        const email = fields[SignupStatus.EMAIL].email.value;
+        const pwd = fields[SignupStatus.PASSWORD].pwd.value;
+        const confirmPwd = fields[SignupStatus.PASSWORD].confirmPwd.value;
 
         this.props
           .signup(uid, email, pwd, confirmPwd)
@@ -89,11 +112,6 @@ export default class Signup extends Component {
           }
         }
       }
-      /*ToastAndroid.showWithGravity(
-        errorList,
-        ToastAndroid.LONG,
-        ToastAndroid.CENTER
-      );*/
       this.setState({ error: errorList });
     }
   };
@@ -134,7 +152,7 @@ export default class Signup extends Component {
     <OutlinedInput
       placeholder="Username"
       textContentType="username"
-      value={this.state.fields[0].uid.value}
+      value={this.state.fields[SignupStatus.USERNAME].uid.value}
       onTextChange={text => this.handleChange("uid", text)}
       onSubmitEditing={() => this.checkField("uid", true)}
       onFocus={this.props.hideFooter}
@@ -144,7 +162,7 @@ export default class Signup extends Component {
     <OutlinedInput
       placeholder="Email"
       textContentType="emailAddress"
-      value={this.state.fields[1].email.value}
+      value={this.state.fields[SignupStatus.EMAIL].email.value}
       onTextChange={text => this.handleChange("email", text)}
       onSubmitEditing={() => this.checkField("email", true)}
       autoFocus
@@ -158,7 +176,7 @@ export default class Signup extends Component {
       <OutlinedInput
         placeholder="Password"
         textContentType="password"
-        value={this.state.fields[2].pwd.value}
+        value={this.state.fields[SignupStatus.PASSWORD].pwd.value}
         onTextChange={text => this.handleChange("pwd", text)}
         onSubmitEditing={() => this.checkField("pwd")}
         secureTextEntry={true}
@@ -167,7 +185,7 @@ export default class Signup extends Component {
       />
       <OutlinedInput
         placeholder="Conferma Password"
-        value={this.state.fields[2].confirmPwd.value}
+        value={this.state.fields[SignupStatus.PASSWORD].confirmPwd.value}
         onTextChange={text => this.handleChange("confirmPwd", text)}
         onSubmitEditing={() => this.checkField("confirmPwd", true)}
         secureTextEntry={true}
@@ -176,14 +194,38 @@ export default class Signup extends Component {
     </View>
   );
 
+  _renderOffice = () => (
+    <OfficeButton
+      office={this.props.office}
+      onPress={this.props.goChangeOffice}
+    />
+  );
+
+  _renderPhone = () => (
+    <PhonePicker
+      placeholder="Cellulare"
+      value={this.state.fields[SignupStatus.PHONE].phone.value}
+      onTextChange={text => this.handleChange("phone", text)}
+      onSubmitEditing={() => this.checkField("phone")}
+      autoFocus
+      onFocus={this.props.hideFooter}
+      status={0}
+      disableStatusBar
+    />
+  );
+
   _getContent = () => {
     switch (this.props.status) {
-      case 0:
+      case SignupStatus.USERNAME:
         return this._renderUsername();
-      case 1:
+      case SignupStatus.EMAIL:
         return this._renderEmail();
-      case 2:
+      case SignupStatus.PASSWORD:
         return this._renderPwd();
+      case SignupStatus.OFFICE:
+        return this._renderOffice();
+      case SignupStatus.PHONE:
+        return this._renderPhone();
       default:
         return null;
     }
@@ -195,7 +237,10 @@ export default class Signup extends Component {
 
     return (
       <View style={{ flex: 1 }}>
-        <StatusBar status={status} />
+        <StatusBar
+          data={["Username", "Email", "Password", "Istituto", "Cellulare"]}
+          status={status}
+        />
         <View
           style={{
             flex: 1,
@@ -211,7 +256,7 @@ export default class Signup extends Component {
                 color={"primary"}
                 style={{ textAlign: "center", flex: 1 }}
               >
-                {status === 2 ? "Registrati" : "Continua"}
+                {status === LASTSTEP ? "Registrati" : "Continua"}
               </Header3>
             </SolidButton>
           </View>
@@ -220,92 +265,59 @@ export default class Signup extends Component {
     );
   }
 
-  getPwd = () => this.state.fields[2].pwd.value;
+  getPwd = () => this.state.fields[SignupStatus.PASSWORD].pwd.value;
 
   isDifferentPwd = confirmPwd => {
-    console.log(confirmPwd, "+", this.state.fields[2].pwd);
+    console.log(confirmPwd, "+", this.state.fields[SignupStatus.PASSWORD].pwd);
     const pwd = this.getPwd();
     console.log(pwd, confirmPwd);
     return pwd !== confirmPwd;
   };
 
   validators = {
-    0: {
+    [SignupStatus.USERNAME]: {
       uid: {
         functions: [isEmpty],
         warnings: ["Inserisci il nome"]
       }
     },
-    1: {
+    [SignupStatus.EMAIL]: {
       email: {
         functions: [isEmpty, isInvalidEmail],
         warnings: ["Inserisci l'email", "L'email non è valida"]
       }
     },
-    2: {
+    [SignupStatus.PASSWORD]: {
       pwd: {
         functions: [isEmpty],
         warnings: ["Inserisci la password"]
       },
       confirmPwd: {
         functions: [isEmpty],
-        warnings: ["Reinserisci la password", "Le due password non coincidono"]
+        warnings: ["Reinserisci la password", "Le due password non combaciano"]
+      }
+    },
+    [SignupStatus.OFFICE]: {
+      office: {
+        functions: [notExist],
+        warnings: ["Inserisci l'istituto"]
+      }
+    },
+    [SignupStatus.PHONE]: {
+      phone: {
+        functions: [isEmpty],
+        warnings: ["Inserisci il tuo numero di telefono"]
       }
     }
   };
 }
 
-const StatusBar = ({ status }) => {
-  let statusText;
-  switch (status) {
-    case 0:
-      statusText = "Username";
-      break;
+const LASTSTEP = 4;
 
-    case 1:
-      statusText = "Email";
-      break;
-
-    case 2:
-      statusText = "Password";
-      break;
-
-    default:
-      statusText = "Errore";
-      break;
-  }
-
-  return (
-    <View style={{ marginVertical: 10, alignItems: "center" }}>
-      <Header2 color={"primary"} style={{ marginBottom: 8 }}>
-        {statusText}
-      </Header2>
-      <View style={{ flexDirection: "row" }}>
-        <View
-          style={status >= 0 ? styles.activeStatus : styles.inactiveStatus}
-        />
-        <View
-          style={status >= 1 ? styles.activeStatus : styles.inactiveStatus}
-        />
-        <View
-          style={status >= 2 ? styles.activeStatus : styles.inactiveStatus}
-        />
-      </View>
-    </View>
-  );
+const SignupStatus = {
+  USERNAME: 0,
+  EMAIL: 1,
+  PASSWORD: 2,
+  OFFICE: 3,
+  PHONE: 4
 };
-
-const styles = StyleSheet.create({
-  activeStatus: {
-    flex: 1 / 3,
-    borderBottomWidth: 1,
-    borderColor: colors.secondary,
-    margin: 5
-  },
-  inactiveStatus: {
-    flex: 1 / 3,
-    borderBottomWidth: 1,
-    borderColor: colors.grey,
-    margin: 5
-  }
-});

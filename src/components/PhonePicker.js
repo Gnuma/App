@@ -17,30 +17,16 @@ export default class PhonePicker extends Component {
   };
 
   changePhoneText = value => {
-    /*let subtracting = value < this.props.phone;
-    value = value.replace(/\s/g, "");
-    let spaces = 0;
-    for (let i = 0; i < mask.length; i++) {
-      let pointer = mask[i] + spaces;
-      if (
-        value.length >= pointer &&
-        (!subtracting || value.length !== pointer)
-      ) {
-        value = value.substring(0, pointer) + " " + value.substring(pointer);
-        spaces++;
-      } else {
-        break;
-      }
-    }*/
     this.props.changePhoneText && this.props.changePhoneText(value);
   };
 
   getContent = () => {
-    const { phone, status } = this.props;
+    const { phone, status, ...rest } = this.props;
     if (status == 0) {
       return (
         <View
           style={{
+            flex: 1,
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center"
@@ -53,7 +39,8 @@ export default class PhonePicker extends Component {
             onTextChange={this.changePhoneText}
             inputType="phone-pad"
             containerStyle={{ flex: 1 }}
-            isPhone
+            inputStyle={{ flex: 1 }}
+            {...rest}
           />
         </View>
       );
@@ -70,13 +57,15 @@ export default class PhonePicker extends Component {
   };
 
   render() {
-    const { status } = this.props;
+    const { status, disableStatusBar } = this.props;
     return (
-      <View>
-        <StatusBar
-          status={status}
-          data={["Numero di telefono", "Codice di attivazione"]}
-        />
+      <View style={disableStatusBar && { flexDirection: "row" }}>
+        {!disableStatusBar && (
+          <StatusBar
+            status={status}
+            data={["Numero di telefono", "Codice di attivazione"]}
+          />
+        )}
         {this.getContent()}
       </View>
     );

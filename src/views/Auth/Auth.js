@@ -20,6 +20,7 @@ import { AndroidBackHandler } from "react-navigation-backhandler";
 import * as authActions from "../../store/actions/auth";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { HiddenBar } from "../../components/StatusBars";
+import { mockOffice } from "../../mockData/MockUser";
 
 export class Auth extends Component {
   constructor(props) {
@@ -32,7 +33,9 @@ export class Auth extends Component {
   static propTypes = {
     isLoading: PropTypes.bool,
     signupRedux: PropTypes.func,
-    loginRedux: PropTypes.func
+    loginRedux: PropTypes.func,
+
+    office: PropTypes.object
   };
 
   state = {
@@ -80,6 +83,10 @@ export class Auth extends Component {
     }));
   };
 
+  _goChangeOffice = () => {
+    this.props.navigation.navigate("OfficeChangeAuth");
+  };
+
   _switchAuthType = () =>
     this.setState(prevState => ({
       authType: prevState.authType === "signup" ? "login" : "signup",
@@ -92,7 +99,13 @@ export class Auth extends Component {
   };
 
   render() {
-    const { signupRedux, isLoading, loginRedux, serverError } = this.props;
+    const {
+      signupRedux,
+      isLoading,
+      loginRedux,
+      serverError,
+      office
+    } = this.props;
     const { authType } = this.state;
 
     return (
@@ -145,6 +158,8 @@ export class Auth extends Component {
                 goNext={this._goNext}
                 hideFooter={this.hideFooter}
                 completeAuth={this.completeAuth}
+                office={office}
+                goChangeOffice={this._goChangeOffice}
               />
             ) : (
               <Login
@@ -229,7 +244,8 @@ export class Auth extends Component {
 }
 
 const mapStateToProps = state => ({
-  isLoading: state.auth.loading
+  isLoading: state.auth.loading,
+  office: mockOffice //Test
 });
 
 const mapDispatchToProps = dispatch => ({
