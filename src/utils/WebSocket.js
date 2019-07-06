@@ -66,11 +66,11 @@ class WS {
         store.dispatch(authCompleted());
         this.startConnection();
 
-        resolve(token);
+        resolve({ token, isActive: true });
       })
       .catch(err => {
         store.dispatch(authFail(err));
-        resolve(token);
+        resolve({ token, isActive: true });
       });
   }
 

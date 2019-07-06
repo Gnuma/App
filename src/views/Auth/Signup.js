@@ -93,7 +93,9 @@ export default class Signup extends Component {
 
         this.props
           .signup(uid, email, pwd, confirmPwd)
-          .then(token => this.props.completeAuth(token))
+          .then(({ token, isActive }) => {
+            this.props.goValidation();
+          })
           .catch(err =>
             this.setState({ error: "Signup Error: " + err.response.status })
           );

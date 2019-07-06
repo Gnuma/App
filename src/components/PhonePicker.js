@@ -3,14 +3,14 @@ import { Text, StyleSheet, View } from "react-native";
 import PropTypes from "prop-types";
 import { StatusBar } from "./StatusBar";
 import OutlinedInput from "./Form/OutlinedInput";
-import { Header3 } from "./Text";
+import { Header3, Header2 } from "./Text";
 import CodeInput from "./Form/CodeInput";
 
 export default class PhonePicker extends Component {
   static propTypes = {
-    phone: PropTypes.string,
-    code: PropTypes.array,
-    status: PropTypes.number,
+    phone: PropTypes.any,
+    code: PropTypes.any,
+    status: PropTypes.any,
 
     changePhoneText: PropTypes.func,
     changeCodeValue: PropTypes.func
@@ -47,6 +47,10 @@ export default class PhonePicker extends Component {
     } else {
       return (
         <View>
+          <Header3 color="black">
+            Inserisci il codice di attivazione inviato al numero{" "}
+            <Header3 color="primary">+39 {phone}</Header3>
+          </Header3>
           <CodeInput
             code={this.props.code}
             onTextChange={this.props.changeCodeValue}

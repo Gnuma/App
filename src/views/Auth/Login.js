@@ -42,8 +42,17 @@ export default class Login extends Component {
 
         this.props
           .login(uid, pwd)
-          .then(token => this.props.completeAuth(token))
+          .then(res => {
+            const { isActive, token } = res;
+            console.log(isActive);
+            if (isActive !== false) {
+              this.props.completeAuth(token);
+            } else {
+              this.props.goValidation();
+            }
+          })
           .catch(err => {
+            console.log(err);
             this.setState({ error: "Login Error: " + err.response.status });
           });
       }

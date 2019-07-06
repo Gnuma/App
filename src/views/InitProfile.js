@@ -72,8 +72,19 @@ export class InitProfile extends Component {
   };
 
   complete = () => {
-    if (this.state.office !== undefined) {
-      //this.props.appInitRedux(this.state.office);
+    if (
+      this.state.office != undefined &&
+      this.state.year != undefined &&
+      this.state.course != undefined
+    ) {
+      const office = {
+        ...this.state.office,
+        course: {
+          ...this.state.course,
+          year: this.state.year
+        }
+      };
+      this.props.appInitRedux(office);
       this.props.navigation.navigate("App");
     }
   };

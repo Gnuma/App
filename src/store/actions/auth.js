@@ -16,11 +16,14 @@ import CookieManager from "react-native-cookies";
 import { commentsClear } from "./comments";
 import { messagingClear } from "../actions/messaging";
 import { chatClear } from "./chat";
+import { mockWHOAMI } from "../../mockData/MockUser";
+import NetInfo from "@react-native-community/netinfo";
 
 const isOffline = false;
 
 const tokenKey = "@auth:token";
 const officeKey = "@auth:office";
+const userDataKey = "@auth:userData";
 
 export const authAppInit = (office, isSaving) => {
   if (isSaving) setItem(officeKey, office);
@@ -44,27 +47,22 @@ export const authCompleted = () => {
   };
 };
 
-export const loginSuccess = (
-  token,
-  username = "NotSet",
-  gnumaUser = "NotSet",
-  id = "NotSet"
-) => {
+export const loginSuccess = (token, userData) => {
   setItem(tokenKey, token);
+  setItem(userDataKey, userData);
   axios.defaults.headers.common["Authorization"] = "Token " + token; // for all requests
   return {
     type: actionTypes.LOGIN_SUCCESS,
     payload: {
       token,
-      username,
-      gnumaUser,
-      id
+      userData
     }
   };
 };
 
 export const logoutSuccess = () => {
   removeItem(tokenKey);
+  removeItem(userDataKey);
   axios.defaults.headers.common["Authorization"] = undefined; // for all requests
   return {
     type: actionTypes.LOGOUT_SUCCESS
@@ -80,6 +78,15 @@ export const authFail = error => {
   };
 };
 
+export const authSetPhone = phone => ({
+  type: actionTypes.AUTH_SET_PHONE,
+  payload: {
+    phone
+  }
+});
+
+//Action Creators
+
 export const authLogin = (username, password) => {
   return (dispatch, getState) => {
     return new Promise(function(resolve, reject) {
@@ -91,21 +98,7 @@ export const authLogin = (username, password) => {
         })
         .then(res => {
           const token = res.data.key;
-          axios
-            .get(___WHOAMI_ENDPOINT___, {
-              headers: {
-                Authorization: "Token " + token
-              }
-            })
-            .then(res => {
-              if (!res.data.gnuma_user) throw "Gnuma User not initialized";
-              login({ dispatch, token, resolve, data: res.data });
-            })
-            .catch(err => {
-              console.log("Error -> ", err);
-              dispatch(authFail(err));
-              reject(err);
-            });
+          login({ dispatch, token, resolve });
         })
         .catch(err => {
           console.log(err);
@@ -119,30 +112,29 @@ export const authLogin = (username, password) => {
 export const autoLogin = () => {
   return (dispatch, getState) => {
     return new Promise(function(resolve, reject) {
+      //return reject(AutoStart.firstTime); //Testing
       if (getState().auth.token) return resolve(AutoStart.logged);
       dispatch(authStart());
-      multiGet([tokenKey, officeKey])
-        .then(userInfos => {
+      multiGet([tokenKey, officeKey, userDataKey])
+        .then(async userInfos => {
           //console.log(userInfos);
           const token = userInfos[0][1];
           const office = userInfos[1][1];
+          const userData = userInfos[2][1];
 
           if (token !== null) {
-            axios
-              .get(___WHOAMI_ENDPOINT___, {
-                headers: {
-                  Authorization: "Token " + token
-                }
-              })
-              .then(res => {
-                if (!res.data.gnuma_user) throw "Gnuma User not initialized";
-                login({ dispatch, token, resolve, data: res.data });
-              })
-              .catch(err => {
-                console.log("Error -> ", err);
-                dispatch(authFail(err));
+            if (await NetInfo.isConnected.fetch()) {
+              login({ dispatch, resolve, token });
+            } else {
+              console.log("Offline login");
+              if (userData) {
+                dispatch(loginSuccess(token, userData));
+                resolve(AutoStart.logged);
+              } else {
+                dispatch(authFail("No User data saved in async store"));
                 reject(AutoStart.anonymous);
-              });
+              }
+            }
           } else {
             dispatch(authFail("Token not found"));
             if (office !== null) {
@@ -185,11 +177,11 @@ export const authLogout = () => {
   };
 };
 
-export const authSignup = (username, email, password1, password2) => {
-  return dispatch => {
+export const authSignup = (username, email, password1, password2, phone) => {
+  return (dispatch, getState) => {
     return new Promise(function(resolve, reject) {
+      const office = getState().auth.office;
       dispatch(authStart());
-      console.log("INIZIO");
       if (isOffline) {
         console.log(username, email, password1, password2);
       } else {
@@ -198,29 +190,15 @@ export const authSignup = (username, email, password1, password2) => {
             username: username,
             email: email,
             password1: password1,
-            password2: password2
+            password2: password2,
+            office: office,
+            phone: phone
           })
           .then(res => {
-            const token = res.data.key;
-            axios
-              .post(___INITUSER_ENDPOINT___, {
-                key: token,
-                classM: "5B",
-                office: "J. Von Neumann"
-              })
-              .then(res => {
-                login({ dispatch, resolve, token });
-                //NavigatorService.goBack(null);
-              })
-              .catch(err => {
-                dispatch(authFail(err));
-                console.log("DENTRO");
-                reject(err);
-              });
+            login({ dispatch, resolve, token: res.data.key });
           })
           .catch(err => {
             dispatch(authFail(err));
-            console.log("FUORI");
             reject(err);
           });
       }
@@ -228,7 +206,14 @@ export const authSignup = (username, email, password1, password2) => {
   };
 };
 
-const login = async ({ dispatch, resolve, token, data }) => {
+export const authValidateAccount = () => (dispatch, getState) =>
+  new Promise((resolve, reject) => {
+    const token = getState().auth.token;
+    dispatch({ type: actionTypes.AUTH_VALIDATE_ACCOUNT });
+    WS.init(token, resolve);
+  });
+
+const login = async ({ dispatch, resolve, token }) => {
   await CookieManager.clearAll();
 
   console.log("Logging in...", token);
@@ -237,11 +222,28 @@ const login = async ({ dispatch, resolve, token, data }) => {
     throw "Error not set in login";
   }
 
-  if (data) {
-    dispatch(loginSuccess(token, data.username, data.gnuma_user, data.pk));
-  } else {
-    dispatch(loginSuccess(token));
+  let userData;
+  /*
+  try {
+    userData = await axios.get(___WHOAMI_ENDPOINT___, {
+      headers: {
+        Authorization: "Token " + token
+      }
+    }).data;
+  } catch (error) {
+    console.log("Error -> ", error);
+    dispatch(authFail(error));
+    reject(error);
   }
+  */
+  userData = mockWHOAMI; //TEST
 
-  WS.init(token, resolve);
+  dispatch(loginSuccess(token, userData));
+  console.log(userData.isActive);
+  if (userData.isActive) {
+    WS.init(token, resolve);
+  } else {
+    resolve({ token, isActive: false });
+    dispatch(authCompleted());
+  }
 };

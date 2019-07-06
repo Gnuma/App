@@ -1,24 +1,20 @@
 import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
+import update from "immutability-helper";
 
 const initialState = {
   token: null,
+  office: null,
+  userData: null,
+  isActive: false,
+
   error: null,
-  id: null,
-  loading: false,
-  gnumaUser: null,
-  username: null
+  loading: false
 };
 
 export const authAppInit = (state, action) => {
   return updateObject(state, {
-    gnumaUser: {
-      $set: {
-        classM: {
-          office: action.payload.office
-        }
-      }
-    }
+    office: action.payload.office
   });
 };
 
@@ -29,13 +25,21 @@ const authStart = (state, action) => {
   });
 };
 
-const loginSuccess = (state, action) => {
+const loginSuccess = (
+  state,
+  {
+    payload: {
+      token,
+      userData: { office, isActive, ...restUserData }
+    }
+  }
+) => {
   return updateObject(state, {
-    token: action.payload.token,
-    error: null,
-    gnumaUser: action.payload.gnumaUser,
-    username: action.payload.username,
-    id: action.payload.id
+    token,
+    userData: restUserData,
+    office,
+    isActive,
+    error: null
   });
 };
 
@@ -52,7 +56,20 @@ const authFail = (state, action) => {
   });
 };
 
+const authSetPhone = (state, { payload: { phone } }) =>
+  update(state, {
+    userData: {
+      phone: { $set: phone }
+    },
+    isActive: { $set: false }
+  });
+
 const logoutSuccess = (state, action) => initialState;
+
+const authValidateAccount = (state, action) =>
+  update(state, {
+    isActive: { $set: true }
+  });
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -73,6 +90,12 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.LOGOUT_SUCCESS:
       return logoutSuccess(state, action);
+
+    case actionTypes.AUTH_SET_PHONE:
+      return authSetPhone(state, action);
+
+    case actionTypes.AUTH_VALIDATE_ACCOUNT:
+      return authValidateAccount(state, action);
 
     default:
       return state;

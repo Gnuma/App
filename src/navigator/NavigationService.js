@@ -1,4 +1,4 @@
-import { NavigationActions } from "react-navigation";
+import { NavigationActions, StackActions } from "react-navigation";
 import store from "../store/store";
 
 let _navigator;
@@ -19,6 +19,16 @@ function navigate(routeName, params, key) {
 
 function dispatch(action) {
   _navigator.dispatch(action);
+}
+
+function push(routeName, params, key) {
+  _navigator.dispatch(
+    StackActions.push({
+      routeName,
+      params,
+      key
+    })
+  );
 }
 
 function goBack(key) {
@@ -54,5 +64,6 @@ export default {
   setTopLevelNavigator,
   protectedNavigation,
   goBack,
-  dispatch
+  dispatch,
+  push
 };

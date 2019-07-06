@@ -27,6 +27,7 @@ import UserInfoScreen from "../views/UserChanges/UserInfo";
 import OfficeChangeScreen from "../views/UserChanges/OfficeChange";
 import PhoneChangeScreen from "../views/UserChanges/PhoneChange";
 import PreviewItemScreen from "../views/PreviewItem";
+import PhoneValidationScreen from "../views/Auth/PhoneValidation";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
@@ -212,6 +213,7 @@ ShoppingNavigator.navigationOptions = ({ navigation }) => {
 const AuthNavigator = createStackNavigator(
   {
     AUTH: Auth,
+    PhoneValidation: PhoneValidationScreen,
     OfficeChangeAuth: OfficeChangeScreen
   },
   {
@@ -220,6 +222,11 @@ const AuthNavigator = createStackNavigator(
     }
   }
 );
+
+AuthNavigator.navigationOptions = ({ navigation }) => {
+  console.log(navigation.state);
+  return {};
+};
 
 const AppStack = createBottomTabNavigator(
   {

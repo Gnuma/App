@@ -7,6 +7,7 @@ import PhonePicker from "../../components/PhonePicker";
 import SolidButton from "../../components/SolidButton";
 import { Header3 } from "../../components/Text";
 import { AndroidBackHandler } from "react-navigation-backhandler";
+import { StackActions, NavigationActions } from "react-navigation";
 
 export class PhoneChange extends Component {
   static propTypes = {};

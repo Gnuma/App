@@ -58,3 +58,14 @@ export const isNotISBN = value => {
 };
 
 export const notExist = object => !object;
+
+export const isInvalidPhone = value => {
+  let re = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+  return !re.test(String(value));
+};
+
+export const getNumber = value => {
+  let num = value.match(/\d/g);
+  console.log(num);
+  return num.join("");
+};

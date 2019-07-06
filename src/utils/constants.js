@@ -78,3 +78,9 @@ export const OffertType = {
   PAY: "PAY",
   WAITPAYMENT: "WAITPAYMENT"
 };
+
+export const UserType = {
+  FREE: "FREE",
+  PRO: "PRO",
+  BUSINESS: "BUSINESS"
+};

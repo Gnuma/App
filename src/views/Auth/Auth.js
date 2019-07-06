@@ -21,6 +21,7 @@ import * as authActions from "../../store/actions/auth";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { HiddenBar } from "../../components/StatusBars";
 import { mockOffice } from "../../mockData/MockUser";
+import { StackActions, NavigationActions } from "react-navigation";
 
 export class Auth extends Component {
   constructor(props) {
@@ -93,6 +94,13 @@ export class Auth extends Component {
       status: 0
     }));
 
+  goValidation = () => {
+    this.props.navigation.replace("PhoneValidation", {
+      resolve: this._resolve,
+      reject: this._reject
+    });
+  };
+
   completeAuth = token => {
     this._resolve(token);
     this.props.navigation.goBack(null);
@@ -160,6 +168,7 @@ export class Auth extends Component {
                 completeAuth={this.completeAuth}
                 office={office}
                 goChangeOffice={this._goChangeOffice}
+                goValidation={this.goValidation}
               />
             ) : (
               <Login
@@ -168,6 +177,7 @@ export class Auth extends Component {
                 goNext={this._goNext}
                 hideFooter={this.hideFooter}
                 completeAuth={this.completeAuth}
+                goValidation={this.goValidation}
               />
             )}
           </View>
