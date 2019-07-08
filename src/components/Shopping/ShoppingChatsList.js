@@ -76,7 +76,7 @@ export class ChatLink extends Component {
         <View style={{ flex: 3 / 4, paddingLeft: 5 }}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <View style={{ flexDirection: "row", flex: 1 }}>
-              <Header2 color={"black"}>{data.UserTO.username}</Header2>
+              <Header2 color={"black"}>{data.UserTO.user.username}</Header2>
             </View>
             <Icon
               name={"chevron-circle-right"}

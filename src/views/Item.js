@@ -13,6 +13,7 @@ import * as chatActions from "../store/actions/chat";
 import * as sellActions from "../store/actions/sell";
 import { notificationsViewItem } from "../store/actions/notifications";
 import { GreyBar } from "../components/StatusBars";
+import { formatOffice } from "../utils/helper";
 
 export class Item extends Component {
   constructor(props) {
@@ -59,12 +60,13 @@ export class Item extends Component {
     axios
       .get(___GET_AD___ + `${id}/`)
       .then(res => {
+        console.log(res.data);
         this.setState({
           data: this.formatData(res.data),
           isOwner: this.props.user.id == res.data.seller._id,
           refreshing: false
         });
-        console.log(res.data);
+        //console.log(res.data);
         console.log(this.formatData(res.data));
         this.props.readComments(id);
       })
@@ -75,7 +77,7 @@ export class Item extends Component {
 
   formatData = data => {
     let comments = data.comment_ad;
-
+    const { course, ...restSeller } = data.seller;
     //console.log("NativeComments", comments);
     let formattedComments = [];
     for (let i = 0; i < comments.length; i++) {
@@ -83,7 +85,11 @@ export class Item extends Component {
     }
     return {
       ...data,
-      comment_ad: formattedComments
+      comment_ad: formattedComments,
+      seller: {
+        office: formatOffice(course),
+        ...restSeller
+      }
     };
   };
 

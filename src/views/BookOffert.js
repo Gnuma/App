@@ -64,17 +64,15 @@ export class BookOffert extends Component {
 
   getData = (props = this.props) => {
     const { objectID, chatID } = this.state;
-
     //console.log(this.type, props.data[objectID].chats[chatID].offerts);
     if (this.type == ChatType.sales) {
       console.log(props.data[objectID]);
       const { chats, newsCount, ...item } = props.data[objectID];
       const { offerts, statusLoading } = chats[chatID];
       return {
-        item: {
-          ...item,
-          seller: mockData.item.seller //TEST
-        },
+        item,
+        //seller: mockData.item.seller //TEST
+        //seller: item.
         offert:
           _.isEmpty(offerts) || offerts[0].status === OffertStatus.REJECTED
             ? undefined
@@ -87,14 +85,14 @@ export class BookOffert extends Component {
         objectID
       ].chats[chatID];
       return {
-        item: {
-          ...item,
-          seller: mockData.item.seller //TEST
-        },
         /*item: {
           ...item,
-          seller: UserTO
+          seller: mockData.item.seller //TEST
         },*/
+        item: {
+          ...item,
+          seller: UserTO
+        },
         offert:
           _.isEmpty(offerts) || offerts[0].status === OffertStatus.REJECTED
             ? undefined
@@ -171,7 +169,14 @@ export class BookOffert extends Component {
 
 const mapStateToProps = state => ({
   data: state.chat.data,
-  userID: state.auth.id
+  userID: state.auth.id,
+  userSeller: {
+    ...state.auth.userData,
+    user: {
+      username: state.auth.userData.username
+    },
+    office: state.auth.office
+  }
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -211,13 +216,15 @@ const mockData = {
       user: {
         username: "Federico"
       },
-      classM: {
-        office: {
-          id: 1,
-          name: "I.I.S.S. J. Von Neumann",
-          address: "via Pollenza 156, Roma",
-          cap: "00156",
-          type: "SP"
+      office: {
+        id: 1,
+        name: "I.I.S.S. J. Von Neumann",
+        address: "via Pollenza 156, Roma",
+        cap: "00156",
+        type: "SP",
+        course: {
+          name: "B",
+          year: 3
         }
       }
     }

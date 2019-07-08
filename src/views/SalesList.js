@@ -13,6 +13,7 @@ import Button from "../components/Button";
 import colors from "../styles/colors";
 import IconPlus from "../media/vectors/plus-icon";
 import { GreyBar } from "../components/StatusBars";
+import OfflineView, { OfflineNotification } from "../components/OfflineView";
 
 export class SalesList extends Component {
   static propTypes = {
@@ -40,8 +41,12 @@ export class SalesList extends Component {
       orderedData,
       focus,
       setSaleFocus,
-      isAuthenticated
+      isAuthenticated,
+      delayedLogin,
+      isConnected
     } = this.props;
+
+    if (delayedLogin) return <OfflineView sales />;
 
     return (
       <View style={{ flex: 1 }}>
@@ -63,7 +68,14 @@ export class SalesList extends Component {
               focus={focus}
               onGoChat={this.onGoChat}
             />
-            <SellButton onPress={this.onGoSell} />
+            {isConnected && <SellButton onPress={this.onGoSell} />}
+          </View>
+        )}
+        {!isConnected && (
+          <View
+            style={{ position: "absolute", bottom: 0, left: 20, right: 20 }}
+          >
+            <OfflineNotification />
           </View>
         )}
       </View>
@@ -87,22 +99,29 @@ export class SalesList extends Component {
         <Header3 color="black">
           Sembra che tu non abbia ancora creato nessun annuncio...
         </Header3>
-        <Button
-          style={{
-            backgroundColor: colors.white,
-            elevation: 2,
-            borderRadius: 8,
-            alignSelf: "center",
-            padding: 6,
-            marginTop: 30
-          }}
-          onPress={this.onGoSell}
-        >
-          <IconPlus />
-        </Button>
-        <Header2 color="primary" style={{ marginTop: 10, alignSelf: "center" }}>
-          Inizia ora
-        </Header2>
+        {this.props.isConnected && (
+          <View>
+            <Button
+              style={{
+                backgroundColor: colors.white,
+                elevation: 2,
+                borderRadius: 8,
+                alignSelf: "center",
+                padding: 6,
+                marginTop: 30
+              }}
+              onPress={this.onGoSell}
+            >
+              <IconPlus />
+            </Button>
+            <Header2
+              color="primary"
+              style={{ marginTop: 10, alignSelf: "center" }}
+            >
+              Inizia ora
+            </Header2>
+          </View>
+        )}
       </View>
     );
   };
@@ -112,7 +131,9 @@ const mapStateToProps = state => ({
   isAuthenticated: state.auth.token !== null,
   focus: state.chat.salesFocus,
   data: state.chat.data,
-  orderedData: state.chat.salesOrderedData
+  orderedData: state.chat.salesOrderedData,
+  delayedLogin: state.auth.delayedLogin,
+  isConnected: state.settings.isConnected
 });
 
 const mapDispatchToProps = dispatch => ({

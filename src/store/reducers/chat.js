@@ -10,6 +10,7 @@ import {
   createOffert
 } from "../../utils/chatUtility";
 import { ChatType, ChatStatus, OffertStatus } from "../../utils/constants";
+import { formatOffice } from "../../utils/helper";
 
 const initialState = {
   data: {},
@@ -250,7 +251,9 @@ const chatNewChat = (state, { payload: { objectID, chatID, data } }) => {
     _id: chatID,
     UserTO: {
       _id: data.buyer.pk,
-      username: data.buyer.user.username
+      user: {
+        username: data.buyer.user.username
+      }
     },
     hasNews: 1,
     status: ChatStatus.PENDING,
@@ -422,12 +425,7 @@ const chatNewOffert = (
   state,
   { payload: { objectID, chatID, price, pk, user } }
 ) => {
-  user = user || {
-    _id: state.data[objectID].chats[chatID].UserTO._id,
-    user: {
-      username: state.data[objectID].chats[chatID].UserTO.username
-    }
-  };
+  user = user || state.data[objectID].chats[chatID].UserTO;
 
   return update(state, {
     data: {
@@ -586,27 +584,30 @@ const formatSalesData = (arrayData, focus = 0) => {
   let orderedData = [];
   let data = {};
   for (let i = 0; i < arrayData.length; i++) {
-    const { chats, _id: itemID, ...restItem } = arrayData[i];
+    const { chats, _id: itemID, seller, ...restItem } = arrayData[i];
+
+    seller.office = formatOffice(seller.course);
+    seller.course = null;
+
     data[itemID] = {
       _id: itemID,
+      seller,
       ...restItem,
       chats: {}
     };
     let orderedChats = [];
     for (let f = 0; f < chats.length; f++) {
-      const chat = chats[f];
+      const { buyer, ...chat } = chats[f];
       orderedChats.push(chat._id);
 
-      const UserTO = {
-        _id: chat.buyer._id,
-        ...chat.buyer.user
-      };
+      buyer.office = formatOffice(buyer.course);
+      buyer.course = null;
 
       for (let m = 0; m < chat.messages.length; m++)
         chat.messages[m].createdAt = new Date(chat.messages[m].createdAt);
 
       data[itemID].chats[chat._id] = {
-        UserTO,
+        UserTO: buyer,
         ...chat,
         composer: "",
         loading: false
@@ -644,10 +645,9 @@ const formatShoppingData = (arrayData, focus = 0) => {
       const { chats: chat, seller, ...restItem } = items[f];
       orderedChats.push(chat._id);
 
-      const UserTO = {
-        _id: seller._id,
-        ...seller.user
-      };
+      seller.office = formatOffice(seller.course);
+      seller.course = null;
+
       const item = {
         ...restItem
       };
@@ -656,7 +656,7 @@ const formatShoppingData = (arrayData, focus = 0) => {
         chat.messages[m].createdAt = new Date(chat.messages[m].createdAt);
 
       data["s" + subject._id].chats[chat._id] = {
-        UserTO,
+        UserTO: seller,
         item,
         ...chat,
         composer: "",

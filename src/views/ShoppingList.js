@@ -10,6 +10,7 @@ import ShoppingChatsList from "../components/Shopping/ShoppingChatsList";
 import SearchLink from "../components/Home/SearchLink";
 import _ from "lodash";
 import colors from "../styles/colors";
+import OfflineView, { OfflineNotification } from "../components/OfflineView";
 
 export class ShoppingList extends Component {
   static propTypes = {
@@ -36,8 +37,12 @@ export class ShoppingList extends Component {
       orderedData,
       focus,
       setShoppingFocus,
-      isAuthenticated
+      isAuthenticated,
+      delayedLogin,
+      isConnected
     } = this.props;
+
+    if (delayedLogin) return <OfflineView shopping />;
 
     if (!orderedData || _.isEmpty(orderedData)) return this.renderEmpty();
 
@@ -57,6 +62,13 @@ export class ShoppingList extends Component {
           focus={focus}
           onGoChat={this.onGoChat}
         />
+        {!isConnected && (
+          <View
+            style={{ position: "absolute", bottom: 0, left: 20, right: 20 }}
+          >
+            <OfflineNotification />
+          </View>
+        )}
       </View>
     );
   }
@@ -80,6 +92,13 @@ export class ShoppingList extends Component {
             onPress={this.goSearch}
           />
         </View>
+        {!this.props.isConnected && (
+          <View
+            style={{ position: "absolute", bottom: -20, left: 0, right: 0 }}
+          >
+            <OfflineNotification />
+          </View>
+        )}
       </View>
     );
   };
@@ -94,7 +113,9 @@ const mapStateToProps = state => ({
   isAuthenticated: state.auth.token !== null,
   focus: state.chat.shoppingFocus,
   data: state.chat.data,
-  orderedData: state.chat.shoppingOrderedData
+  orderedData: state.chat.shoppingOrderedData,
+  delayedLogin: state.auth.delayedLogin,
+  isConnected: state.settings.isConnected
 });
 
 const mapDispatchToProps = dispatch => ({

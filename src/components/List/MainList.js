@@ -12,6 +12,9 @@ import ListMultiItem from "../ListItem/ListMultiItem";
 import ListSingleItem from "../ListItem/ListSingleItem";
 import { Header2, Header4 } from "../../components/Text";
 import colors from "../../styles/colors";
+import Button from "../Button";
+import NavigationService from "../../navigator/NavigationService";
+import { StackActions } from "react-navigation";
 
 export class MainList extends Component {
   static propTypes = {
@@ -32,9 +35,30 @@ export class MainList extends Component {
       );
     }
 
-    if (!data || data.results.length <= 0) {
+    /*if (!data || data.results.length <= 0) {
       return <Header2>Nessun Risultato</Header2>;
+    }*/
+    //TEST
+    if (!data || data.results.length <= 0) {
+      return (
+        <Button
+          onPress={() => {
+            const pushAction = StackActions.push({
+              routeName: "Item",
+              params: {
+                itemID: 1,
+                name: "FAKE",
+                authors: "FAKE"
+              }
+            });
+            NavigationService.dispatch(pushAction);
+          }}
+        >
+          <Header2>AOOO</Header2>
+        </Button>
+      );
     }
+    //TEST
 
     const isSingle = data.resultType === "single";
     const results = data.results;

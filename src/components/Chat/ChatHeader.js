@@ -121,7 +121,7 @@ export default class ChatHeader extends Component {
                 numberOfLines={1}
                 style={{ flex: 1, marginRight: 8 }}
               >
-                {data.UserTO.username}
+                {data.UserTO.user.username}
               </Header1>
             </View>
             <FullButton

@@ -104,8 +104,8 @@ export default class Composer extends Component {
       >
         {showPendingWarning ? (
           <Header4 style={{ marginHorizontal: 20 }}>
-            Ricorda che {data.UserTO.username} non potrà vedere i tuoi messaggi
-            finchè non accetterà la conversazione
+            Ricorda che {data.UserTO.user.username} non potrà vedere i tuoi
+            messaggi finchè non accetterà la conversazione
           </Header4>
         ) : null}
         <View

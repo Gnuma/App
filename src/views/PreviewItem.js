@@ -101,9 +101,9 @@ const mapStateToProps = state => ({
   price: state.sell.price,
   seller: {
     _id: state.auth.id,
-    classM: state.auth.gnumaUser.classM,
+    office: state.auth.office,
     user: {
-      username: state.auth.username
+      username: state.auth.userData.username
     }
   },
   loading: state.sell.loading

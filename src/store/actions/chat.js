@@ -203,8 +203,19 @@ export const chatRead = (objectID, chatID) => (dispatch, getState) => {
   console.log(chat.hasNews);
   if (chat.hasNews) {
     try {
-      const from = chat.messages[chat.hasNews - 1]._id;
-      const to = chat.messages[0]._id;
+      let index = chat.hasNews - 1;
+      let from = chat.messages[index]._id;
+      while (isNaN(from)) {
+        index++;
+        from = chat.messages[index]._id;
+      }
+
+      index = 0;
+      let to = chat.messages[0]._id;
+      while (isNaN(to)) {
+        index++;
+        to = chat.messages[index]._id;
+      }
       axios
         .post(___READ_CHAT___, {
           chat: chatID,

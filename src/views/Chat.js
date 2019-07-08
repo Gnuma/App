@@ -120,7 +120,7 @@ export class Chat extends Component {
               isLoading={chatData.loading}
               onSettle={this.props.chatSettle}
               onContactRequest={this.props.chatRequestContact}
-              username={chatData.UserTO.username}
+              username={chatData.UserTO.user.username}
               type={this.type}
             />
           ) : (

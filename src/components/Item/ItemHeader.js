@@ -23,8 +23,12 @@ export default class ItemHeader extends Component {
         </Button>
         <View style={styles.contentContainer}>
           <View style={styles.content}>
-            <Header2 color={"primary"}>{this.props.title}</Header2>
-            <Header5 style={styles.authors}>di {this.props.authors}</Header5>
+            <Header2 numberOfLines={1} color={"primary"}>
+              {this.props.title}
+            </Header2>
+            <Header5 numberOfLines={1} style={styles.authors}>
+              di {this.props.authors}
+            </Header5>
           </View>
           {this.props.hasNewComments ? (
             <Button style={styles.notificationButton} disabled>

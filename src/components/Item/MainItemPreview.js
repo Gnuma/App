@@ -12,7 +12,7 @@ export default class MainItemPreview extends Component {
     const primaryData = {
       price: data.price,
       conditions: data.condition,
-      office: data.seller.classM.office
+      office: data.seller.office
     };
     const sellerData = data.seller.user;
     const secondaryData = {

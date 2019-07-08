@@ -81,7 +81,7 @@ export class ChatLink extends Component {
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ flexDirection: "row", flex: 1 }}>
-            <Header2 color={"black"}>{data.UserTO.username}</Header2>
+            <Header2 color={"black"}>{data.UserTO.user.username}</Header2>
           </View>
           <Icon
             name={"chevron-circle-right"}
@@ -104,7 +104,7 @@ export class ChatLink extends Component {
             style={{ flex: 1, marginRight: 10 }}
             numberOfLines={1}
           >
-            {data.UserTO.username} vuole contattarti
+            {data.UserTO.user.username} vuole contattarti
           </Header4>
           <View onStartShouldSetResponder={event => true}>
             <BooleanButton />

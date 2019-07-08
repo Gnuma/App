@@ -6,6 +6,7 @@ import { Header1, Header3, Header4, Header5 } from "../../components/Text";
 import CircleValue from "../CircleValue";
 import { CachedImage } from "react-native-cached-image";
 import { ___BASE_ENDPOINT___ } from "../../store/constants";
+import { formatOffice } from "../../utils/helper";
 
 export default class Item extends Component {
   static propTypes = {
@@ -14,9 +15,9 @@ export default class Item extends Component {
   };
   render() {
     const { isSingle, data } = this.props;
-    //console.log(data);
+    console.log(data);
     const { price, seller, condition, book, image_ad } = data;
-    const office = seller.classM.office;
+    const office = seller.office;
     let mainImage;
     try {
       mainImage = image_ad[0];
