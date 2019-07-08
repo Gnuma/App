@@ -48,7 +48,7 @@ export const authCompleted = () => {
   };
 };
 
-export const loginSuccess = (token, userData) => {
+export const loginSuccess = (token, userData, isDelayed) => {
   setItem(tokenKey, token);
   setItem(userDataKey, userData);
   axios.defaults.headers.common["Authorization"] = "Token " + token; // for all requests
@@ -56,7 +56,8 @@ export const loginSuccess = (token, userData) => {
     type: actionTypes.LOGIN_SUCCESS,
     payload: {
       token,
-      userData
+      userData,
+      isDelayed
     }
   };
 };
@@ -134,7 +135,7 @@ export const autoLogin = () => {
             } else {
               console.log("Offline login");
               if (userData) {
-                dispatch(loginSuccess(token, userData));
+                dispatch(loginSuccess(token, userData, true));
                 resolve(AutoStart.logged);
               } else {
                 dispatch(authFail("No User data saved in async store"));
@@ -220,6 +221,15 @@ export const authValidateAccount = () => (dispatch, getState) =>
     const token = getState().auth.token;
     dispatch({ type: actionTypes.AUTH_VALIDATE_ACCOUNT });
     WS.init(token, resolve);
+  });
+
+export const authDelayedLogin = () => (dispatch, getState) =>
+  new Promise((resolve, reject) => {
+    if (getState().auth.delayedLogin) {
+      login({ dispatch, resolve, reject, token: getState().auth.token });
+    } else {
+      reject("No Delayed Login");
+    }
   });
 
 const login = async ({ dispatch, resolve, reject, token }) => {

@@ -3,6 +3,7 @@ import { View } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import * as authActions from "../store/actions/auth";
+import * as settingsActions from "../store/actions/settings";
 import Button from "../components/Button";
 import { Header1 } from "../components/Text";
 import { AutoStart } from "../utils/constants";
@@ -12,6 +13,9 @@ import { HiddenBar } from "../components/StatusBars";
 let mounted = false;
 export class AppLoader extends Component {
   componentDidMount() {
+    if (!mounted) {
+      this.props.startSettings();
+    }
     this.props
       .autoLoginRedux()
       .then(() => NavigatorService.navigate("Home"))
@@ -44,7 +48,8 @@ const mapStateToProps = state => ({});
 const mapDispatchToProps = dispatch => {
   return {
     autoLoginRedux: (resolve, reject) =>
-      dispatch(authActions.autoLogin(resolve, reject))
+      dispatch(authActions.autoLogin(resolve, reject)),
+    startSettings: () => dispatch(settingsActions.settingsStart())
   };
 };
 

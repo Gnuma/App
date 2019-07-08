@@ -70,6 +70,9 @@ export class UserSettings extends Component {
 
   render() {
     const { office, userData, isActive } = this.props;
+    if (!office || !userData) {
+      return null;
+    }
     const { level, exp } = getLevel(userData.xp);
 
     return (

@@ -10,7 +10,8 @@ const initialState = {
   id: null,
 
   error: null,
-  loading: false
+  loading: false,
+  delayedLogin: false
 };
 
 export const authAppInit = (state, action) => {
@@ -31,7 +32,8 @@ const loginSuccess = (
   {
     payload: {
       token,
-      userData: { pk, office, isActive, ...restUserData }
+      userData: { pk, office, isActive, ...restUserData },
+      isDelayed
     }
   }
 ) => {
@@ -41,7 +43,8 @@ const loginSuccess = (
     office,
     isActive,
     id: pk,
-    error: null
+    error: null,
+    delayedLogin: isDelayed
   });
 };
 
