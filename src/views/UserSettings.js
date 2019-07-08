@@ -22,11 +22,16 @@ import CircleValue from "../components/CircleValue";
 import Button from "../components/Button";
 import * as authActions from "../store/actions/auth";
 import Divider from "../components/Divider";
+import { getLevel } from "../utils/helper";
+import { LEVEL_DATA } from "../utils/constants";
 
 const marginHorizontal = 20;
 
 export class UserSettings extends Component {
-  static propTypes = {};
+  static propTypes = {
+    userData: PropTypes.object,
+    office: PropTypes.object
+  };
 
   componentDidMount() {
     this._navListener = this.props.navigation.addListener("willFocus", () => {
@@ -64,24 +69,39 @@ export class UserSettings extends Component {
   };
 
   render() {
+    const { office, userData, isActive } = this.props;
+    const { level, exp } = getLevel(userData.xp);
+
     return (
       <View style={{ flex: 1 }}>
         <BasicHeader title="Il Tuo Profilo" />
         <View style={{ flex: 1 }}>
           <ScrollView>
-            <UserInfoPanel onPress={this.goUserInfo} />
+            <UserInfoPanel
+              onPress={this.goUserInfo}
+              username={userData.username}
+              email={userData.email}
+            />
             <Divider
               style={{
                 marginHorizontal: marginHorizontal
               }}
             />
-            <UserOfficePanel onPress={this.goChangeOffice} />
+            <UserOfficePanel
+              onPress={this.goChangeOffice}
+              address={office.address}
+              office={office.name}
+            />
             <Divider
               style={{
                 marginHorizontal: marginHorizontal
               }}
             />
-            <UserPhonePanel onPress={this.goChangePhone} />
+            <UserPhonePanel
+              onPress={this.goChangePhone}
+              phone={userData.phone}
+              isActive={isActive}
+            />
             <Divider
               style={{
                 marginHorizontal: marginHorizontal
@@ -111,15 +131,15 @@ export class UserSettings extends Component {
               </View>
             </View>
             <View style={{ marginVertical: 10 }}>
-              <LevelList />
+              <LevelList level={level} exp={exp} />
               <Header2 style={{ alignSelf: "center", marginTop: 5 }}>
                 <Header2
                   color="secondary"
                   style={{ fontWeight: "800", fontSize: 30 }}
                 >
-                  70
+                  {exp}
                 </Header2>
-                /100
+                /{LEVEL_DATA[level]}
               </Header2>
             </View>
             <View style={{ marginHorizontal: marginHorizontal, marginTop: 15 }}>
@@ -178,7 +198,11 @@ export class UserSettings extends Component {
   };
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  userData: state.auth.userData,
+  office: state.auth.office,
+  isActive: state.auth.isActive
+});
 
 const mapDispatchToProps = dispatch => ({
   logout: () => dispatch(authActions.authLogout())
@@ -293,11 +317,7 @@ const UserOfficePanel = ({
   );
 };
 
-UserPhonePanel = ({
-  phone = "1234567890",
-  phoneStatus = "Non Validato",
-  onPress
-}) => {
+UserPhonePanel = ({ phone = "1234567890", isActive = false, onPress }) => {
   return (
     <Button
       onPress={onPress}
@@ -321,8 +341,11 @@ UserPhonePanel = ({
           marginTop: 10
         }}
       >
-        <Header3 style={{ color: colors.darkRed }} numberOfLines={1}>
-          {phoneStatus}
+        <Header3
+          style={{ color: isActive ? colors.secondary : colors.darkRed }}
+          numberOfLines={1}
+        >
+          {isActive ? "Validato" : "Non Validato"}
         </Header3>
       </View>
     </Button>

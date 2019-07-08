@@ -192,7 +192,7 @@ export class Item extends Component {
 
 const mapStateToProps = state => ({
   user: {
-    username: state.auth.username,
+    username: state.auth.userData.username,
     id: state.auth.id
   },
   commentsData: state.comments.data

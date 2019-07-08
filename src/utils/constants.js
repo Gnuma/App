@@ -1,4 +1,6 @@
 import colors from "../styles/colors";
+import { StatusBar, Platform } from "react-native";
+import Device from "react-native-device-info";
 
 export const ___BOOK_IMG_RATIO___ = 4 / 3;
 
@@ -84,3 +86,10 @@ export const UserType = {
   PRO: "PRO",
   BUSINESS: "BUSINESS"
 };
+
+export const AUTH_ERROR = {
+  SEMIAUTH: "SEMIAUTH"
+};
+
+export const NOTCH_MARGIN =
+  Platform.OS === "android" && Device.hasNotch() ? StatusBar.currentHeight : 0;

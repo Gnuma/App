@@ -3,8 +3,7 @@ import {
   View,
   ScrollView,
   KeyboardAvoidingView,
-  StyleSheet,
-  StatusBar
+  StyleSheet
 } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
@@ -16,11 +15,13 @@ import { HiddenBar, GreyBar } from "../../components/StatusBars";
 import PhonePicker from "../../components/PhonePicker";
 import ContinueButton from "../../components/ContinueButton";
 import * as authActions from "../../store/actions/auth";
-import axios from "axios";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { StackActions } from "react-navigation";
 import { isInvalidPhone, getNumber } from "../../utils/validator";
 import ErrorMessage from "../../components/Form/ErrorMessage";
+import axios from "axios";
+import { ___VALIDATE_USER___ } from "../../store/constants";
+import { AUTH_ERROR, NOTCH_MARGIN } from "../../utils/constants";
 
 export class PhoneValidation extends Component {
   static propTypes = {};
@@ -34,7 +35,7 @@ export class PhoneValidation extends Component {
     this.state = {
       phone: props.phone.toString(),
       status: 1,
-      code: ["", "", "", "", ""],
+      code: ["", "", "", "", "", ""],
       loading: false,
       error: ""
     };
@@ -46,7 +47,7 @@ export class PhoneValidation extends Component {
 
   goBack = () => {
     if (this.state.status === 0) {
-      this._reject();
+      this._reject(AUTH_ERROR.SEMIAUTH);
       this.quit();
     } else {
       this.setState(prevState => ({
@@ -66,7 +67,7 @@ export class PhoneValidation extends Component {
     } else {
       let code = this.state.code.join("");
       code = code.replace(/\s/g, "");
-      return code.length === 5;
+      return code.length === CODE_LENGTH;
     }
   };
 
@@ -100,15 +101,28 @@ export class PhoneValidation extends Component {
       this.setState({
         loading: true
       });
-      setTimeout(() => {
-        this.props.validate().then(() => {
-          this.setState({
-            loading: false
+      axios
+        .post(___VALIDATE_USER___, {
+          phone,
+          key: code.join("")
+        })
+        .then(res => {
+          this.props.validate().then(() => {
+            this.setState({
+              loading: false
+            });
+            this._resolve();
+            this.quit();
           });
-          this._resolve();
-          this.quit();
+          console.log(res);
+        })
+        .catch(err => {
+          console.log({ err });
+          this.setState({
+            loading: false,
+            error: "Il codice inserito non è valido"
+          });
         });
-      }, 2000);
     }
   };
 
@@ -119,7 +133,7 @@ export class PhoneValidation extends Component {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior="padding"
-        keyboardVerticalOffset={StatusBar.currentHeight}
+        keyboardVerticalOffset={NOTCH_MARGIN}
       >
         <AndroidBackHandler style={{ flex: 1 }} onBackPress={this.goBack}>
           <HiddenBar />
@@ -204,3 +218,5 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(PhoneValidation);
+
+const CODE_LENGTH = 6;

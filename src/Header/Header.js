@@ -53,7 +53,9 @@ export class Header extends Component {
   };
 
   openSettings = () => {
-    protectedAction().then(() => NavigationService.navigate("UserSettings"));
+    protectedAction({ SEMIAUTH: true }).then(() =>
+      NavigationService.navigate("UserSettings")
+    );
     //NavigationService.navigate("UserSettings");
   };
 

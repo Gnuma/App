@@ -17,7 +17,7 @@ export class PhoneChange extends Component {
     this.state = {
       phone: "34142565675",
       status: 1,
-      code: ["", "", "", "", ""]
+      code: ["", "", "", "", "", ""]
     };
   }
 

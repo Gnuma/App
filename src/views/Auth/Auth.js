@@ -22,6 +22,7 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 import { HiddenBar } from "../../components/StatusBars";
 import { mockOffice } from "../../mockData/MockUser";
 import { StackActions, NavigationActions } from "react-navigation";
+import { NOTCH_MARGIN } from "../../utils/constants";
 
 export class Auth extends Component {
   constructor(props) {
@@ -117,83 +118,91 @@ export class Auth extends Component {
     const { authType } = this.state;
 
     return (
-      <AndroidBackHandler
-        onBackPress={this._goBack}
-        style={StyleSheet.absoluteFill}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="padding"
+        keyboardVerticalOffset={NOTCH_MARGIN}
       >
-        <HiddenBar />
-        <View style={{ flex: 1, marginHorizontal: 20 }}>
-          <View style={{ marginBottom: 10, flex: 1 }}>
-            <View
-              style={{
-                marginLeft: -10,
-                marginTop: 10,
-                flexDirection: "row",
-                alignItems: "center"
-              }}
-            >
-              <Button
+        <AndroidBackHandler
+          onBackPress={this._goBack}
+          style={StyleSheet.absoluteFill}
+        >
+          <HiddenBar />
+          <View style={{ flex: 1, marginHorizontal: 20 }}>
+            <View style={{ marginBottom: 10, flex: 1 }}>
+              <View
                 style={{
-                  borderRadius: 6
+                  marginLeft: -10,
+                  marginTop: 10,
+                  flexDirection: "row",
+                  alignItems: "center"
                 }}
-                onPress={this._goBack}
               >
-                <Icon
-                  name={this.state.status > 0 ? "chevron-left" : "times"}
-                  size={32}
-                  style={{ color: "black", padding: 10, borderRadius: 4 }}
+                <Button
+                  style={{
+                    borderRadius: 6
+                  }}
+                  onPress={this._goBack}
+                >
+                  <Icon
+                    name={this.state.status > 0 ? "chevron-left" : "times"}
+                    size={32}
+                    style={{ color: "black", padding: 10, borderRadius: 4 }}
+                  />
+                </Button>
+                <Header1 color="primary">
+                  {authType == "signup" ? "Registrati" : "Accedi"}
+                </Header1>
+              </View>
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <Header1
+                  style={{ fontSize: 50, textAlign: "center" }}
+                  color={"primary"}
+                >
+                  Quipu
+                </Header1>
+              </View>
+              {authType === "signup" ? (
+                <Signup
+                  signup={signupRedux}
+                  status={this.state.status}
+                  goNext={this._goNext}
+                  hideFooter={this.hideFooter}
+                  completeAuth={this.completeAuth}
+                  office={office}
+                  goChangeOffice={this._goChangeOffice}
+                  goValidation={this.goValidation}
                 />
-              </Button>
-              <Header1 color="primary">Accedi</Header1>
+              ) : (
+                <Login
+                  login={loginRedux}
+                  status={this.state.status}
+                  goNext={this._goNext}
+                  hideFooter={this.hideFooter}
+                  completeAuth={this.completeAuth}
+                  goValidation={this.goValidation}
+                />
+              )}
             </View>
-            <View
-              style={{
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Header1
-                style={{ fontSize: 50, textAlign: "center" }}
-                color={"primary"}
-              >
-                Quipu
-              </Header1>
+            {this._renderFooter()}
+          </View>
+          {isLoading ? (
+            <View style={{ ...StyleSheet.absoluteFill, elevation: 10 }}>
+              <LoadingOverlay />
             </View>
-            {authType === "signup" ? (
-              <Signup
-                signup={signupRedux}
-                status={this.state.status}
-                goNext={this._goNext}
-                hideFooter={this.hideFooter}
-                completeAuth={this.completeAuth}
-                office={office}
-                goChangeOffice={this._goChangeOffice}
-                goValidation={this.goValidation}
-              />
-            ) : (
-              <Login
-                login={loginRedux}
-                status={this.state.status}
-                goNext={this._goNext}
-                hideFooter={this.hideFooter}
-                completeAuth={this.completeAuth}
-                goValidation={this.goValidation}
-              />
-            )}
-          </View>
-          {this._renderFooter()}
-        </View>
-        {isLoading ? (
-          <View style={{ ...StyleSheet.absoluteFill, elevation: 10 }}>
-            <LoadingOverlay />
-          </View>
-        ) : null}
-      </AndroidBackHandler>
+          ) : null}
+        </AndroidBackHandler>
+      </KeyboardAvoidingView>
     );
   }
 
   _renderFooter = () => {
-    //    if (!this.state.showFooter) return null;
+    if (!this.state.showFooter || this.state.status > 0) return null;
 
     return (
       <View

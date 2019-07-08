@@ -7,6 +7,7 @@ const initialState = {
   office: null,
   userData: null,
   isActive: false,
+  id: null,
 
   error: null,
   loading: false
@@ -30,7 +31,7 @@ const loginSuccess = (
   {
     payload: {
       token,
-      userData: { office, isActive, ...restUserData }
+      userData: { pk, office, isActive, ...restUserData }
     }
   }
 ) => {
@@ -39,6 +40,7 @@ const loginSuccess = (
     userData: restUserData,
     office,
     isActive,
+    id: pk,
     error: null
   });
 };

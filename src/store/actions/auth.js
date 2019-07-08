@@ -18,6 +18,7 @@ import { messagingClear } from "../actions/messaging";
 import { chatClear } from "./chat";
 import { mockWHOAMI } from "../../mockData/MockUser";
 import NetInfo from "@react-native-community/netinfo";
+import { formatUserData } from "../../utils/helper";
 
 const isOffline = false;
 
@@ -98,7 +99,7 @@ export const authLogin = (username, password) => {
         })
         .then(res => {
           const token = res.data.key;
-          login({ dispatch, token, resolve });
+          login({ dispatch, token, resolve, reject });
         })
         .catch(err => {
           console.log(err);
@@ -124,7 +125,12 @@ export const autoLogin = () => {
 
           if (token !== null) {
             if (await NetInfo.isConnected.fetch()) {
-              login({ dispatch, resolve, token });
+              login({
+                dispatch,
+                resolve,
+                token,
+                reject: () => reject(AutoStart.anonymous)
+              });
             } else {
               console.log("Offline login");
               if (userData) {
@@ -180,7 +186,9 @@ export const authLogout = () => {
 export const authSignup = (username, email, password1, password2, phone) => {
   return (dispatch, getState) => {
     return new Promise(function(resolve, reject) {
-      const office = getState().auth.office;
+      //const office = getState().auth.office;
+      const office = 1; // TEST
+      const course = "5B"; // TEST
       dispatch(authStart());
       if (isOffline) {
         console.log(username, email, password1, password2);
@@ -192,10 +200,11 @@ export const authSignup = (username, email, password1, password2, phone) => {
             password1: password1,
             password2: password2,
             office: office,
+            course: course,
             phone: phone
           })
           .then(res => {
-            login({ dispatch, resolve, token: res.data.key });
+            login({ dispatch, resolve, reject, token: res.data.key });
           })
           .catch(err => {
             dispatch(authFail(err));
@@ -213,7 +222,7 @@ export const authValidateAccount = () => (dispatch, getState) =>
     WS.init(token, resolve);
   });
 
-const login = async ({ dispatch, resolve, token }) => {
+const login = async ({ dispatch, resolve, reject, token }) => {
   await CookieManager.clearAll();
 
   console.log("Logging in...", token);
@@ -223,20 +232,22 @@ const login = async ({ dispatch, resolve, token }) => {
   }
 
   let userData;
-  /*
+
   try {
-    userData = await axios.get(___WHOAMI_ENDPOINT___, {
+    const response = await axios.get(___WHOAMI_ENDPOINT___, {
       headers: {
         Authorization: "Token " + token
       }
-    }).data;
+    });
+    userData = formatUserData(response.data);
+    console.log(userData);
   } catch (error) {
     console.log("Error -> ", error);
     dispatch(authFail(error));
-    reject(error);
+    return reject(error);
   }
-  */
-  userData = mockWHOAMI; //TEST
+
+  //userData = mockWHOAMI; //TEST
 
   dispatch(loginSuccess(token, userData));
   console.log(userData.isActive);

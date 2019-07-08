@@ -90,9 +90,10 @@ export default class Signup extends Component {
         const email = fields[SignupStatus.EMAIL].email.value;
         const pwd = fields[SignupStatus.PASSWORD].pwd.value;
         const confirmPwd = fields[SignupStatus.PASSWORD].confirmPwd.value;
+        const phone = fields[SignupStatus.PHONE].phone.value;
 
         this.props
-          .signup(uid, email, pwd, confirmPwd)
+          .signup(uid, email, pwd, confirmPwd, phone)
           .then(({ token, isActive }) => {
             this.props.goValidation();
           })

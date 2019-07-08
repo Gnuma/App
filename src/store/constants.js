@@ -17,6 +17,7 @@ export const ___LOGOUT_ENDPOINT___ = ___BASE_ENDPOINT___ + "auth/logout/";
 export const ___SIGNUP_ENDPOINT___ = ___BASE_ENDPOINT___ + "auth/registration/";
 export const ___WHOAMI_ENDPOINT___ = ___BASE_ENDPOINT___ + "whoami/";
 export const ___INITUSER_ENDPOINT___ = ___BASE_ENDPOINT___ + "init/";
+export const ___VALIDATE_USER___ = ___BASE_ENDPOINT___ + "verify/";
 
 export const ___CREATE_AD___ = ___BASE_ENDPOINT___ + "ads/";
 export const ___BASE_UPLOAD_PICTURE___ = ___BASE_ENDPOINT___ + "ads/upload/";
