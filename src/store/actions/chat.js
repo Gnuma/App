@@ -204,6 +204,7 @@ export const chatRead = (objectID, chatID) => (dispatch, getState) => {
   console.log(chat.hasNews);
   if (chat.hasNews) {
     try {
+      /*
       let index = chat.hasNews - 1;
       let from = chat.messages[index]._id;
       while (isNaN(from)) {
@@ -216,12 +217,12 @@ export const chatRead = (objectID, chatID) => (dispatch, getState) => {
       while (isNaN(to)) {
         index++;
         to = chat.messages[index]._id;
-      }
+      }*/
+      const messagesToRead = chat.hasNews;
       axios
         .post(___READ_CHAT___, {
           chat: chatID,
-          from,
-          to
+          messages: messagesToRead
         })
         .then(res => console.log(res))
         .catch(err => console.log({ err }));
@@ -338,7 +339,10 @@ export const chatCreateOffert = (objectID, chatID, price) => (
     })
     .then(res => {
       console.log(res);
-      const { username, id } = getState().auth;
+      const {
+        userData: { username },
+        id
+      } = getState().auth;
       dispatch(
         chatNewOffert(objectID, chatID, res.data.pk, price, {
           _id: id,
