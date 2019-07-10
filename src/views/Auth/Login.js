@@ -23,12 +23,13 @@ export default class Login extends Component {
     error: ""
   };
 
-  continue = () => {
+  continue = async () => {
     const { status } = this.props;
     const stateFields = this.state.fields[status];
     const stateValidators = validators[status];
-
-    const result = submit(stateFields, stateValidators);
+    this.props.setLoading(true);
+    const result = await submit(stateFields, stateValidators);
+    this.props.setLoading(false);
     if (result === true) {
       this.setState({ error: "" });
       if (status !== 0) {
@@ -60,7 +61,6 @@ export default class Login extends Component {
       this.setState(prevState => ({
         fields: { ...prevState.fields, [status]: { ...result } }
       }));
-
       let errorList = "";
       for (var key in result) {
         if (result.hasOwnProperty(key)) {

@@ -12,16 +12,25 @@ import Button from "../../components/Button";
 import { Header1, Header3 } from "../../components/Text";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { HiddenBar, GreyBar } from "../../components/StatusBars";
-import PhonePicker from "../../components/PhonePicker";
+import PhonePicker, { RetrySend } from "../../components/PhonePicker";
 import ContinueButton from "../../components/ContinueButton";
 import * as authActions from "../../store/actions/auth";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { StackActions } from "react-navigation";
-import { isInvalidPhone, getNumber } from "../../utils/validator";
+import {
+  isInvalidPhone,
+  getNumber,
+  isPhoneTaken,
+  submit
+} from "../../utils/validator";
 import ErrorMessage from "../../components/Form/ErrorMessage";
 import axios from "axios";
-import { ___VALIDATE_USER___ } from "../../store/constants";
+import {
+  ___VALIDATE_USER___,
+  ___SEND_VALIDATION___
+} from "../../store/constants";
 import { AUTH_ERROR, NOTCH_MARGIN } from "../../utils/constants";
+import { isEmpty } from "rxjs/operators";
 
 export class PhoneValidation extends Component {
   static propTypes = {};
@@ -51,7 +60,8 @@ export class PhoneValidation extends Component {
       this.quit();
     } else {
       this.setState(prevState => ({
-        status: Math.max(0, prevState.status - 1)
+        status: Math.max(0, prevState.status - 1),
+        error: ""
       }));
     }
     return true;
@@ -60,6 +70,8 @@ export class PhoneValidation extends Component {
   quit = () => {
     this.props.navigation.navigate("App");
   };
+
+  retrySend = () => this.setState({ status: 0, error: "" });
 
   canContinue = status => {
     if (status === 0) {
@@ -71,31 +83,58 @@ export class PhoneValidation extends Component {
     }
   };
 
-  continue = () => {
+  continue = async () => {
     let { status, phone, code } = this.state;
     if (status === 0) {
       //API
-      if (isInvalidPhone(phone)) {
-        this.setState({
-          error: "Il numero inserito non sembra essere valido"
-        });
-        return;
-      }
-      phone = getNumber(phone);
-      console.log(phone, isInvalidPhone(phone));
       this.setState({
         loading: true
       });
-      setTimeout(() => {
-        this.props.setPhone(phone);
+      phone = getNumber(phone);
+      const validators = {
+        phone: {
+          functions: [isEmpty],
+          warnings: ["Inserisci il tuo numero di telefono"]
+        }
+      };
+      if (phone != this.props.phone) {
+        validators.phone.functions.push(isPhoneTaken);
+        validators.phone.warnings.push(
+          "Il telefono è già utilizzato per un altro account"
+        );
+      }
+      const result = await submit(
+        { phone: { value: phone, errorMessage: "" } },
+        validators
+      );
+      if (result !== true) {
         this.setState({
           loading: false,
-          status: 1,
-          code: ["", "", "", "", ""],
-          phone,
-          error: ""
+          error: result.phone.errorMessage
         });
-      }, 2000);
+        return;
+      }
+      axios
+        .post(___SEND_VALIDATION___, {
+          phone
+        })
+        .then(res => {
+          console.log(res);
+          this.props.setPhone(phone);
+          this.setState({
+            loading: false,
+            status: 1,
+            code: ["", "", "", "", "", ""],
+            phone,
+            error: ""
+          });
+        })
+        .catch(err => {
+          this.setState({
+            loading: false,
+            error: "Errore nel invio dei dati"
+          });
+        });
     } else {
       //API
       this.setState({
@@ -183,8 +222,10 @@ export class PhoneValidation extends Component {
                   changePhoneText={this.changePhoneText}
                   code={code}
                   changeCodeValue={this.changeCodeValue}
+                  retrySend={this.retrySend}
                 />
                 {!!error && <ErrorMessage message={error} />}
+                {status === 1 && <RetrySend retrySend={this.retrySend} />}
               </ScrollView>
             </View>
             <ContinueButton

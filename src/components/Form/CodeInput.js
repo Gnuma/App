@@ -36,7 +36,7 @@ export default class CodeInput extends Component {
   };
 
   render() {
-    const { code } = this.props;
+    const { code, containerStyle } = this.props;
     const { focus } = this.state;
 
     const styles = StyleSheet.create({
@@ -52,7 +52,7 @@ export default class CodeInput extends Component {
     });
 
     return (
-      <View style={{ flexDirection: "row" }}>
+      <View style={[{ flexDirection: "row" }, containerStyle]}>
         {code.map((value, index) => {
           return (
             <View

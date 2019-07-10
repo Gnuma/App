@@ -6,7 +6,10 @@ import {
   isEmpty,
   fieldCheck,
   isInvalidEmail,
-  notExist
+  notExist,
+  isUsernameTaken,
+  isEmailTaken,
+  isPhoneTaken
 } from "../../utils/validator.js";
 import Button from "../../components/Button";
 import { Header3, Header2, Header1 } from "../../components/Text";
@@ -67,7 +70,7 @@ export default class Signup extends Component {
     error: ""
   };
 
-  continue = () => {
+  continue = async () => {
     const { status } = this.props;
     let stateFields;
     if (status === SignupStatus.OFFICE) {
@@ -76,8 +79,9 @@ export default class Signup extends Component {
       stateFields = this.state.fields[status];
     }
     const stateValidators = this.validators[status];
-
-    const result = submit(stateFields, stateValidators);
+    this.props.setLoading(true);
+    const result = await submit(stateFields, stateValidators);
+    this.props.setLoading(false);
     if (result === true) {
       this.setState({ error: "" });
       if (status < LASTSTEP) {
@@ -280,14 +284,18 @@ export default class Signup extends Component {
   validators = {
     [SignupStatus.USERNAME]: {
       uid: {
-        functions: [isEmpty],
-        warnings: ["Inserisci il nome"]
+        functions: [isEmpty, isUsernameTaken],
+        warnings: ["Inserisci il nome", "L'Username è già preso"]
       }
     },
     [SignupStatus.EMAIL]: {
       email: {
-        functions: [isEmpty, isInvalidEmail],
-        warnings: ["Inserisci l'email", "L'email non è valida"]
+        functions: [isEmpty, isInvalidEmail, isEmailTaken],
+        warnings: [
+          "Inserisci l'email",
+          "L'email non è valida",
+          "L'email è già utilizzata per un altro account"
+        ]
       }
     },
     [SignupStatus.PASSWORD]: {
@@ -308,8 +316,11 @@ export default class Signup extends Component {
     },
     [SignupStatus.PHONE]: {
       phone: {
-        functions: [isEmpty],
-        warnings: ["Inserisci il tuo numero di telefono"]
+        functions: [isEmpty, isPhoneTaken],
+        warnings: [
+          "Inserisci il tuo numero di telefono",
+          "Il telefono è già utilizzato per un altro account"
+        ]
       }
     }
   };

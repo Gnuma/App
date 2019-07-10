@@ -5,6 +5,7 @@ import { StatusBar } from "./StatusBar";
 import OutlinedInput from "./Form/OutlinedInput";
 import { Header3, Header2 } from "./Text";
 import CodeInput from "./Form/CodeInput";
+import Button from "../components/Button";
 
 export default class PhonePicker extends Component {
   static propTypes = {
@@ -47,13 +48,14 @@ export default class PhonePicker extends Component {
     } else {
       return (
         <View>
-          <Header3 color="black">
+          <Header3 color="black" style={{ marginBottom: 10 }}>
             Inserisci il codice di attivazione inviato al numero{" "}
             <Header3 color="primary">+39 {phone}</Header3>
           </Header3>
           <CodeInput
             code={this.props.code}
             onTextChange={this.props.changeCodeValue}
+            containerStyle={{ marginBottom: 25 }}
           />
         </View>
       );
@@ -75,6 +77,17 @@ export default class PhonePicker extends Component {
     );
   }
 }
+
+export const RetrySend = ({ retrySend }) => {
+  return (
+    <View style={{ marginTop: 25, alignItems: "center" }}>
+      <Header3 color="black">Non hai ricevuto nessun messaggio? </Header3>
+      <Button style={{ padding: 4, borderRadius: 6 }} onPress={retrySend}>
+        <Header3 color="primary">Prova di nuovo</Header3>
+      </Button>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({});
 

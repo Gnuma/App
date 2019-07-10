@@ -18,6 +18,7 @@ export const ___SIGNUP_ENDPOINT___ = ___BASE_ENDPOINT___ + "auth/registration/";
 export const ___WHOAMI_ENDPOINT___ = ___BASE_ENDPOINT___ + "whoami/";
 export const ___INITUSER_ENDPOINT___ = ___BASE_ENDPOINT___ + "init/";
 export const ___VALIDATE_USER___ = ___BASE_ENDPOINT___ + "verify/";
+export const ___SEND_VALIDATION___ = ___BASE_ENDPOINT___ + "send/";
 
 export const ___CREATE_AD___ = ___BASE_ENDPOINT___ + "ads/";
 export const ___BASE_UPLOAD_PICTURE___ = ___BASE_ENDPOINT___ + "ads/upload/";
@@ -46,3 +47,7 @@ export const ___REJECT_OFFERT___ =
   ___BASE_ENDPOINT___ + "chat/operations/rejectOffert/";
 export const ____CANCEL_OFFERT___ =
   ___BASE_ENDPOINT___ + "chat/operations/deleteOffert/";
+
+export const ___CHECK_USERNAME___ = ___BASE_ENDPOINT___ + "verify/username/";
+export const ___CHECK_EMAIL___ = ___BASE_ENDPOINT___ + "verify/email/";
+export const ___CHECK_PHONE___ = ___BASE_ENDPOINT___ + "verify/phone/";

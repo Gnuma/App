@@ -43,7 +43,8 @@ export class Auth extends Component {
   state = {
     authType: "signup",
     showFooter: true,
-    status: 0
+    status: 0,
+    isLoading: false
   };
 
   componentDidMount() {
@@ -107,15 +108,21 @@ export class Auth extends Component {
     this.props.navigation.goBack(null);
   };
 
+  setLoading = isLoading => {
+    this.setState({
+      isLoading
+    });
+  };
+
   render() {
     const {
       signupRedux,
-      isLoading,
+      isLoading: isPropsLoading,
       loginRedux,
       serverError,
       office
     } = this.props;
-    const { authType } = this.state;
+    const { authType, isLoading: isStateLoading } = this.state;
 
     return (
       <KeyboardAvoidingView
@@ -177,6 +184,7 @@ export class Auth extends Component {
                   office={office}
                   goChangeOffice={this._goChangeOffice}
                   goValidation={this.goValidation}
+                  setLoading={this.setLoading}
                 />
               ) : (
                 <Login
@@ -186,12 +194,13 @@ export class Auth extends Component {
                   hideFooter={this.hideFooter}
                   completeAuth={this.completeAuth}
                   goValidation={this.goValidation}
+                  setLoading={this.setLoading}
                 />
               )}
             </View>
             {this._renderFooter()}
           </View>
-          {isLoading ? (
+          {isPropsLoading || isStateLoading ? (
             <View style={{ ...StyleSheet.absoluteFill, elevation: 10 }}>
               <LoadingOverlay />
             </View>

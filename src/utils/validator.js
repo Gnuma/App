@@ -1,30 +1,51 @@
-export const submit = (fields, validators) => {
-  let valid = true;
-  Object.keys(fields).map(key => {
-    const { functions, warnings } = validators[key];
-    const value = fields[key].value;
-    let localValid = true;
-    for (let i = 0; i < functions.length; i++) {
-      if (functions[i](value)) {
-        valid = false;
-        localValid = false;
+import axios from "axios";
+import {
+  ___CHECK_USERNAME___,
+  ___CHECK_EMAIL___,
+  ___CHECK_PHONE___
+} from "../store/constants";
+
+export const submit = (fields, validators) =>
+  new Promise(async (resolve, reject) => {
+    let valid = true;
+    for (key in fields) {
+      const { functions, warnings } = validators[key];
+      const value = fields[key].value;
+      let localValid = true;
+      for (let i = 0; i < functions.length; i++) {
+        try {
+          const res = await functions[i](value);
+          console.log(res);
+          if (res === true) {
+            valid = false;
+            localValid = false;
+            fields[key] = {
+              value,
+              errorMessage: warnings[i]
+            };
+            break;
+          }
+        } catch (error) {
+          console.log(error);
+          valid = false;
+          localValid = false;
+          fields[key] = {
+            value,
+            errorMessage: warnings[i]
+          };
+          break;
+        }
+      }
+      if (localValid) {
         fields[key] = {
           value,
-          errorMessage: warnings[i]
+          errorMessage: ""
         };
-        break;
       }
     }
-    if (localValid) {
-      fields[key] = {
-        value,
-        errorMessage: ""
-      };
-    }
+    if (valid) resolve(valid);
+    else resolve(fields);
   });
-  if (valid) return valid;
-  else return fields;
-};
 
 export const isEmpty = value => {
   return !value;
@@ -69,3 +90,18 @@ export const getNumber = value => {
   console.log(num);
   return num.join("");
 };
+
+export const isUsernameTaken = username =>
+  axios.post(___CHECK_USERNAME___, {
+    username
+  });
+
+export const isEmailTaken = email =>
+  axios.post(___CHECK_EMAIL___, {
+    email
+  });
+
+export const isPhoneTaken = phone =>
+  axios.post(___CHECK_PHONE___, {
+    phone
+  });

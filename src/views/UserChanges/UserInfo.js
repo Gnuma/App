@@ -24,9 +24,9 @@ export class UserInfo extends Component {
     this.initialFields = this.state.fields;
   }
 
-  save = () => {
+  save = async () => {
     Keyboard.dismiss();
-    const result = submit(this.state.fields, this.validators);
+    const result = await submit(this.state.fields, this.validators);
     if (result === true) {
     } else {
       this.setState(prevState =>
