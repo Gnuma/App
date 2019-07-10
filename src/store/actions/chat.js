@@ -12,7 +12,8 @@ import {
   ___LOAD_EARLIER_CHAT___,
   ___REQUEST_CONTACT___,
   ___ACCEPT_CHAT___,
-  ___REJECT_CHAT___
+  ___REJECT_CHAT___,
+  ____CANCEL_OFFERT___
 } from "../constants";
 import { loadMockNew } from "../../mockData/Chat2";
 import protectedAction from "../../utils/protectedAction";
@@ -352,12 +353,20 @@ export const chatCreateOffert = (objectID, chatID, price) => (
     });
 };
 
-export const chatCancelOffert = (objectID, chatID) => dispatch => {
+export const chatCancelOffert = (objectID, chatID) => (dispatch, getState) => {
   dispatch(chatStartStatusAction(objectID, chatID));
-  //API
-  setTimeout(() => {
-    dispatch(chatRemoveOffert(objectID, chatID));
-  }, 2000);
+  const offertID = getState().chat.data[objectID].chats[chatID].offerts[0]._id;
+  axios
+    .post(____CANCEL_OFFERT___, {
+      offert: offertID
+    })
+    .then(res => {
+      console.log(res);
+      dispatch(chatRemoveOffert(objectID, chatID));
+    })
+    .catch(err => {
+      dispatch(chatOffertFail(objectID, chatID, err));
+    });
 };
 
 export const chatRejectOffert = (objectID, chatID) => (dispatch, getState) => {

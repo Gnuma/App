@@ -151,6 +151,14 @@ class WS {
             )
           );
 
+        case DataType.CANCEL_OFFERT:
+          return store.dispatch(
+            chatRemoveOffert(
+              (data.for === "sale" ? "" : "s") + data.objectID,
+              data._id
+            )
+          );
+
         default:
           throw `Type ${data.type} not valid`;
       }
@@ -230,7 +238,8 @@ const DataType = {
   ACCEPTED_CHAT: "acceptChat",
   REJECTED_CHAT: "rejectChat",
   ACCEPTED_OFFERT: "acceptOffert",
-  REJECTED_OFFERT: "rejectOffert"
+  REJECTED_OFFERT: "rejectOffert",
+  CANCEL_OFFERT: "deleteOffert"
 };
 
 formatMsg = msg => {

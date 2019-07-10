@@ -44,3 +44,5 @@ export const ___ACCEPT_OFFERT___ =
   ___BASE_ENDPOINT___ + "chat/operations/acceptOffert/";
 export const ___REJECT_OFFERT___ =
   ___BASE_ENDPOINT___ + "chat/operations/rejectOffert/";
+export const ____CANCEL_OFFERT___ =
+  ___BASE_ENDPOINT___ + "chat/operations/deleteOffert/";

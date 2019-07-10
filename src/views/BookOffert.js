@@ -12,6 +12,7 @@ import _ from "lodash";
 import CreateOffert from "../components/BookOffert/CreateOffert";
 import DecideOffert from "../components/BookOffert/DecideOffert";
 import EditOffert from "../components/BookOffert/EditOffert";
+import DecisionOverlay from "../components/DecisionOverlay";
 
 export class BookOffert extends Component {
   constructor(props) {
@@ -25,7 +26,8 @@ export class BookOffert extends Component {
       price:
         this.type == ChatType.sales
           ? props.data[objectID].price.toString()
-          : props.data[objectID].chats[chatID].item.price.toString()
+          : props.data[objectID].chats[chatID].item.price.toString(),
+      decision: null
     };
   }
 
@@ -33,24 +35,58 @@ export class BookOffert extends Component {
     //type: PropTypes.string,
   };
 
-  createOffert = () => {
+  takeAction = text =>
+    new Promise((resolve, reject) => {
+      this.setState({
+        decision: {
+          resolve,
+          reject,
+          text
+        }
+      });
+    });
+
+  completeAction = () => {
+    this.setState({
+      decision: null
+    });
+  };
+
+  createOffert = async () => {
     const { objectID, chatID, price } = this.state;
-    this.props.chatCreateOffert(objectID, chatID, price);
+    try {
+      await this.takeAction("Sei sicuro di voler offrire EUR " + price + " ?");
+      this.props.chatCreateOffert(objectID, chatID, price);
+    } catch (error) {}
+    this.completeAction();
   };
 
-  removeOffert = () => {
-    return ToastAndroid.show("Coming soon...", ToastAndroid.SHORT);
-    this.props.chatCancelOffert(objectID, chatID);
-  };
-
-  rejectOffert = () => {
+  removeOffert = async () => {
+    //return ToastAndroid.show("Coming soon...", ToastAndroid.SHORT);
     const { objectID, chatID } = this.state;
-    this.props.chatRejectOffert(objectID, chatID);
+    try {
+      await this.takeAction("Sei sicuro di voler cancellare questa offerta?");
+      this.props.chatCancelOffert(objectID, chatID);
+    } catch (error) {}
+    this.completeAction();
   };
 
-  acceptOffert = () => {
+  rejectOffert = async () => {
     const { objectID, chatID } = this.state;
-    this.props.chatAcceptOffert(objectID, chatID);
+    try {
+      await this.takeAction("Sei sicuro di voler rifiutare l'offerta?");
+      this.props.chatRejectOffert(objectID, chatID);
+    } catch (error) {}
+    this.completeAction();
+  };
+
+  acceptOffert = async () => {
+    const { objectID, chatID } = this.state;
+    try {
+      await this.takeAction("Sei sicuro di voler accettare l'offerta?");
+      this.props.chatAcceptOffert(objectID, chatID);
+    } catch (error) {}
+    this.completeAction();
   };
 
   setPrice = price => this.setState({ price });
@@ -151,6 +187,7 @@ export class BookOffert extends Component {
   };
 
   render() {
+    const { decision } = this.state;
     const data = this.getData();
     const { type, title } = this.getState(data);
     console.log(this.props.userID);
@@ -161,6 +198,7 @@ export class BookOffert extends Component {
         <View style={{ flex: 1 }}>
           {this.renderContent(type, data)}
           {data.loading ? <LoadingOverlay /> : null}
+          {decision && <DecisionOverlay decision={decision} />}
         </View>
       </View>
     );
