@@ -16,6 +16,21 @@ export const dateDisplay = date => {
     );
 };
 
+export const dateHourDisplay = date => {
+  if (!(date instanceof Date)) date = new Date(date);
+  return (
+    date.getHours() +
+    ":" +
+    date.getMinutes() +
+    "  " +
+    date.getDate() +
+    "/" +
+    (date.getMonth() + 1) +
+    "/" +
+    date.getFullYear()
+  );
+};
+
 export const formatOffice = course => {
   try {
     const { office, ...courseData } = course;
@@ -37,6 +52,19 @@ export const formatUserData = userData => {
       office: formatOffice(course),
       ...restDjangoUser,
       ...restUserData
+    };
+  } catch (error) {
+    console.log("USER FORMAT ERROR ->" + userData);
+    throw "USER FORMAT ERROR ->" + userData;
+  }
+};
+
+export const formatUser = user => {
+  try {
+    const { course, ...restUser } = user;
+    return {
+      ...restUser,
+      office: formatOffice(course)
     };
   } catch (error) {
     console.log("USER FORMAT ERROR ->" + userData);

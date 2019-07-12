@@ -14,11 +14,12 @@ export default (CreateOffert = ({
   price,
   setPrice,
   focusPrice,
-  createOffert
+  createOffert,
+  UserTO
 }) => {
   return (
     <View style={{ flex: 1 }}>
-      <OffertInfo item={item}>
+      <OffertInfo item={item} user={UserTO}>
         <Card>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Header3

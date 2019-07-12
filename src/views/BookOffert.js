@@ -13,6 +13,8 @@ import CreateOffert from "../components/BookOffert/CreateOffert";
 import DecideOffert from "../components/BookOffert/DecideOffert";
 import EditOffert from "../components/BookOffert/EditOffert";
 import DecisionOverlay from "../components/DecisionOverlay";
+import WaitExchangeOffert from "../components/BookOffert/WaitExchangeOffert";
+import CompleteExchangeOffert from "../components/BookOffert/CompleteExchangeOffert";
 
 export class BookOffert extends Component {
   constructor(props) {
@@ -89,6 +91,17 @@ export class BookOffert extends Component {
     this.completeAction();
   };
 
+  completeExchange = async () => {
+    const { objectID, chatID } = this.state;
+    try {
+      await this.takeAction(
+        "Sei sicuro completare la transazione? Ricorda che una volta completata non potrai più tornare indietro"
+      );
+      console.log("OK");
+    } catch (error) {}
+    this.completeAction();
+  };
+
   setPrice = price => this.setState({ price });
 
   setPriceRef = ref => {
@@ -104,8 +117,9 @@ export class BookOffert extends Component {
     if (this.type == ChatType.sales) {
       console.log(props.data[objectID]);
       const { chats, newsCount, ...item } = props.data[objectID];
-      const { offerts, statusLoading } = chats[chatID];
+      const { offerts, statusLoading, status, UserTO } = chats[chatID];
       return {
+        status,
         item,
         //seller: mockData.item.seller //TEST
         //seller: item.
@@ -113,11 +127,12 @@ export class BookOffert extends Component {
           _.isEmpty(offerts) || offerts[0].status === OffertStatus.REJECTED
             ? undefined
             : offerts[0],
-        loading: statusLoading
+        loading: statusLoading,
+        UserTO
       };
     } else {
       console.log(props.data[objectID].chats[chatID]);
-      const { UserTO, item, offerts, statusLoading } = props.data[
+      const { UserTO, item, offerts, statusLoading, status } = props.data[
         objectID
       ].chats[chatID];
       return {
@@ -125,6 +140,7 @@ export class BookOffert extends Component {
           ...item,
           seller: mockData.item.seller //TEST
         },*/
+        status,
         item: {
           ...item,
           seller: UserTO
@@ -133,23 +149,29 @@ export class BookOffert extends Component {
           _.isEmpty(offerts) || offerts[0].status === OffertStatus.REJECTED
             ? undefined
             : offerts[0],
-        loading: statusLoading
+        loading: statusLoading,
+        UserTO
       };
     }
   };
 
   getState = data => {
-    if (!data.offert) {
-      return OffertStates.CREATE;
-    }
-    switch (data.offert.status) {
-      case OffertStatus.ACCEPTED:
-        return OffertStates.ACCEPTED;
-      case OffertStatus.PENDING:
+    console.log(data);
+    if (!data.offert) return OffertStates.CREATE;
+    console.log(data);
+    switch (data.status) {
+      //Offert has to be pending
+      case ChatStatus.PROGRESS:
         if (data.offert.creator._id == this.props.userID) {
           return OffertStates.EDIT;
         } else {
           return OffertStates.DECIDE;
+        }
+      case ChatStatus.EXCHANGE:
+        if (data.offert.creator._id == this.props.userID) {
+          return OffertStates.COMPLETE_EXCHANGE;
+        } else {
+          return OffertStates.WAIT_EXCHANGE;
         }
     }
   };
@@ -181,6 +203,17 @@ export class BookOffert extends Component {
           />
         );
 
+      case OffertType.WAIT_EXCHANGE:
+        return <WaitExchangeOffert {...data} />;
+
+      case OffertType.COMPLETE_EXCHANGE:
+        return (
+          <CompleteExchangeOffert
+            {...data}
+            setComplete={this.completeExchange}
+          />
+        );
+
       default:
         return null;
     }
@@ -190,7 +223,7 @@ export class BookOffert extends Component {
     const { decision } = this.state;
     const data = this.getData();
     const { type, title } = this.getState(data);
-    console.log(this.props.userID);
+    console.log(data);
 
     return (
       <View style={{ flex: 1 }}>
@@ -234,56 +267,16 @@ export default connect(
   mapDispatchToProps
 )(BookOffert);
 
-const mockData = {
-  item: {
-    pk: 1,
-    book: {
-      isbn: 1,
-      title: "Matematica Verde 1",
-      author: "Massimo Bergamini",
-      subject: {
-        title: "matematica",
-        _id: 1
-      }
-    },
-    price: 15,
-    condition: 1,
-    image_ad: ["AAA"],
-    seller: {
-      id: 1,
-      user: {
-        username: "Federico"
-      },
-      office: {
-        id: 1,
-        name: "I.I.S.S. J. Von Neumann",
-        address: "via Pollenza 156, Roma",
-        cap: "00156",
-        type: "SP",
-        course: {
-          name: "B",
-          year: 3
-        }
-      }
-    }
-  },
-  offert: {
-    creator: {
-      pk: 1,
-      username: "Alberto"
-    },
-    createdAt: "06/05/2019-12:02:14",
-    value: 15,
-    status: ChatStatus.PENDING
-  }
-};
-
 const OffertStates = {
   CREATE: { type: OffertType.CREATE, title: "Fai una offerta" },
-  ACCEPTED: {
-    type: OffertType.ACCEPTED,
-    title: "Offerta Accettata"
-  },
   EDIT: { type: OffertType.EDIT, title: "La tua offerta" },
-  DECIDE: { type: OffertType.DECIDE, title: "L'offerta dell'altro" }
+  DECIDE: { type: OffertType.DECIDE, title: "Accetta/Declina offerta" },
+  COMPLETE_EXCHANGE: {
+    type: OffertType.COMPLETE_EXCHANGE,
+    title: "Concludi scambio"
+  },
+  WAIT_EXCHANGE: {
+    type: OffertType.WAIT_EXCHANGE,
+    title: "Concludi scambio"
+  }
 };

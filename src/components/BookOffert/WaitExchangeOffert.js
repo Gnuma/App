@@ -5,24 +5,15 @@ import Card from "../Card";
 import { Header2, Header1, Header3 } from "../Text";
 import FullButton from "../FullButton";
 
-export default (EditOffert = ({ item, offert, removeOffert, UserTO }) => {
+export default (WaitExchangeOffert = ({ item, offert, UserTO }) => {
   return (
     <View style={{ flex: 1 }}>
       <OffertInfo item={item} user={UserTO} offert={offert}>
         <Header3 color="secondary" style={{ alignSelf: "center" }}>
-          Aspettando che {UserTO.user.username} gestisca l'offerta inviata
+          Aspettando che {UserTO.user.username} segnali il completamento dello
+          scambio per terminare la transazione
         </Header3>
       </OffertInfo>
-      <DecisionBox>
-        <FullButton
-          onPress={removeOffert}
-          value="Rimuovi Offerta"
-          icon="times"
-          style={{ marginVertical: 4 }}
-          contentStyle={{ flex: 1, textAlign: "center" }}
-          color={"darkRed"}
-        />
-      </DecisionBox>
     </View>
   );
 });

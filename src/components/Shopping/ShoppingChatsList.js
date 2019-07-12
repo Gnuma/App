@@ -55,7 +55,7 @@ export default class ShoppingChatsList extends Component {
 export class ChatLink extends Component {
   render() {
     const { data, subjectID } = this.props;
-
+    console.log(data);
     return (
       <Button
         style={{

@@ -10,7 +10,7 @@ import {
   createOffert
 } from "../../utils/chatUtility";
 import { ChatType, ChatStatus, OffertStatus } from "../../utils/constants";
-import { formatOffice } from "../../utils/helper";
+import { formatOffice, formatUser } from "../../utils/helper";
 
 const initialState = {
   data: {},
@@ -246,15 +246,11 @@ const chatSettle = (state, { payload: { objectID, chatID, status } }) =>
 
 const chatNewChat = (state, { payload: { objectID, chatID, data } }) => {
   const { pk, ...restItem } = data.item;
+  const UserTO = formatUser(data.buyer);
 
   const chat = {
     _id: chatID,
-    UserTO: {
-      _id: data.buyer.pk,
-      user: {
-        username: data.buyer.user.username
-      }
-    },
+    UserTO,
     hasNews: 1,
     status: ChatStatus.PENDING,
     messages: [],
@@ -340,7 +336,7 @@ const chatContactUser = (state, { payload: { item, chatID } }) => {
   const chat = {
     _id: chatID,
     item: item,
-    UserTO: item.seller.user,
+    UserTO: item.seller,
     hasNews: false,
     status: ChatStatus.LOCAL,
     messages: [],
@@ -451,8 +447,8 @@ const chatNewOffert = (
   });
 };
 
-const chatRemoveOffert = (state, { payload: { objectID, chatID } }) =>
-  update(state, {
+const chatRemoveOffert = (state, { payload: { objectID, chatID } }) => {
+  return update(state, {
     data: {
       [objectID]: {
         chats: {
@@ -464,6 +460,7 @@ const chatRemoveOffert = (state, { payload: { objectID, chatID } }) =>
       }
     }
   });
+};
 
 const chatAcceptOffert = (state, { payload: { objectID, chatID } }) =>
   update(state, {
@@ -471,6 +468,7 @@ const chatAcceptOffert = (state, { payload: { objectID, chatID } }) =>
       [objectID]: {
         chats: {
           [chatID]: {
+            status: { $set: ChatStatus.EXCHANGE },
             offerts: { 0: { $merge: { status: OffertStatus.ACCEPTED } } },
             statusLoading: { $set: false }
           }

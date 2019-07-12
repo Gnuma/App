@@ -312,16 +312,19 @@ export const chatContactUser = item => dispatch => {
     )
     .then(res => {
       console.log(res);
+      /*
+      This API returns the object ITEM but is up until now 12/07/2019 incomplete
+      */
       dispatch({
         type: actionTypes.CHAT_CONTACT_USER,
         payload: {
-          item: res.data.item,
+          item: item,
           chatID: res.data._id
         }
       });
       NavigationService.navigate("ShoppingChat", {
         chatID: res.data._id,
-        subjectID: "s" + res.data.item.book.subject._id
+        subjectID: "s" + item.book.subject._id
       });
     })
     .catch(err => chatFail(err));

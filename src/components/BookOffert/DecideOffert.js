@@ -8,29 +8,17 @@ import FullButton from "../FullButton";
 export default (DecideOffert = ({
   item,
   offert,
+  UserTO,
   rejectOffert,
   acceptOffert
 }) => {
   console.log(item, offert);
   return (
     <View style={{ flex: 1 }}>
-      <OffertInfo item={item}>
-        <Card style={{ marginVertical: 10 }}>
-          <View style={{ flexDirection: "row", alignContent: "flex-end" }}>
-            <Header2 style={{ flex: 1, marginRight: 5 }} color="black">
-              {offert.creator.user.username}
-            </Header2>
-            <Header3 color="secondary">Offerta</Header3>
-          </View>
-          <Header1 color="primary" style={{ alignSelf: "center" }}>
-            EUR {offert.value}
-          </Header1>
-        </Card>
-        <Card>
-          <View style={{ flexDirection: "row" }}>
-            <Header2 color="black">{offert.creator.user.username}</Header2>
-          </View>
-        </Card>
+      <OffertInfo item={item} user={UserTO} offert={offert}>
+        <Header3 color="secondary" style={{ alignSelf: "center" }}>
+          Gestisci l'offerta inviata da {UserTO.user.username}
+        </Header3>
       </OffertInfo>
       <DecisionBox>
         <FullButton
