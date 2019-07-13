@@ -88,6 +88,21 @@ export default class Chat extends Component {
           Inviando...
         </Header5>
       );
+    else if (currentMessage.error)
+      return (
+        <Header5
+          style={{
+            color: props.position === "left" ? colors.grey : colors.white,
+            justifyContent: "center",
+            textAlign: "center",
+            paddingHorizontal: 15,
+            lineHeight: 11,
+            color: colors.red
+          }}
+        >
+          Errore
+        </Header5>
+      );
     else return <Time {...props} />;
   };
 
@@ -167,22 +182,3 @@ export default class Chat extends Component {
     });
   }
 }
-
-/*
-    return (
-      <InputToolbar
-        {...props}
-        containerStyle={{
-          borderTopWidth: 0,
-          minHeight: 60
-        }}
-        primaryStyle={{
-          marginHorizontal: 15,
-          marginTop: 4,
-          marginBottom: 7,
-          borderRadius: 6,
-          backgroundColor: colors.white,
-          elevation: 2
-        }}
-      />
-    );*/

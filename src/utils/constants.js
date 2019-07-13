@@ -78,7 +78,9 @@ export const OffertType = {
   DECIDE: "DECIDE",
   ACCEPTED: "ACCEPTED",
   COMPLETE_EXCHANGE: "COMPLETE_EXCHANGE",
-  WAIT_EXCHANGE: "WAIT_EXCHANGE"
+  WAIT_EXCHANGE: "WAIT_EXCHANGE",
+  SEND_FEEDBACK: "SEND_FEEDBACK",
+  COMPLETED: "COMPLETED"
 };
 
 export const UserType = {
@@ -98,4 +100,9 @@ export const TextOffertStatus = {
   0: "Da gestire",
   1: "Accettata",
   2: "Rifiutata"
+};
+
+export const FEEDBACK_TYPES = {
+  POSITIVE: 1,
+  NEGATIVE: 0
 };

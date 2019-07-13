@@ -203,6 +203,7 @@ class WS {
     this.retries = 5;
     console.log("Connected");
     ToastAndroid.show("Connected", ToastAndroid.SHORT);
+    this.close();
   };
 
   onClose = code => {

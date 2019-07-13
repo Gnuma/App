@@ -209,6 +209,38 @@ const chatConfirmMsg = (
   }
 };
 
+const chatErrorMsg = (state, { payload: { objectID, chatID, msgID } }) => {
+  try {
+    const chat = state.data[objectID].chats[chatID].messages;
+    for (let i = 0; i < chat.length; i++) {
+      if (chat[i]._id == msgID) {
+        return update(state, {
+          data: {
+            [objectID]: {
+              chats: {
+                [chatID]: {
+                  messages: {
+                    [i]: {
+                      $merge: {
+                        isSending: false,
+                        error: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+    throw "Message Not Found when confirming";
+  } catch (error) {
+    console.warn(error);
+    return state;
+  }
+};
+
 const chatRead = (state, { payload: { objectID, chatID } }) => {
   console.log(objectID, chatID);
   const hasNews = state.data[objectID].chats[chatID].hasNews;
@@ -491,6 +523,43 @@ const chatOffertFail = (state, { payload: { objectID, chatID, error } }) =>
     error: { $set: error }
   });
 
+const chatSetChatCompleted = (state, { payload: { objectID, chatID } }) =>
+  update(state, {
+    data: {
+      [objectID]: {
+        chats: {
+          [chatID]: {
+            status: { $set: ChatStatus.FEEDBACK },
+            statusLoading: { $set: false }
+          }
+        }
+      }
+    }
+  });
+
+const chatSetFeedback = (
+  state,
+  { payload: { objectID, chatID, feedback, comment } }
+) =>
+  update(state, {
+    data: {
+      [objectID]: {
+        chats: {
+          [chatID]: {
+            status: { $set: ChatStatus.COMPLETED },
+            statusLoading: { $set: false },
+            feedback: {
+              $set: {
+                judgment: feedback,
+                comment
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.CHAT_INIT:
@@ -532,6 +601,9 @@ export default (state = initialState, action) => {
     case actionTypes.CHAT_CONFIRM_MSG:
       return chatConfirmMsg(state, action);
 
+    case actionTypes.CHAT_ERROR_MSG:
+      return chatErrorMsg(state, action);
+
     case actionTypes.CHAT_READ:
       return chatRead(state, action);
 
@@ -570,6 +642,12 @@ export default (state = initialState, action) => {
 
     case actionTypes.CHAT_ONLINE:
       return chatStartGlobalAction(state, action);
+
+    case actionTypes.CHAT_COMPLETE:
+      return chatSetChatCompleted(state, action);
+
+    case actionTypes.CHAT_SET_FEEDBACK:
+      return chatSetFeedback(state, action);
 
     default:
       return state;

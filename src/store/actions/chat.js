@@ -13,16 +13,25 @@ import {
   ___REQUEST_CONTACT___,
   ___ACCEPT_CHAT___,
   ___REJECT_CHAT___,
-  ____CANCEL_OFFERT___
+  ____CANCEL_OFFERT___,
+  ___COMPLETE_EXCHANGE___,
+  ___SEND_FEEDBACK___
 } from "../constants";
 import { loadMockNew } from "../../mockData/Chat2";
 import protectedAction from "../../utils/protectedAction";
 import axios from "axios";
 import NavigationService from "../../navigator/NavigationService";
-import { map, filter, retryWhen, concatMap } from "rxjs/operators";
+import {
+  map,
+  filter,
+  retryWhen,
+  concatMap,
+  delay,
+  catchError
+} from "rxjs/operators";
 import { ofType } from "redux-observable";
 import { ajax } from "rxjs/ajax";
-import { of, timer, interval, fromEvent } from "rxjs";
+import { of, timer, interval, fromEvent, throwError, iif } from "rxjs";
 import { ChatStatus } from "../../utils/constants";
 
 export const chatInit = (salesData, shoppingData) => ({
@@ -111,6 +120,15 @@ export const chatConfirmMsg = (objectID, chatID, msgID, data) => ({
   }
 });
 
+export const chatErrorMsg = (objectID, chatID, msgID) => ({
+  type: actionTypes.CHAT_ERROR_MSG,
+  payload: {
+    objectID,
+    chatID,
+    msgID
+  }
+});
+
 export const chatNewChat = (objectID, chatID, data) => ({
   type: actionTypes.CHAT_NEW_CHAT,
   payload: {
@@ -187,6 +205,24 @@ export const chatSetOffertAccepted = (objectID, chatID) => ({
   }
 });
 
+export const chatSetChatCompleted = (objectID, chatID) => ({
+  type: actionTypes.CHAT_COMPLETE,
+  payload: {
+    objectID,
+    chatID
+  }
+});
+
+export const chatSetFeedback = (objectID, chatID, feedback, comment) => ({
+  type: actionTypes.CHAT_SET_FEEDBACK,
+  payload: {
+    objectID,
+    chatID,
+    feedback,
+    comment
+  }
+});
+
 // ---THUNK---
 
 export const chatSend = (type, objectID, chatID) => {
@@ -204,20 +240,6 @@ export const chatRead = (objectID, chatID) => (dispatch, getState) => {
   console.log(chat.hasNews);
   if (chat.hasNews) {
     try {
-      /*
-      let index = chat.hasNews - 1;
-      let from = chat.messages[index]._id;
-      while (isNaN(from)) {
-        index++;
-        from = chat.messages[index]._id;
-      }
-
-      index = 0;
-      let to = chat.messages[0]._id;
-      while (isNaN(to)) {
-        index++;
-        to = chat.messages[index]._id;
-      }*/
       const messagesToRead = chat.hasNews;
       axios
         .post(___READ_CHAT___, {
@@ -408,6 +430,43 @@ export const chatAcceptOffert = (objectID, chatID) => (dispatch, getState) => {
     });
 };
 
+export const chatCompleteExchange = (objectID, chatID) => dispatch => {
+  dispatch(chatStartStatusAction(objectID, chatID));
+  axios
+    .post(___COMPLETE_EXCHANGE___, {
+      chat: chatID
+    })
+    .then(res => {
+      console.log(res);
+      dispatch(chatSetChatCompleted(objectID, chatID));
+    })
+    .catch(err => {
+      dispatch(chatOffertFail(objectID, chatID, err));
+    });
+};
+
+export const chatSendFeedback = (
+  objectID,
+  chatID,
+  feedback,
+  comment
+) => dispatch => {
+  dispatch(chatStartStatusAction(objectID, chatID));
+  axios
+    .post(___SEND_FEEDBACK___, {
+      chat: chatID,
+      judgment: feedback,
+      comment: comment
+    })
+    .then(res => {
+      console.log(res);
+      dispatch(chatSetFeedback(objectID, chatID, feedback, comment));
+    })
+    .catch(err => {
+      dispatch(chatOffertFail(objectID, chatID, err));
+    });
+};
+
 export const onNewMessage = (objectID, chatID, msg, type) => (
   dispatch,
   getState
@@ -461,13 +520,31 @@ const sendMessageEpic = (action$, state$) =>
           }
         )
         .pipe(
-          retryWhen(err => fromEvent(NetInfo, "connectionChange")),
+          retryWhen(errorSubject =>
+            errorSubject.pipe(
+              concatMap((err, i) => {
+                console.log(err);
+                if (err.message == "ajax error") {
+                  return fromEvent(NetInfo, "connectionChange");
+                } else {
+                  if (i < 3) {
+                    return of(err).pipe(delay(100));
+                  } else {
+                    return throwError(err);
+                  }
+                }
+              })
+            )
+          ),
+          catchError(err => of(actionTypes.CHAT_ERROR_MSG)),
           map(res => {
             console.log(res);
-            return chatConfirmMsg(objectID, chatID, msg._id, {
-              isSending: false,
-              _id: uuid.v4()
-            });
+            return res === actionTypes.CHAT_ERROR_MSG
+              ? chatErrorMsg(objectID, chatID, msg._id)
+              : chatConfirmMsg(objectID, chatID, msg._id, {
+                  isSending: false,
+                  _id: uuid.v4()
+                });
           })
         );
     })

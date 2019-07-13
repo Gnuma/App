@@ -47,6 +47,9 @@ export const ___REJECT_OFFERT___ =
   ___BASE_ENDPOINT___ + "chat/operations/rejectOffert/";
 export const ____CANCEL_OFFERT___ =
   ___BASE_ENDPOINT___ + "chat/operations/deleteOffert/";
+export const ___COMPLETE_EXCHANGE___ =
+  ___BASE_ENDPOINT___ + "chat/operations/complete/";
+export const ___SEND_FEEDBACK___ = ___BASE_ENDPOINT___ + "chat/feedback/";
 
 export const ___CHECK_USERNAME___ = ___BASE_ENDPOINT___ + "verify/username/";
 export const ___CHECK_EMAIL___ = ___BASE_ENDPOINT___ + "verify/email/";

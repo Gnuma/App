@@ -15,6 +15,7 @@ import EditOffert from "../components/BookOffert/EditOffert";
 import DecisionOverlay from "../components/DecisionOverlay";
 import WaitExchangeOffert from "../components/BookOffert/WaitExchangeOffert";
 import CompleteExchangeOffert from "../components/BookOffert/CompleteExchangeOffert";
+import FeedbackOffert from "../components/BookOffert/FeedbackOffert";
 
 export class BookOffert extends Component {
   constructor(props) {
@@ -97,7 +98,16 @@ export class BookOffert extends Component {
       await this.takeAction(
         "Sei sicuro completare la transazione? Ricorda che una volta completata non potrai più tornare indietro"
       );
-      console.log("OK");
+      this.props.chatCompleteExchange(objectID, chatID);
+    } catch (error) {}
+    this.completeAction();
+  };
+
+  sendFeedback = async (feedback, comment) => {
+    const { objectID, chatID } = this.state;
+    try {
+      await this.takeAction("Sei sicuro di voler lasciare questo feedback?");
+      this.props.chatSendFeedback(objectID, chatID, feedback, comment);
     } catch (error) {}
     this.completeAction();
   };
@@ -168,11 +178,15 @@ export class BookOffert extends Component {
           return OffertStates.DECIDE;
         }
       case ChatStatus.EXCHANGE:
-        if (data.offert.creator._id == this.props.userID) {
+        if (data.item.seller._id == this.props.userID) {
           return OffertStates.COMPLETE_EXCHANGE;
         } else {
           return OffertStates.WAIT_EXCHANGE;
         }
+      case ChatStatus.FEEDBACK:
+        return OffertStates.SEND_FEEDBACK;
+      case ChatStatus.COMPLETED:
+        return OffertStates.COMPLETED;
     }
   };
 
@@ -213,6 +227,9 @@ export class BookOffert extends Component {
             setComplete={this.completeExchange}
           />
         );
+
+      case OffertType.SEND_FEEDBACK:
+        return <FeedbackOffert {...data} sendFeedback={this.sendFeedback} />;
 
       default:
         return null;
@@ -259,7 +276,11 @@ const mapDispatchToProps = dispatch => ({
   chatRejectOffert: (objectID, chatID) =>
     dispatch(chatActions.chatRejectOffert(objectID, chatID)),
   chatAcceptOffert: (objectID, chatID) =>
-    dispatch(chatActions.chatAcceptOffert(objectID, chatID))
+    dispatch(chatActions.chatAcceptOffert(objectID, chatID)),
+  chatCompleteExchange: (objectID, chatID) =>
+    dispatch(chatActions.chatCompleteExchange(objectID, chatID)),
+  chatSendFeedback: (objectID, chatID, feedback, comment) =>
+    dispatch(chatActions.chatSendFeedback(objectID, chatID, feedback, comment))
 });
 
 export default connect(
@@ -278,5 +299,13 @@ const OffertStates = {
   WAIT_EXCHANGE: {
     type: OffertType.WAIT_EXCHANGE,
     title: "Concludi scambio"
+  },
+  SEND_FEEDBACK: {
+    type: OffertType.SEND_FEEDBACK,
+    title: "Lascia un feedback"
+  },
+  COMPLETED: {
+    type: OffertType.COMPLETED,
+    title: "Completato"
   }
 };
