@@ -7,6 +7,8 @@ import BasicHeader from "../../components/BasicHeader";
 import SolidButton from "../../components/SolidButton";
 import { Header2, Header3 } from "../../components/Text";
 import { AndroidBackHandler } from "react-navigation-backhandler";
+import colors from "../../styles/colors";
+import FullButton from "../../components/FullButton";
 
 export class OfficeChange extends Component {
   static propTypes = {};
@@ -58,7 +60,6 @@ export class OfficeChange extends Component {
   };
 
   complete = () => {
-    console.log("complete");
     this.props.navigation.goBack(null);
   };
 
@@ -89,7 +90,7 @@ export class OfficeChange extends Component {
           <View>
             <ContinueButton
               onPress={this.continue}
-              disabled={!canContinue}
+              active={canContinue}
               text={status == 2 ? "Salva" : "Continua"}
             />
           </View>
@@ -108,23 +109,30 @@ export default connect(
   mapDispatchToProps
 )(OfficeChange);
 
-const ContinueButton = ({ onPress, text, disabled }) => {
+const ContinueButton = ({ onPress, active, text }) => {
+  console.log(active);
   return (
     <View
       style={{
-        flexDirection: "row",
         paddingVertical: 10,
         paddingHorizontal: 20
       }}
     >
-      <SolidButton style={{ flex: 1 }} onPress={onPress} disabled={disabled}>
-        <Header3
-          style={{ flex: 1, textAlign: "center" }}
-          color={disabled ? "black" : "secondary"}
-        >
-          {text}
-        </Header3>
-      </SolidButton>
+      <FullButton
+        onPress={onPress}
+        value={text}
+        icon={active == "Salva" ? "pencil" : "chevron-right"}
+        iconStyle={{
+          color: active ? colors.white : colors.black
+        }}
+        contentStyle={{
+          flex: 1,
+          textAlign: "center",
+          color: active ? colors.white : colors.black
+        }}
+        color={active ? "secondary" : "white"}
+        disabled={!active}
+      />
     </View>
   );
 };
