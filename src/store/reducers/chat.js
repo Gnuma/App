@@ -560,6 +560,18 @@ const chatSetFeedback = (
     }
   });
 
+const chatBlockItem = (state, { payload: { itemID } }) => {
+  const item = state.data[itemID];
+  for (chatID in item.chats) {
+    item.chats[chatID].status = ChatStatus.BLOCKED;
+  }
+  return update(state, {
+    data: {
+      [itemID]: { $set: item }
+    }
+  });
+};
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.CHAT_INIT:
@@ -648,6 +660,9 @@ export default (state = initialState, action) => {
 
     case actionTypes.CHAT_SET_FEEDBACK:
       return chatSetFeedback(state, action);
+
+    case actionTypes.CHAT_BLOCK_ITEM:
+      return chatBlockItem(state, action);
 
     default:
       return state;

@@ -53,7 +53,8 @@ export const ChatStatus = {
   EXCHANGE: 3,
   FEEDBACK: 4,
   COMPLETED: 5,
-  REJECTED: 6
+  REJECTED: 6,
+  BLOCKED: 7
 };
 
 export const OfficeTypes = {
