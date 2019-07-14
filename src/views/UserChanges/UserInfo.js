@@ -1,23 +1,34 @@
 import React, { Component } from "react";
-import { View, Keyboard } from "react-native";
+import { View, Keyboard, StyleSheet } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import BasicHeader from "../../components/BasicHeader";
 import SolidButton from "../../components/SolidButton";
 import { Header2 } from "../../components/Text";
 import UserInfoForm from "../../components/UserSettings/UserInfoForm";
-import { isEmpty, isInvalidEmail, submit } from "../../utils/validator";
+import {
+  isEmpty,
+  isInvalidEmail,
+  submit,
+  isEmailTaken,
+  isUsernameTaken
+} from "../../utils/validator";
 import update from "immutability-helper";
+import FullButton from "../../components/FullButton";
+import colors from "../../styles/colors";
+import axios from "axios";
+import { ___MODIFY_USER___ } from "../../store/constants";
+import LoadingOverlay from "../../components/LoadingOverlay";
 
 export class UserInfo extends Component {
   static propTypes = {};
   constructor(props) {
     super(props);
     this.state = {
+      loading: false,
       fields: {
-        uid: { value: "FakeTest", errorMessage: "" },
-        email: { value: "Fake@test.com", errorMessage: "" }
-        //office: { value: "", errorMessage: "" },
+        uid: { value: props.userData.username, errorMessage: "" },
+        email: { value: props.userData.email, errorMessage: "" }
       }
     };
 
@@ -26,12 +37,37 @@ export class UserInfo extends Component {
 
   save = async () => {
     Keyboard.dismiss();
+    this.setState({
+      loading: true
+    });
     const result = await submit(this.state.fields, this.validators);
     if (result === true) {
+      const username =
+        this.initialFields.uid.value !== this.state.fields.uid.value
+          ? this.state.fields.uid.value
+          : undefined;
+      const email =
+        this.initialFields.email.value !== this.state.fields.email.value
+          ? this.state.fields.email.value
+          : undefined;
+      axios
+        .post(___MODIFY_USER___, {
+          username,
+          email
+        })
+        .then(res => {
+          console.log(res);
+          this.props.navigation.goBack(null);
+        })
+        .catch(err => {
+          console.log({ err });
+          this.setState({ loading: false });
+        });
     } else {
       this.setState(prevState =>
         update(prevState, {
-          fields: { $set: result }
+          fields: { $set: result },
+          loading: { $set: false }
         })
       );
     }
@@ -47,8 +83,12 @@ export class UserInfo extends Component {
     );
   };
 
+  canSave = () =>
+    this.initialFields.uid.value !== this.state.fields.uid.value ||
+    this.initialFields.email.value !== this.state.fields.email.value;
+
   render() {
-    const { fields } = this.state;
+    const { fields, loading } = this.state;
 
     return (
       <View style={{ flex: 1 }}>
@@ -60,24 +100,38 @@ export class UserInfo extends Component {
             initialFields={this.initialFields}
           />
         </View>
-        <SaveButton save={this.save} />
+        <SaveButton save={this.save} active={this.canSave()} />
+        {loading && (
+          <View style={{ ...StyleSheet.absoluteFill, elevation: 10 }}>
+            <LoadingOverlay />
+          </View>
+        )}
       </View>
     );
   }
 
   validators = {
     uid: {
-      functions: [isEmpty],
-      warnings: ["Inserisci il nome"]
+      functions: [isEmpty, isUsernameTaken],
+      warnings: [
+        "Inserisci il nome",
+        "Questo username è già usato per un'altro account"
+      ]
     },
     email: {
-      functions: [isEmpty, isInvalidEmail],
-      warnings: ["Inserisci l'email", "L'email non è valida"]
+      functions: [isEmpty, isInvalidEmail, isEmailTaken],
+      warnings: [
+        "Inserisci l'email",
+        "L'email non è valida",
+        "Questa email è già usata per un'altro account"
+      ]
     }
   };
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  userData: state.auth.userData
+});
 
 const mapDispatchToProps = dispatch => ({});
 
@@ -86,20 +140,30 @@ export default connect(
   mapDispatchToProps
 )(UserInfo);
 
-const SaveButton = ({ save }) => {
+const SaveButton = ({ save, active }) => {
+  console.log(active);
   return (
     <View
       style={{
-        flexDirection: "row",
         paddingVertical: 10,
         paddingHorizontal: 20
       }}
     >
-      <SolidButton style={{ flex: 1 }} onPress={save}>
-        <Header2 style={{ flex: 1, textAlign: "center" }} color="black">
-          Salva
-        </Header2>
-      </SolidButton>
+      <FullButton
+        onPress={save}
+        value="Salva"
+        icon="pencil"
+        iconStyle={{
+          color: active ? colors.white : colors.black
+        }}
+        contentStyle={{
+          flex: 1,
+          textAlign: "center",
+          color: active ? colors.white : colors.black
+        }}
+        color={active ? "secondary" : "white"}
+        disabled={!active}
+      />
     </View>
   );
 };
