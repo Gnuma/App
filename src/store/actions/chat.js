@@ -15,7 +15,8 @@ import {
   ___REJECT_CHAT___,
   ____CANCEL_OFFERT___,
   ___COMPLETE_EXCHANGE___,
-  ___SEND_FEEDBACK___
+  ___SEND_FEEDBACK___,
+  ___DELTE_AD___
 } from "../constants";
 import { loadMockNew } from "../../mockData/Chat2";
 import protectedAction from "../../utils/protectedAction";
@@ -220,6 +221,13 @@ export const chatSetFeedback = (objectID, chatID, feedback, comment) => ({
     chatID,
     feedback,
     comment
+  }
+});
+
+export const chatBlockItem = itemID => ({
+  type: actionTypes.CHAT_BLOCK_ITEM,
+  payload: {
+    itemID
   }
 });
 

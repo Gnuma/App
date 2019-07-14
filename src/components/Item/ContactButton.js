@@ -3,6 +3,7 @@ import { Text, View, Animated, StyleSheet } from "react-native";
 import Button from "../Button";
 import { Header2, Header3 } from "../Text";
 import colors from "../../styles/colors";
+import FullButton from "../FullButton";
 
 export class ContactButton extends Component {
   height = 0;
@@ -47,20 +48,16 @@ export class ContactButton extends Component {
           style={{
             flex: 1,
             paddingVertical: 10,
-            paddingHorizontal: 30,
+            paddingHorizontal: 35,
             backgroundColor: colors.white
           }}
         >
-          <Button
-            style={isOwner ? styles.modifyButton : styles.contactButton}
+          <FullButton
+            value={isOwner ? "Modifica Vendita" : "Contatta Ora"}
+            icon={isOwner ? "pencil" : "send"}
+            contentStyle={{ flex: 1, textAlign: "center" }}
             onPress={this.props.onContact}
-          >
-            {!isOwner ? (
-              <Header3 color={"white"}>Contatta Ora</Header3>
-            ) : (
-              <Header3 color="primary">Modifica Vendita</Header3>
-            )}
-          </Button>
+          />
         </View>
       </Animated.View>
     );

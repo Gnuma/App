@@ -5,7 +5,11 @@ import Card from "../Card";
 import { Header2, Header3, Header4 } from "../Text";
 import CircleValue from "../CircleValue";
 import { getLevel, dateHourDisplay } from "../../utils/helper";
-import { TextOffertStatus } from "../../utils/constants";
+import {
+  TextOffertStatus,
+  TextFeedbackTypes,
+  FEEDBACK_TYPES
+} from "../../utils/constants";
 
 export const OffertInfo = ({ item, user, offert, children }) => {
   console.log(item);

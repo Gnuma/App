@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import { Text, View } from "react-native";
 import SolidButton from "../SolidButton";
 import { CachedImage as Image } from "react-native-cached-image";
-import { Header2, Header1 } from "../Text";
+import { Header2, Header1, Header3 } from "../Text";
 import Icon from "react-native-vector-icons/FontAwesome";
 import colors from "../../styles/colors";
 import Button from "../Button";
+import { TextOffertStatus } from "../../utils/constants";
 
 export default ({ offert, item, goBookOffert }) => {
   return (
@@ -19,7 +20,7 @@ export default ({ offert, item, goBookOffert }) => {
       <View style={{ flex: 1 / 5 }}>
         <Image
           style={{ flex: 1, borderRadius: 6 }}
-          source={require("../../media/imgs/mockHomeBook.png")}
+          source={{uri: item.image_ad[0]}}
           resizeMode={"cover"}
         />
       </View>
@@ -38,9 +39,14 @@ export default ({ offert, item, goBookOffert }) => {
             style={{ color: colors.black }}
           />
         </View>
-        <Header1 color={"primary"} numberOfLines={1}>
-          EUR {offert.value}
-        </Header1>
+        <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+          <Header2 color={"primary"} numberOfLines={1} style={{ flex: 1 }}>
+            EUR {offert.value}
+          </Header2>
+          <Header3 color="secondary" numberOfLines={1}>
+            {TextOffertStatus[offert.status]}
+          </Header3>
+        </View>
       </View>
     </SolidButton>
   );

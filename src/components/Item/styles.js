@@ -102,9 +102,10 @@ export const ItemInfoStyles = StyleSheet.create({
 export const SellerInfoStyles = StyleSheet.create({
   container: {
     backgroundColor: "white",
-    elevation: 4,
+    elevation: 3,
     padding: 10,
-    borderRadius: 6
+    borderRadius: 6,
+    marginBottom: 8
   },
   headerContainer: {
     flexDirection: "row",

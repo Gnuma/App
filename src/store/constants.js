@@ -24,6 +24,7 @@ export const ___CREATE_AD___ = ___BASE_ENDPOINT___ + "ads/";
 export const ___BASE_UPLOAD_PICTURE___ = ___BASE_ENDPOINT___ + "ads/upload/";
 export const ___GET_AD___ = ___BASE_ENDPOINT___ + "ads/";
 export const ___MODIFY_AD___ = ___BASE_ENDPOINT___ + "ads/modify/";
+export const ___DELTE_AD___ = ___BASE_ENDPOINT___ + "ads/delete/";
 
 export const ___CREATE_COMMENT___ = ___BASE_ENDPOINT___ + "comments/";
 

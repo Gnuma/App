@@ -7,13 +7,14 @@ import { itemData } from "../mockData/Item";
 import MainItem from "../components/Item/MainItem";
 import colors from "../styles/colors";
 import axios from "axios";
-import { ___GET_AD___ } from "../store/constants";
+import { ___GET_AD___, ___DELTE_AD___ } from "../store/constants";
 import * as commentActions from "../store/actions/comments";
 import * as chatActions from "../store/actions/chat";
 import * as sellActions from "../store/actions/sell";
 import { notificationsViewItem } from "../store/actions/notifications";
 import { GreyBar } from "../components/StatusBars";
 import { formatOffice } from "../utils/helper";
+import DecisionOverlay from "../components/DecisionOverlay";
 
 export class Item extends Component {
   constructor(props) {
@@ -25,7 +26,8 @@ export class Item extends Component {
       bookAuthors: props.navigation.getParam("authors", "Undesfineds"),
       keyboardOpen: false,
       isOwner: false,
-      refreshing: false
+      refreshing: false,
+      decision: null
     };
 
     this.newComments =
@@ -72,6 +74,50 @@ export class Item extends Component {
       })
       .catch(err => {
         console.log("ERROR", err);
+      });
+  };
+
+  takeAction = text =>
+    new Promise((resolve, reject) => {
+      this.setState({
+        decision: {
+          resolve,
+          reject,
+          text
+        }
+      });
+    });
+
+  completeAction = () => {
+    this.setState({
+      decision: null
+    });
+  };
+
+  deleteItem = async () => {
+    const id = this.state.data.pk;
+    try {
+      await this.takeAction(
+        "Sei sicuro di voler eliminare questa inserzione? Non potrai tornare indietro!"
+      );
+      this.props.blockItem();
+    } catch (error) {}
+    this.setState({
+      decision: null,
+      loading: true
+    });
+    axios
+      .get(___DELTE_AD___ + id + "/")
+      .then(res => {
+        console.log(res);
+        this.props.blockItem(id);
+        this.props.navigation.pop();
+      })
+      .catch(err => {
+        console.log({ err });
+        this.setState({
+          loading: false
+        });
       });
   };
 
@@ -133,7 +179,14 @@ export class Item extends Component {
   };
 
   render() {
-    const { data, bookName, bookAuthors, isOwner, refreshing } = this.state;
+    const {
+      data,
+      bookName,
+      bookAuthors,
+      isOwner,
+      refreshing,
+      decision
+    } = this.state;
     const { navigation } = this.props;
     const isLoading = data === undefined;
 
@@ -146,27 +199,31 @@ export class Item extends Component {
           authors={bookAuthors}
           hasNewComments={this.hasNewComments}
         />
-        {isLoading ? (
-          <View
-            style={styles.container}
-            onLayout={event =>
-              (this.viewHeight = event.nativeEvent.layout.height)
-            }
-          >
-            <ActivityIndicator size="large" color={colors.secondary} />
-          </View>
-        ) : (
-          <MainItem
-            data={data}
-            user={this.props.user}
-            newComments={this.newComments}
-            onContact={this._handleContact}
-            viewHeight={this.viewHeight}
-            isOwner={isOwner}
-            onRefresh={this.onRefresh}
-            refreshing={refreshing}
-          />
-        )}
+        <View style={{ flex: 1 }}>
+          {isLoading ? (
+            <View
+              style={styles.container}
+              onLayout={event =>
+                (this.viewHeight = event.nativeEvent.layout.height)
+              }
+            >
+              <ActivityIndicator size="large" color={colors.secondary} />
+            </View>
+          ) : (
+            <MainItem
+              data={data}
+              user={this.props.user}
+              newComments={this.newComments}
+              onContact={this._handleContact}
+              viewHeight={this.viewHeight}
+              isOwner={isOwner}
+              onRefresh={this.onRefresh}
+              refreshing={refreshing}
+              deleteItem={this.deleteItem}
+            />
+          )}
+          {decision && <DecisionOverlay decision={decision} />}
+        </View>
       </View>
     );
   }
@@ -210,7 +267,8 @@ const mapDispatchToProps = dispatch => {
     notificationViewItemRedux: itemPK =>
       dispatch(notificationsViewItem(itemPK)),
     readComments: item => dispatch(commentActions.commentsRead(item)),
-    sellStartMofifying: item => dispatch(sellActions.sellStartModifying(item))
+    sellStartMofifying: item => dispatch(sellActions.sellStartModifying(item)),
+    blockItem: item => dispatch(chatActions.chatBlockItem(item))
   };
 };
 

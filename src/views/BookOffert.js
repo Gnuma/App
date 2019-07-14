@@ -16,6 +16,7 @@ import DecisionOverlay from "../components/DecisionOverlay";
 import WaitExchangeOffert from "../components/BookOffert/WaitExchangeOffert";
 import CompleteExchangeOffert from "../components/BookOffert/CompleteExchangeOffert";
 import FeedbackOffert from "../components/BookOffert/FeedbackOffert";
+import CompletedOffert from "../components/BookOffert/CompletedOffert";
 
 export class BookOffert extends Component {
   constructor(props) {
@@ -230,6 +231,9 @@ export class BookOffert extends Component {
 
       case OffertType.SEND_FEEDBACK:
         return <FeedbackOffert {...data} sendFeedback={this.sendFeedback} />;
+
+      case OffertType.COMPLETED:
+        return <CompletedOffert {...data} />;
 
       default:
         return null;

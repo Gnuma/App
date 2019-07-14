@@ -7,6 +7,7 @@ import ImageSlider from "./ImageSlider";
 import Divider from "../Divider";
 import QuipuComment from "../Comments/QuipuComment";
 import ContactButton from "./ContactButton";
+import FullButton from "../FullButton";
 
 export class MainItem extends Component {
   state = {
@@ -36,7 +37,8 @@ export class MainItem extends Component {
       newComments,
       isOwner,
       refreshing,
-      onRefresh
+      onRefresh,
+      deleteItem
     } = this.props;
     const primaryData = {
       price: data.price,
@@ -66,14 +68,23 @@ export class MainItem extends Component {
           <SellerInfo data={sellerData} />
           <View
             style={{
-              height: this.state.contactButtonHeight,
-              marginVertical: 10
+              height: this.state.contactButtonHeight
             }}
             onLayout={event => {
               this.setState({ contactSnapY: event.nativeEvent.layout.y });
               console.log(event.nativeEvent);
             }}
           />
+          {isOwner && (
+            <FullButton
+              value="Elimina Inserzione"
+              icon="times"
+              style={{ marginBottom: 10 }}
+              contentStyle={{ flex: 1, textAlign: "center" }}
+              color={"darkRed"}
+              onPress={deleteItem}
+            />
+          )}
           <Divider style={styles.bigDivider} />
           <DescriptionInfo data={data.description} />
           <Divider style={styles.smallDivider} />

@@ -106,3 +106,8 @@ export const FEEDBACK_TYPES = {
   POSITIVE: 1,
   NEGATIVE: 0
 };
+
+export const TextFeedbackTypes = {
+  1: "Positivo",
+  0: "Negativo"
+};
