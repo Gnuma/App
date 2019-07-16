@@ -29,7 +29,7 @@ import {
   ___VALIDATE_USER___,
   ___SEND_VALIDATION___
 } from "../../store/constants";
-import { AUTH_ERROR, NOTCH_MARGIN } from "../../utils/constants";
+import { AUTH_ERROR, NOTCH_MARGIN, CODE_LENGTH } from "../../utils/constants";
 import { isEmpty } from "rxjs/operators";
 
 export class PhoneValidation extends Component {
@@ -259,5 +259,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(PhoneValidation);
-
-const CODE_LENGTH = 6;

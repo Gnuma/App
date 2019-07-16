@@ -52,7 +52,13 @@ export default class SelectBookHeader extends Component {
             <TextInput
               onChangeText={onChangeText}
               value={searchQuery}
-              style={{ flex: 1, fontSize: 22, marginLeft: 6, marginRight: 30 }}
+              style={{
+                flex: 1,
+                fontSize: 22,
+                marginLeft: 6,
+                marginRight: 30,
+                padding: 8
+              }}
               blurOnSubmit={true}
               autoFocus={true}
               placeholder={"eg: Matematica Verde 3"}

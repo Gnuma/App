@@ -23,6 +23,7 @@ export default class PhonePicker extends Component {
 
   getContent = () => {
     const { phone, status, ...rest } = this.props;
+    console.log(this.props);
     if (status == 0) {
       return (
         <View
