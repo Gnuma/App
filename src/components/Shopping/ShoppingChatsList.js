@@ -100,7 +100,7 @@ export class ChatLink extends Component {
         <Header3 numberOfLines={1} color="black">
           EUR {data.item.price}
         </Header3>
-        {data.messages.length > 0 && (
+        {data.messages.length > 0 ? (
           <View
             style={{
               flexDirection: "row",
@@ -117,6 +117,10 @@ export class ChatLink extends Component {
             <Header5 color={data.hasNews ? "darkRed" : "grey"}>
               {helper.dateDisplay(data.messages[0].createdAt)}
             </Header5>
+          </View>
+        ) : (
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Header4 color={"white"}>AAA</Header4>
           </View>
         )}
       </View>

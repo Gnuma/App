@@ -6,14 +6,23 @@ import { Header2, Header1, Header3 } from "../Text";
 import FullButton from "../FullButton";
 import { FEEDBACK_TYPES, TextFeedbackTypes } from "../../utils/constants";
 
-export default (CompletedOffert = ({ item, offert, UserTO, feedback }) => {
+export default (CompletedOffert = ({
+  item,
+  offert,
+  UserTO,
+  feedbacks,
+  type
+}) => {
   return (
     <View style={{ flex: 1 }}>
       <OffertInfo item={item} user={UserTO} offert={offert}>
         <Header1 color="secondary" style={{ alignSelf: "center" }}>
           Transazione Completata
         </Header1>
-        <FeedbackCard feedback={feedback} username={UserTO.user.username} />
+        <FeedbackCard
+          feedback={feedbacks[type == "seller" ? "buyer" : "seller"]}
+          username={UserTO.user.username}
+        />
       </OffertInfo>
     </View>
   );

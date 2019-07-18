@@ -15,6 +15,7 @@ import { notificationsViewItem } from "../store/actions/notifications";
 import { GreyBar } from "../components/StatusBars";
 import { formatOffice } from "../utils/helper";
 import DecisionOverlay from "../components/DecisionOverlay";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 export class Item extends Component {
   constructor(props) {
@@ -27,7 +28,8 @@ export class Item extends Component {
       keyboardOpen: false,
       isOwner: false,
       refreshing: false,
-      decision: null
+      decision: null,
+      loading: false
     };
 
     this.newComments =
@@ -185,45 +187,49 @@ export class Item extends Component {
       bookAuthors,
       isOwner,
       refreshing,
-      decision
+      decision,
+      loading
     } = this.state;
     const { navigation } = this.props;
     const isLoading = data === undefined;
 
     return (
       <View style={{ flex: 1 }}>
-        <GreyBar />
-        <ItemHeader
-          handleGoBack={this._handleGoBack}
-          title={bookName}
-          authors={bookAuthors}
-          hasNewComments={this.hasNewComments}
-        />
         <View style={{ flex: 1 }}>
-          {isLoading ? (
-            <View
-              style={styles.container}
-              onLayout={event =>
-                (this.viewHeight = event.nativeEvent.layout.height)
-              }
-            >
-              <ActivityIndicator size="large" color={colors.secondary} />
-            </View>
-          ) : (
-            <MainItem
-              data={data}
-              user={this.props.user}
-              newComments={this.newComments}
-              onContact={this._handleContact}
-              viewHeight={this.viewHeight}
-              isOwner={isOwner}
-              onRefresh={this.onRefresh}
-              refreshing={refreshing}
-              deleteItem={this.deleteItem}
-            />
-          )}
-          {decision && <DecisionOverlay decision={decision} />}
+          <GreyBar />
+          <ItemHeader
+            handleGoBack={this._handleGoBack}
+            title={bookName}
+            authors={bookAuthors}
+            hasNewComments={this.hasNewComments}
+          />
+          <View style={{ flex: 1 }}>
+            {isLoading ? (
+              <View
+                style={styles.container}
+                onLayout={event =>
+                  (this.viewHeight = event.nativeEvent.layout.height)
+                }
+              >
+                <ActivityIndicator size="large" color={colors.secondary} />
+              </View>
+            ) : (
+              <MainItem
+                data={data}
+                user={this.props.user}
+                newComments={this.newComments}
+                onContact={this._handleContact}
+                viewHeight={this.viewHeight}
+                isOwner={isOwner}
+                onRefresh={this.onRefresh}
+                refreshing={refreshing}
+                deleteItem={this.deleteItem}
+              />
+            )}
+            {decision && <DecisionOverlay decision={decision} />}
+          </View>
         </View>
+        {loading && <LoadingOverlay />}
       </View>
     );
   }
@@ -233,20 +239,23 @@ export class Item extends Component {
   };
 
   _handleContact = () => {
-    /*NavigatorService.protectedNavigation(
-      "CHAT",
-      null,
-      this.props.contactRedux(
-        this.state.data.pk,
-        1,
-        this.state.data.seller.user.username
-      )
-    );*/
-    /*protectedAction().then(() => {
-      this.props.contactRedux();
-    });*/
     if (!this.state.isOwner) {
-      this.props.contactRedux(this.state.data);
+      this.setState({
+        loading: true
+      });
+      this.props
+        .contactRedux(this.state.data)
+        .then(() => {
+          this.props.navigation.navigate("ShoppingChat", {
+            chatID: res.data._id,
+            subjectID: "s" + item.book.subject._id
+          });
+        })
+        .catch(() => {
+          this.setState({
+            loading: false
+          });
+        });
     } else {
       this.props.sellStartMofifying(this.state.data);
     }
@@ -254,10 +263,12 @@ export class Item extends Component {
 }
 
 const mapStateToProps = state => ({
-  user: {
-    username: state.auth.userData.username,
-    id: state.auth.id
-  },
+  user: state.auth.userData
+    ? {
+        username: state.auth.userData.username,
+        id: state.auth.id
+      }
+    : null,
   commentsData: state.comments.data
 });
 

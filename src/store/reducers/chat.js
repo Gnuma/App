@@ -112,15 +112,12 @@ const chatReceiveMessage = (
   state,
   { payload: { objectID, chatID, msg, type } }
 ) => {
-  //const inChat = state.chatFocus === chatID;
-  const inChat = false; //Test
   const orderedType =
     type === "sale" ? "salesOrderedData" : "shoppingOrderedData";
   const objectIndex =
     type === "sale"
       ? getItemIndex(objectID, state.salesOrderedData)
       : getSubjectIndex(objectID, state.shoppingOrderedData);
-
   const chatIndex = (chatID, state[orderedType][objectIndex]);
   const hadNews = state.data[objectID].chats[chatID].hasNews > 0;
 
@@ -130,12 +127,11 @@ const chatReceiveMessage = (
         chats: {
           [chatID]: {
             messages: { $unshift: [msg] },
-            hasNews: { $apply: oldHasNews => (inChat ? 0 : oldHasNews + 1) }
+            hasNews: { $apply: oldHasNews => oldHasNews + 1 }
           }
         },
         newsCount: {
-          $apply: oldNewsCount =>
-            !inChat && hadNews ? oldNewsCount + 1 : oldNewsCount
+          $apply: oldNewsCount => (hadNews ? oldNewsCount + 1 : oldNewsCount)
         }
       }
     },
@@ -146,6 +142,14 @@ const chatReceiveMessage = (
         }
       }
     }
+  });
+};
+
+const chatSystemMsg = (state, { payload: { objectID, chatID, msg } }) => {
+  const type = String(objectID).charAt(0) === "s" ? "shopping" : "sale";
+  const messageData = createSystemMessage(msg);
+  return chatReceiveMessage(state, {
+    payload: { objectID, chatID, msg: messageData, type }
   });
 };
 
@@ -461,17 +465,7 @@ const chatNewOffert = (
         chats: {
           [chatID]: {
             statusLoading: { $set: false },
-            offerts: { $unshift: [createOffert(user, price, pk)] },
-            messages: {
-              $unshift: [
-                createSystemMessage(
-                  user.user.username +
-                    " ha inviato un offerta: €" +
-                    price +
-                    ".00"
-                )
-              ]
-            }
+            offerts: { $unshift: [createOffert(user, price, pk)] }
           }
         }
       }
@@ -540,18 +534,22 @@ const chatSetChatCompleted = (state, { payload: { objectID, chatID } }) =>
 const chatSetFeedback = (
   state,
   { payload: { objectID, chatID, feedback, comment } }
-) =>
-  update(state, {
+) => {
+  const isBuyer = String(objectID).charAt(0) == "s";
+  const type = isBuyer ? "buyer" : "seller";
+  return update(state, {
     data: {
       [objectID]: {
         chats: {
           [chatID]: {
             status: { $set: ChatStatus.COMPLETED },
             statusLoading: { $set: false },
-            feedback: {
-              $set: {
-                judgment: feedback,
-                comment
+            feedbacks: {
+              [type]: {
+                $set: {
+                  judgment: feedback,
+                  comment
+                }
               }
             }
           }
@@ -559,6 +557,7 @@ const chatSetFeedback = (
       }
     }
   });
+};
 
 const chatBlockItem = (state, { payload: { itemID } }) => {
   const item = state.data[itemID];
@@ -606,6 +605,9 @@ export default (state = initialState, action) => {
 
     case actionTypes.CHAT_RECEIVE_MSG:
       return chatReceiveMessage(state, action);
+
+    case actionTypes.CHAT_SYSTEM_MSG:
+      return chatSystemMsg(state, action);
 
     case actionTypes.CHAT_SEND_MSG:
       return chatSendMsg(state, action);

@@ -46,7 +46,7 @@ export class MainList extends Component {
             const pushAction = StackActions.push({
               routeName: "Item",
               params: {
-                itemID: 1,
+                itemID: 2,
                 name: "FAKE",
                 authors: "FAKE"
               }

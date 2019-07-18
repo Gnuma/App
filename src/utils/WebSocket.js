@@ -32,7 +32,9 @@ import {
   chatOnline,
   chatRemoveOffert,
   chatSetOffertAccepted,
-  chatSettleAction
+  chatSettleAction,
+  chatSetFeedback,
+  chatSetChatCompleted
 } from "../store/actions/chat";
 
 class WS {
@@ -147,7 +149,8 @@ class WS {
           return store.dispatch(
             chatRemoveOffert(
               (data.for === "sale" ? "" : "s") + data.objectID,
-              data._id
+              data._id,
+              true
             )
           );
 
@@ -155,6 +158,25 @@ class WS {
           return store.dispatch(
             chatRemoveOffert(
               (data.for === "sale" ? "" : "s") + data.objectID,
+              data._id,
+              false
+            )
+          );
+
+        case DataType.FEEDBACK_CHAT:
+          return store.dispatch(
+            chatSetFeedback(
+              data.for === "sale" ? "" : "s" + data.objectID,
+              data._id,
+              data.feedback.judgment,
+              data.feedback.comment
+            )
+          );
+
+        case DataType.COMPLETE_CHAT:
+          return store.dispatch(
+            chatSetChatCompleted(
+              data.for === "sale" ? "" : "s" + data.objectID,
               data._id
             )
           );
@@ -239,7 +261,9 @@ const DataType = {
   REJECTED_CHAT: "rejectChat",
   ACCEPTED_OFFERT: "acceptOffert",
   REJECTED_OFFERT: "rejectOffert",
-  CANCEL_OFFERT: "deleteOffert"
+  CANCEL_OFFERT: "deleteOffert",
+  FEEDBACK_CHAT: "feedbackChat",
+  COMPLETE_CHAT: "completeChat"
 };
 
 formatMsg = msg => {

@@ -33,7 +33,12 @@ import {
 import { ofType } from "redux-observable";
 import { ajax } from "rxjs/ajax";
 import { of, timer, interval, fromEvent, throwError, iif } from "rxjs";
-import { ChatStatus } from "../../utils/constants";
+import {
+  ChatStatus,
+  FEEDBACK_TYPES,
+  TextFeedbackTypes
+} from "../../utils/constants";
+import SystemMessages from "../../utils/SystemMessages";
 
 export const chatInit = (salesData, shoppingData) => ({
   type: actionTypes.CHAT_INIT,
@@ -111,6 +116,15 @@ export const chatSendMsg = (objectID, chatID, msg, type) => ({
   }
 });
 
+export const chatSystemMsg = (objectID, chatID, msg) => ({
+  type: actionTypes.CHAT_SYSTEM_MSG,
+  payload: {
+    objectID,
+    chatID,
+    msg
+  }
+});
+
 export const chatConfirmMsg = (objectID, chatID, msgID, data) => ({
   type: actionTypes.CHAT_CONFIRM_MSG,
   payload: {
@@ -147,25 +161,6 @@ export const chatStartStatusAction = (objectID, chatID) => ({
   }
 });
 
-export const chatNewOffert = (objectID, chatID, offertID, price, user) => ({
-  type: actionTypes.CHAT_NEW_OFFERT,
-  payload: {
-    price,
-    objectID,
-    chatID,
-    pk: offertID,
-    user
-  }
-});
-
-export const chatRemoveOffert = (objectID, chatID) => ({
-  type: actionTypes.CHAT_REMOVE_OFFERT,
-  payload: {
-    objectID,
-    chatID
-  }
-});
-
 export const chatOffertFail = (objectID, chatID, error) => ({
   type: actionTypes.CHAT_OFFERT_FAIL,
   payload: {
@@ -185,25 +180,8 @@ export const chatModifyItem = item => ({
   payload: { item }
 });
 
-export const chatSettleAction = (objectID, chatID, status) => ({
-  type: actionTypes.CHAT_SETTLE,
-  payload: {
-    objectID,
-    chatID,
-    status
-  }
-});
-
 export const chatOnline = () => ({
   type: actionTypes.CHAT_ONLINE
-});
-
-export const chatSetOffertAccepted = (objectID, chatID) => ({
-  type: actionTypes.CHAT_ACCEPT_OFFERT,
-  payload: {
-    objectID,
-    chatID
-  }
 });
 
 export const chatSetChatCompleted = (objectID, chatID) => ({
@@ -211,16 +189,6 @@ export const chatSetChatCompleted = (objectID, chatID) => ({
   payload: {
     objectID,
     chatID
-  }
-});
-
-export const chatSetFeedback = (objectID, chatID, feedback, comment) => ({
-  type: actionTypes.CHAT_SET_FEEDBACK,
-  payload: {
-    objectID,
-    chatID,
-    feedback,
-    comment
   }
 });
 
@@ -232,6 +200,129 @@ export const chatBlockItem = itemID => ({
 });
 
 // ---THUNK---
+
+// --ChatNotifications--
+
+export const chatNewOffert = (objectID, chatID, offertID, price, user) => (
+  dispatch,
+  getState
+) => {
+  dispatch({
+    type: actionTypes.CHAT_NEW_OFFERT,
+    payload: {
+      price,
+      objectID,
+      chatID,
+      pk: offertID,
+      user
+    }
+  });
+  user = user || getState().chat.data[objectID].chats[chatID].UserTO;
+  dispatch(
+    chatSystemMsg(
+      objectID,
+      chatID,
+      SystemMessages.sendOffert(user.user.username, price)
+    )
+  );
+};
+
+export const chatSetOffertAccepted = (objectID, chatID) => (
+  dispatch,
+  getState
+) => {
+  dispatch({
+    type: actionTypes.CHAT_ACCEPT_OFFERT,
+    payload: {
+      objectID,
+      chatID
+    }
+  });
+  const username = getOffertDeciderUsername(getState, { objectID, chatID });
+  dispatch(
+    chatSystemMsg(objectID, chatID, SystemMessages.acceptOffert(username))
+  );
+};
+
+export const chatRemoveOffert = (objectID, chatID, isRejected) => (
+  dispatch,
+  getState
+) => {
+  dispatch({
+    type: actionTypes.CHAT_REMOVE_OFFERT,
+    payload: {
+      objectID,
+      chatID
+    }
+  });
+  if (isRejected) {
+    const username = getOffertDeciderUsername(getState, { objectID, chatID });
+    dispatch(
+      chatSystemMsg(objectID, chatID, SystemMessages.rejectOffert(username))
+    );
+  } else {
+    const username = getOffertCreatorUsername(getState, { objectID, chatID });
+    dispatch(
+      chatSystemMsg(objectID, chatID, SystemMessages.cancelOffert(username))
+    );
+  }
+};
+
+export const chatSettleAction = (objectID, chatID, status) => (
+  dispatch,
+  getState
+) => {
+  dispatch({
+    type: actionTypes.CHAT_SETTLE,
+    payload: {
+      objectID,
+      chatID,
+      status
+    }
+  });
+  switch (status) {
+    case ChatStatus.PROGRESS:
+      dispatch(
+        chatSystemMsg(
+          objectID,
+          chatID,
+          SystemMessages.acceptChat(getUserTO(getState, { objectID, chatID }))
+        )
+      );
+      break;
+
+    default:
+      break;
+  }
+};
+
+export const chatSetFeedback = (objectID, chatID, feedback, comment) => (
+  dispatch,
+  getState
+) => {
+  dispatch({
+    type: actionTypes.CHAT_SET_FEEDBACK,
+    payload: {
+      objectID,
+      chatID,
+      feedback,
+      comment
+    }
+  });
+  const user = getUserTO(getState, { objectID, chatID });
+  dispatch(
+    chatSystemMsg(
+      objectID,
+      chatID,
+      SystemMessages.sendFeedback(
+        user,
+        TextFeedbackTypes[feedback].toLowerCase()
+      )
+    )
+  );
+};
+
+// --ChatNotifications--
 
 export const chatSend = (type, objectID, chatID) => {
   return (dispatch, getState) => {
@@ -333,32 +424,33 @@ export const chatLoadEarlier = (objectID, chatID) => (dispatch, getState) => {
   }
 };
 
-export const chatContactUser = item => dispatch => {
-  protectedAction()
-    .then(() =>
-      axios.post(___CONTACT_USER___, {
-        item: item.pk
-      })
-    )
-    .then(res => {
-      console.log(res);
-      /*
+export const chatContactUser = item => dispatch =>
+  new Promise((resolve, reject) => {
+    protectedAction()
+      .then(() =>
+        axios.post(___CONTACT_USER___, {
+          item: item.pk
+        })
+      )
+      .then(res => {
+        console.log(res);
+        /*
       This API returns the object ITEM but is up until now 12/07/2019 incomplete
       */
-      dispatch({
-        type: actionTypes.CHAT_CONTACT_USER,
-        payload: {
-          item: item,
-          chatID: res.data._id
-        }
+        dispatch({
+          type: actionTypes.CHAT_CONTACT_USER,
+          payload: {
+            item: item,
+            chatID: res.data._id
+          }
+        });
+        resolve();
+      })
+      .catch(err => {
+        dispatch(chatFail(err));
+        reject();
       });
-      NavigationService.navigate("ShoppingChat", {
-        chatID: res.data._id,
-        subjectID: "s" + item.book.subject._id
-      });
-    })
-    .catch(err => chatFail(err));
-};
+  });
 
 export const chatCreateOffert = (objectID, chatID, price) => (
   dispatch,
@@ -386,6 +478,7 @@ export const chatCreateOffert = (objectID, chatID, price) => (
       );
     })
     .catch(err => {
+      console.log({ err });
       dispatch(chatOffertFail(objectID, chatID, err));
     });
 };
@@ -399,7 +492,7 @@ export const chatCancelOffert = (objectID, chatID) => (dispatch, getState) => {
     })
     .then(res => {
       console.log(res);
-      dispatch(chatRemoveOffert(objectID, chatID));
+      dispatch(chatRemoveOffert(objectID, chatID, false));
     })
     .catch(err => {
       dispatch(chatOffertFail(objectID, chatID, err));
@@ -415,7 +508,7 @@ export const chatRejectOffert = (objectID, chatID) => (dispatch, getState) => {
     })
     .then(res => {
       console.log(res);
-      dispatch(chatRemoveOffert(objectID, chatID));
+      dispatch(chatRemoveOffert(objectID, chatID, true));
     })
     .catch(err => {
       dispatch(chatOffertFail(objectID, chatID, err));
@@ -571,4 +664,39 @@ const createMsg = (content, userID) => {
     isRead: true,
     isSending: true
   };
+};
+
+const getOffertCreatorUsername = (getState, { objectID, chatID }) => {
+  try {
+    return getState().chat.data[objectID].chats[chatID].offerts[0].creator.user
+      .username;
+  } catch (error) {
+    console.warn(error);
+    console.log(error, "for: ", { objectID, chatID });
+  }
+};
+
+const getOffertDeciderUsername = (getState, { objectID, chatID }) => {
+  try {
+    const offertCreator = getState().chat.data[objectID].chats[chatID]
+      .offerts[0].creator;
+    const userTo = getState().chat.data[objectID].chats[chatID].UserTO;
+    const username =
+      offertCreator._id !== userTo._id
+        ? userTo.user.username
+        : getState().auth.userData.username;
+    return username;
+  } catch (error) {
+    console.warn(error);
+    console.log(error, "for: ", { objectID, chatID });
+  }
+};
+
+const getUserTO = (getState, { objectID, chatID }) => {
+  try {
+    return getState().chat.data[objectID].chats[chatID].UserTO.user.username;
+  } catch (error) {
+    console.warn(error);
+    console.log(error, "for: ", { objectID, chatID });
+  }
 };

@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import BasicHeader from "../../components/BasicHeader";
 import SolidButton from "../../components/SolidButton";
-import { Header2 } from "../../components/Text";
+import { Header2, Header3 } from "../../components/Text";
 import UserInfoForm from "../../components/UserSettings/UserInfoForm";
 import {
   isEmpty,
@@ -29,7 +29,8 @@ export class UserInfo extends Component {
       fields: {
         uid: { value: props.userData.username, errorMessage: "" },
         email: { value: props.userData.email, errorMessage: "" }
-      }
+      },
+      completed: false
     };
 
     this.initialFields = this.state.fields;
@@ -40,16 +41,20 @@ export class UserInfo extends Component {
     this.setState({
       loading: true
     });
-    const result = await submit(this.state.fields, this.validators);
+    const validators = {};
+    const fields = {};
+    if (this.initialFields.uid.value !== this.state.fields.uid.value) {
+      fields.uid = this.state.fields.uid;
+      validators.uid = this.validators.uid;
+    }
+    if (this.initialFields.email.value !== this.state.fields.email.value) {
+      fields.email = this.state.fields.email;
+      validators.email = this.validators.email;
+    }
+    const result = await submit(fields, validators);
     if (result === true) {
-      const username =
-        this.initialFields.uid.value !== this.state.fields.uid.value
-          ? this.state.fields.uid.value
-          : undefined;
-      const email =
-        this.initialFields.email.value !== this.state.fields.email.value
-          ? this.state.fields.email.value
-          : undefined;
+      const username = this.state.fields.uid.value;
+      const email = this.state.fields.email.value;
       axios
         .post(___MODIFY_USER___, {
           username,
@@ -57,7 +62,7 @@ export class UserInfo extends Component {
         })
         .then(res => {
           console.log(res);
-          this.props.navigation.goBack(null);
+          this.setState({ completed: true });
         })
         .catch(err => {
           console.log({ err });
@@ -88,7 +93,27 @@ export class UserInfo extends Component {
     this.initialFields.email.value !== this.state.fields.email.value;
 
   render() {
-    const { fields, loading } = this.state;
+    const { fields, loading, completed } = this.state;
+
+    if (completed) {
+      return (
+        <View style={{ flex: 1 }}>
+          <BasicHeader title="Modifica" />
+          <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 10 }}>
+            <Header2 color="primary" style={{ textAlign: "center" }}>
+              Email inviata!
+            </Header2>
+            <Header3
+              color="black"
+              style={{ marginTop: 10, textAlign: "center" }}
+            >
+              Conferma il cambiamento dall'email che ti abbiamo inviato. Procedi
+              poi riavviando l'applicazione.
+            </Header3>
+          </View>
+        </View>
+      );
+    }
 
     return (
       <View style={{ flex: 1 }}>

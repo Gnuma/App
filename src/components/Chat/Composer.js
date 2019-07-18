@@ -9,7 +9,7 @@ import {
 import Button from "../Button";
 import colors from "../../styles/colors";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Header4, Header3 } from "../Text";
+import { Header4, Header3, Header2 } from "../Text";
 import { AudioRecorder, AudioUtils } from "react-native-audio";
 import NativeButton from "../NativeButton";
 import Sound from "react-native-sound";
@@ -90,11 +90,46 @@ export default class Composer extends Component {
     }, 100);
   }
 
+  renderBlockedComposer = () => {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+      >
+        <ComposerContainer>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              margin: 6,
+              alignItems: "center"
+            }}
+          >
+            <Header3 color="black" style={{ flex: 1 }}>
+              La chat non è più attiva. L'inserzione è stata eliminata o venduta
+              ad un altro utente.
+            </Header3>
+            <Icon
+              name={"ban"}
+              size={40}
+              style={{ color: colors.darkRed, marginHorizontal: 10 }}
+            />
+          </View>
+        </ComposerContainer>
+      </View>
+    );
+  };
+
   render() {
     const { text, onSend, onComposerTextChanged, data, type } = this.props;
     const { recording, currentTime } = this.state;
     const showPendingWarning =
       type === ChatType.shopping && data.status === ChatStatus.PENDING;
+    if (data.status == ChatStatus.BLOCKED) {
+      return this.renderBlockedComposer();
+    }
     return (
       <View
         style={{
@@ -108,18 +143,7 @@ export default class Composer extends Component {
             messaggi finchè non accetterà la conversazione
           </Header4>
         ) : null}
-        <View
-          style={{
-            flexDirection: "row",
-            borderRadius: 10,
-            backgroundColor: colors.white,
-            elevation: 2,
-            marginBottom: 10,
-            marginTop: 5,
-            marginHorizontal: 20,
-            minHeight: 50
-          }}
-        >
+        <ComposerContainer>
           {recording ? (
             <View style={{ flex: 1, justifyContent: "center" }}>
               <Header3
@@ -189,7 +213,7 @@ export default class Composer extends Component {
               />
             </NativeButton>
           )}
-        </View>
+        </ComposerContainer>
       </View>
     );
   }
@@ -238,3 +262,22 @@ export default class Composer extends Component {
     });
   };
 }
+
+const ComposerContainer = ({ children }) => {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        borderRadius: 10,
+        backgroundColor: colors.white,
+        elevation: 2,
+        marginBottom: 10,
+        marginTop: 5,
+        marginHorizontal: 20,
+        minHeight: 50
+      }}
+    >
+      {children}
+    </View>
+  );
+};

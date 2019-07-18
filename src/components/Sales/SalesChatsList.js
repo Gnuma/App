@@ -126,7 +126,12 @@ export class ChatLink extends Component {
           </Header5>
         </View>
       );
+    } else {
+      return (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Header4 color={"white"}>AAA</Header4>
+        </View>
+      );
     }
-    return null;
   };
 }

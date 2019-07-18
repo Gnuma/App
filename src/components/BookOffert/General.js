@@ -16,7 +16,7 @@ export const OffertInfo = ({ item, user, offert, children }) => {
   console.log(user);
   console.log(offert);
   return (
-    <ScrollView style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">
       {item && <ListMultiItem data={item} isSingle={false} pk={item._id} />}
       {user && <UserCard userData={user} />}
       {offert && <OffertCard offert={offert} />}

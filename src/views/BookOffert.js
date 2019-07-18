@@ -17,6 +17,7 @@ import WaitExchangeOffert from "../components/BookOffert/WaitExchangeOffert";
 import CompleteExchangeOffert from "../components/BookOffert/CompleteExchangeOffert";
 import FeedbackOffert from "../components/BookOffert/FeedbackOffert";
 import CompletedOffert from "../components/BookOffert/CompletedOffert";
+import BlockedOffert from "../components/BookOffert/BlockedOffert";
 
 export class BookOffert extends Component {
   constructor(props) {
@@ -128,7 +129,9 @@ export class BookOffert extends Component {
     if (this.type == ChatType.sales) {
       console.log(props.data[objectID]);
       const { chats, newsCount, ...item } = props.data[objectID];
-      const { offerts, statusLoading, status, UserTO } = chats[chatID];
+      const { offerts, statusLoading, status, UserTO, feedbacks } = chats[
+        chatID
+      ];
       return {
         status,
         item,
@@ -139,18 +142,21 @@ export class BookOffert extends Component {
             ? undefined
             : offerts[0],
         loading: statusLoading,
-        UserTO
+        UserTO,
+        feedbacks,
+        type: "seller"
       };
     } else {
       console.log(props.data[objectID].chats[chatID]);
-      const { UserTO, item, offerts, statusLoading, status } = props.data[
-        objectID
-      ].chats[chatID];
+      const {
+        UserTO,
+        item,
+        offerts,
+        statusLoading,
+        status,
+        feedbacks
+      } = props.data[objectID].chats[chatID];
       return {
-        /*item: {
-          ...item,
-          seller: mockData.item.seller //TEST
-        },*/
         status,
         item: {
           ...item,
@@ -161,7 +167,9 @@ export class BookOffert extends Component {
             ? undefined
             : offerts[0],
         loading: statusLoading,
-        UserTO
+        UserTO,
+        feedbacks,
+        type: "buyer"
       };
     }
   };
@@ -169,7 +177,6 @@ export class BookOffert extends Component {
   getState = data => {
     console.log(data);
     if (!data.offert) return OffertStates.CREATE;
-    console.log(data);
     switch (data.status) {
       //Offert has to be pending
       case ChatStatus.PROGRESS:
@@ -185,9 +192,12 @@ export class BookOffert extends Component {
           return OffertStates.WAIT_EXCHANGE;
         }
       case ChatStatus.FEEDBACK:
-        return OffertStates.SEND_FEEDBACK;
+        if (!data.feedbacks[data.type]) return OffertStates.SEND_FEEDBACK;
+        else return OffertStates.COMPLETED;
       case ChatStatus.COMPLETED:
         return OffertStates.COMPLETED;
+      case ChatStatus.BLOCKED:
+        return OffertStates.BLOCKED;
     }
   };
 
@@ -234,6 +244,9 @@ export class BookOffert extends Component {
 
       case OffertType.COMPLETED:
         return <CompletedOffert {...data} />;
+
+      case OffertType.BLOCKED:
+        return <BlockedOffert {...data} />;
 
       default:
         return null;
@@ -310,6 +323,10 @@ const OffertStates = {
   },
   COMPLETED: {
     type: OffertType.COMPLETED,
+    title: "Completato"
+  },
+  BLOCKED: {
+    type: OffertType.BLOCKED,
     title: "Completato"
   }
 };
