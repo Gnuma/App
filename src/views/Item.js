@@ -16,6 +16,8 @@ import { GreyBar } from "../components/StatusBars";
 import { formatOffice } from "../utils/helper";
 import DecisionOverlay from "../components/DecisionOverlay";
 import LoadingOverlay from "../components/LoadingOverlay";
+import { ChatStatus } from "../utils/constants";
+import BlockedItemBar from "../components/Item/BlockedItemBar";
 
 export class Item extends Component {
   constructor(props) {
@@ -102,26 +104,21 @@ export class Item extends Component {
       await this.takeAction(
         "Sei sicuro di voler eliminare questa inserzione? Non potrai tornare indietro!"
       );
-      this.props.blockItem();
-    } catch (error) {}
+      this.setState({ decision: null, loading: true });
+      //const res = await axios.get(___DELTE_AD___ + id + "/");
+      await this.delay();
+      this.props.blockItem(id);
+      this.props.navigation.pop();
+    } catch (error) {
+      console.log(error);
+    }
     this.setState({
       decision: null,
-      loading: true
+      loading: false
     });
-    axios
-      .get(___DELTE_AD___ + id + "/")
-      .then(res => {
-        console.log(res);
-        this.props.blockItem(id);
-        this.props.navigation.pop();
-      })
-      .catch(err => {
-        console.log({ err });
-        this.setState({
-          loading: false
-        });
-      });
   };
+
+  delay = () => new Promise(resolve => setTimeout(resolve, 2000));
 
   formatData = data => {
     let comments = data.comment_ad;
@@ -245,10 +242,11 @@ export class Item extends Component {
       });
       this.props
         .contactRedux(this.state.data)
-        .then(() => {
+        .then(({ chatID, subjectID }) => {
+          console.log(chatID, subjectID);
           this.props.navigation.navigate("ShoppingChat", {
-            chatID: res.data._id,
-            subjectID: "s" + item.book.subject._id
+            chatID,
+            subjectID
           });
         })
         .catch(() => {
@@ -268,7 +266,7 @@ const mapStateToProps = state => ({
         username: state.auth.userData.username,
         id: state.auth.id
       }
-    : null,
+    : {},
   commentsData: state.comments.data
 });
 

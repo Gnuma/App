@@ -33,8 +33,7 @@ import {
   chatRemoveOffert,
   chatSetOffertAccepted,
   chatSettleAction,
-  chatSetFeedback,
-  chatSetChatCompleted
+  chatSetFeedback
 } from "../store/actions/chat";
 
 class WS {
@@ -166,18 +165,20 @@ class WS {
         case DataType.FEEDBACK_CHAT:
           return store.dispatch(
             chatSetFeedback(
-              data.for === "sale" ? "" : "s" + data.objectID,
+              (data.for === "sale" ? "" : "s") + data.objectID,
               data._id,
               data.feedback.judgment,
-              data.feedback.comment
+              data.feedback.comment,
+              true
             )
           );
 
         case DataType.COMPLETE_CHAT:
           return store.dispatch(
-            chatSetChatCompleted(
-              data.for === "sale" ? "" : "s" + data.objectID,
-              data._id
+            chatSettleAction(
+              (data.for === "sale" ? "" : "s") + data.objectID,
+              data._id,
+              ChatStatus.FEEDBACK
             )
           );
 

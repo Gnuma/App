@@ -273,6 +273,7 @@ const chatSettle = (state, { payload: { objectID, chatID, status } }) =>
         chats: {
           [chatID]: {
             status: { $set: status },
+            statusLoading: { $set: false },
             loading: { $set: false }
           }
         }
@@ -293,7 +294,8 @@ const chatNewChat = (state, { payload: { objectID, chatID, data } }) => {
     loading: false,
     composer: "",
     offerts: [],
-    toload: false
+    toload: false,
+    feedbacks: {}
   };
   const item = {
     _id: objectID,
@@ -376,7 +378,8 @@ const chatContactUser = (state, { payload: { item, chatID } }) => {
     hasNews: false,
     status: ChatStatus.LOCAL,
     messages: [],
-    offerts: []
+    offerts: [],
+    feedbacks: {}
   };
   const subject = {
     _id: subjectID,
@@ -517,32 +520,27 @@ const chatOffertFail = (state, { payload: { objectID, chatID, error } }) =>
     error: { $set: error }
   });
 
-const chatSetChatCompleted = (state, { payload: { objectID, chatID } }) =>
-  update(state, {
-    data: {
-      [objectID]: {
-        chats: {
-          [chatID]: {
-            status: { $set: ChatStatus.FEEDBACK },
-            statusLoading: { $set: false }
-          }
-        }
-      }
-    }
-  });
-
 const chatSetFeedback = (
   state,
-  { payload: { objectID, chatID, feedback, comment } }
+  { payload: { objectID, chatID, feedback, comment, fromWS } }
 ) => {
-  const isBuyer = String(objectID).charAt(0) == "s";
+  let isBuyer = String(objectID).charAt(0) == "s";
+  if (fromWS) isBuyer = !isBuyer;
   const type = isBuyer ? "buyer" : "seller";
+  const reciever = isBuyer ? "seller" : "buyer";
+  //Set completed if the other feedback is not null
+  const setCompleted = !!state.data[objectID].chats[chatID].feedbacks[reciever];
+
+  console.log(type, objectID, chatID, feedback, comment);
   return update(state, {
     data: {
       [objectID]: {
         chats: {
           [chatID]: {
-            status: { $set: ChatStatus.COMPLETED },
+            status: {
+              $apply: oldStatus =>
+                setCompleted ? ChatStatus.COMPLETED : oldStatus
+            },
             statusLoading: { $set: false },
             feedbacks: {
               [type]: {
@@ -559,9 +557,11 @@ const chatSetFeedback = (
   });
 };
 
-const chatBlockItem = (state, { payload: { itemID } }) => {
+const chatBlockItem = (state, { payload: { itemID, exclutedChat } }) => {
   const item = state.data[itemID];
+  item.enabled = false;
   for (chatID in item.chats) {
+    if (chatID == exclutedChat) continue;
     item.chats[chatID].status = ChatStatus.BLOCKED;
   }
   return update(state, {
@@ -656,9 +656,6 @@ export default (state = initialState, action) => {
 
     case actionTypes.CHAT_ONLINE:
       return chatStartGlobalAction(state, action);
-
-    case actionTypes.CHAT_COMPLETE:
-      return chatSetChatCompleted(state, action);
 
     case actionTypes.CHAT_SET_FEEDBACK:
       return chatSetFeedback(state, action);

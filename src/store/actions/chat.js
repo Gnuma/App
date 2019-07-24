@@ -184,18 +184,11 @@ export const chatOnline = () => ({
   type: actionTypes.CHAT_ONLINE
 });
 
-export const chatSetChatCompleted = (objectID, chatID) => ({
-  type: actionTypes.CHAT_COMPLETE,
-  payload: {
-    objectID,
-    chatID
-  }
-});
-
-export const chatBlockItem = itemID => ({
+export const chatBlockItem = (itemID, excludedChat) => ({
   type: actionTypes.CHAT_BLOCK_ITEM,
   payload: {
-    itemID
+    itemID,
+    excludedChat
   }
 });
 
@@ -291,25 +284,37 @@ export const chatSettleAction = (objectID, chatID, status) => (
       );
       break;
 
+    case ChatStatus.FEEDBACK:
+      dispatch(
+        chatSystemMsg(objectID, chatID, SystemMessages.completeExchange())
+      );
+
     default:
       break;
   }
 };
 
-export const chatSetFeedback = (objectID, chatID, feedback, comment) => (
-  dispatch,
-  getState
-) => {
+export const chatSetFeedback = (
+  objectID,
+  chatID,
+  feedback,
+  comment,
+  fromWS
+) => (dispatch, getState) => {
+  console.log(objectID, chatID, feedback, comment);
   dispatch({
     type: actionTypes.CHAT_SET_FEEDBACK,
     payload: {
       objectID,
       chatID,
       feedback,
-      comment
+      comment,
+      fromWS
     }
   });
-  const user = getUserTO(getState, { objectID, chatID });
+  const user = fromWS
+    ? getUserTO(getState, { objectID, chatID })
+    : getUser(getState);
   dispatch(
     chatSystemMsg(
       objectID,
@@ -444,7 +449,10 @@ export const chatContactUser = item => dispatch =>
             chatID: res.data._id
           }
         });
-        resolve();
+        resolve({
+          chatID: res.data._id,
+          subjectID: "s" + item.book.subject._id
+        });
       })
       .catch(err => {
         dispatch(chatFail(err));
@@ -539,7 +547,7 @@ export const chatCompleteExchange = (objectID, chatID) => dispatch => {
     })
     .then(res => {
       console.log(res);
-      dispatch(chatSetChatCompleted(objectID, chatID));
+      dispatch(chatSettleAction(objectID, chatID, ChatStatus.FEEDBACK));
     })
     .catch(err => {
       dispatch(chatOffertFail(objectID, chatID, err));
@@ -561,7 +569,7 @@ export const chatSendFeedback = (
     })
     .then(res => {
       console.log(res);
-      dispatch(chatSetFeedback(objectID, chatID, feedback, comment));
+      dispatch(chatSetFeedback(objectID, chatID, feedback, comment, false));
     })
     .catch(err => {
       dispatch(chatOffertFail(objectID, chatID, err));
@@ -695,6 +703,15 @@ const getOffertDeciderUsername = (getState, { objectID, chatID }) => {
 const getUserTO = (getState, { objectID, chatID }) => {
   try {
     return getState().chat.data[objectID].chats[chatID].UserTO.user.username;
+  } catch (error) {
+    console.warn(error);
+    console.log(error, "for: ", { objectID, chatID });
+  }
+};
+
+const getUser = getState => {
+  try {
+    return getState().auth.userData.username;
   } catch (error) {
     console.warn(error);
     console.log(error, "for: ", { objectID, chatID });
