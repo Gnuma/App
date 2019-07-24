@@ -1,8 +1,11 @@
 import React, { Component } from "react";
-import { View, Text, AppState } from "react-native";
+import { View, Text, AppState, AsyncStorage } from "react-native";
 import { Provider, connect } from "react-redux";
 import store from "./src/store/store";
-import Navigator from "./src/navigator/Navigator";
+import Navigator, {
+  loadNavigationState,
+  persistNavigationState
+} from "./src/navigator/Navigator";
 import NavigationService from "./src/navigator/NavigationService";
 import WS from "./src/utils/WebSocket";
 import axios from "axios";
@@ -19,6 +22,8 @@ class App extends Component {
           ref={navigatorRef => {
             NavigationService.setTopLevelNavigator(navigatorRef);
           }}
+          persistNavigationState={persistNavigationState}
+          loadNavigationState={loadNavigationState}
         />
       </Provider>
     );

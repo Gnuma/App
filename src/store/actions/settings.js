@@ -11,6 +11,13 @@ export const settingsStart = () => dispatch => {
   });
 };
 
+export const saveNavState = () => navState => ({
+  type: actionTypes.SETTINGS_SAVE_NAV_STATE,
+  payload: {
+    navState
+  }
+});
+
 const settingsConnectionChange = isConnected => ({
   type: actionTypes.SETTINGS_CHANGE_CONNECTION,
   payload: {

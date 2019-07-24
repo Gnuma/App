@@ -16,6 +16,7 @@ export class AppLoader extends Component {
     if (!mounted) {
       this.props.startSettings();
     }
+    console.log("App Loading");
     this.props
       .autoLoginRedux()
       .then(() => NavigatorService.navigate("Home"))

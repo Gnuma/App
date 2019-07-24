@@ -1,11 +1,12 @@
 import React, { Component } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, AsyncStorage } from "react-native";
 import {
   createAppContainer,
   createStackNavigator,
   createBottomTabNavigator,
   createSwitchNavigator
 } from "react-navigation";
+import store from "../store/store";
 
 import HomeScreen from "../views/Home";
 import ItemScreen from "../views/Item";
@@ -31,6 +32,7 @@ import PhoneValidationScreen from "../views/Auth/PhoneValidation";
 
 import Header from "../Header/Header";
 import TabBar from "../TabBar/TabBar";
+import { saveNavState } from "../store/actions/settings";
 
 const UserSettingsNavigator = createStackNavigator(
   {
@@ -250,15 +252,25 @@ const MainStack = createStackNavigator(
   }
 );
 
-const RootStack = createSwitchNavigator(
-  {
-    AppLoader: AppLoaderScreen,
-    Main: MainStack,
-    InitProfile: InitProfileNavigator
-  },
-  {
-    initialRouteName: "AppLoader"
-  }
-);
+const RootStack = createSwitchNavigator({
+  AppLoader: AppLoaderScreen,
+  Main: MainStack,
+  InitProfile: InitProfileNavigator
+});
 
 export default createAppContainer(RootStack);
+
+//export const persistenceKey = "PERSISTANCE_KEY_0.0.0";
+
+export const persistNavigationState = async newState => {
+  try {
+    navState = newState;
+  } catch (err) {
+    console.log("Error Setting", err);
+  }
+};
+export const loadNavigationState = async () => {
+  return navState;
+};
+
+let navState = null;
