@@ -143,7 +143,7 @@ export class InitProfile extends Component {
           <Header1 color={"primary"} style={{ fontSize: 50 }}>
             Ciao!
           </Header1>
-          <Header3 color={"black"}>Benvenuto in Quipu</Header3>
+          <Header3 color={"black"}>Benvenuto in Civity</Header3>
           <Header3 color={"black"}>
             Per rendere la tua esperienza impeccabile abbiamo bisogno di sapere
             il tuo istituto

@@ -171,7 +171,7 @@ export class Auth extends Component {
                   style={{ fontSize: 50, textAlign: "center" }}
                   color={"primary"}
                 >
-                  Quipu
+                  Civity
                 </Header1>
               </View>
               {authType === "signup" ? (

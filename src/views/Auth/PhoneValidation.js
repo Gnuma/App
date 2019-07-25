@@ -210,7 +210,7 @@ export class PhoneValidation extends Component {
                   style={{ fontSize: 50, textAlign: "center" }}
                   color={"primary"}
                 >
-                  Quipu
+                  Civity
                 </Header1>
               </View>
             </View>

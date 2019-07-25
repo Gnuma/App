@@ -3,8 +3,8 @@ import colors from "../styles/colors";
 
 export default StyleSheet.create({
   logo: {
-    fontWeight: "200",
-    letterSpacing: 5
+    fontWeight: "300",
+    letterSpacing: 4
   },
 
   header: {

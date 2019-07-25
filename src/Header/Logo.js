@@ -5,8 +5,9 @@ import { Header1 } from "../components/Text";
 
 export default class Logo extends Component {
   render() {
+    const { color } = this.props;
     return (
-      <Header1 color="white" style={styles.logo}>
+      <Header1 color={color || "white"} style={styles.logo}>
         Civity
       </Header1>
     );

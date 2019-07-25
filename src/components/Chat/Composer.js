@@ -223,7 +223,7 @@ export default class Composer extends Component {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
         {
-          title: "Quipu Accesso Microfono",
+          title: "Civity Accesso Microfono",
           message: "Utilizzare il microfono per mandari messaggi vocali",
           buttonNegative: "NO",
           buttonPositive: "SI"

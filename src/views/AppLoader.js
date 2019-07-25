@@ -9,6 +9,8 @@ import { Header1 } from "../components/Text";
 import { AutoStart } from "../utils/constants";
 import NavigatorService from "../navigator/NavigationService";
 import { HiddenBar } from "../components/StatusBars";
+import Logo from "../Header/Logo";
+import colors from "../styles/colors";
 
 let mounted = false;
 export class AppLoader extends Component {
@@ -16,7 +18,6 @@ export class AppLoader extends Component {
     if (!mounted) {
       this.props.startSettings();
     }
-    console.log("App Loading");
     this.props
       .autoLoginRedux()
       .then(() => NavigatorService.navigate("Home"))
@@ -37,7 +38,7 @@ export class AppLoader extends Component {
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <HiddenBar />
         <Button onPress={() => this.props.navigation.navigate("App")}>
-          <Header1>Quipu</Header1>
+          <Logo color="black" />
         </Button>
       </View>
     );

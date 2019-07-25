@@ -113,7 +113,7 @@ export class MainItem extends Component {
             isOwner={isOwner}
           />
         </Animated.ScrollView>
-        {!data.enabled && (
+        {data.enabled && (
           <View
             style={{
               ...StyleSheet.absoluteFill,

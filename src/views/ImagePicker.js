@@ -264,7 +264,7 @@ export class ImagePicker extends Component {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         {
-          title: "Quipu Accesso File",
+          title: "Civity Accesso File",
           message:
             "Abbiamo bisogno del tuo permesso per farti scegliere le tue immagini",
           buttonNegative: "NO",

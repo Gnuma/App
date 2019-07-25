@@ -60,7 +60,6 @@ export default class NotificationCenter extends Component {
           style={{
             alignItems: "center",
             height: NCHeight,
-            backgroundColor: "red",
             justifyContent: "center"
           }}
         >
