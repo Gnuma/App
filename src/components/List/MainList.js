@@ -34,11 +34,19 @@ export class MainList extends Component {
         </View>
       );
     }
-
-    /*if (!data || data.results.length <= 0) {
-      return <Header2>Nessun Risultato</Header2>;
-    }*/
+    if (!data || data.results.length <= 0) {
+      return (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Header2 style={{ margin: 10, textAlign: "center" }} color="black">
+            Nessun Risultato
+          </Header2>
+        </View>
+      );
+    }
     //TEST
+    /*
     if (!data || data.results.length <= 0) {
       return (
         <Button
@@ -58,6 +66,7 @@ export class MainList extends Component {
         </Button>
       );
     }
+    */
     //TEST
 
     const isSingle = data.resultType === "single";

@@ -5,12 +5,13 @@ export const ___BASE_ENDPOINT___ = ___SERVER_ENDPOINT___ + "gnuma/v1/";
 export const ___WS_ENDPOINT___ = "ws://176.223.136.43:8000/" + "ws/chat/";
 export const ___WS_TEST_ENDPOINT = "ws://192.168.178.104:1234";
 
-export const ___AD_SEARCH_ENDPOINT___ = ___BASE_ENDPOINT___ + "ads/search/";
+export const ___AD_SEARCH_ENDPOINT___ =
+  ___SERVER_ENDPOINT___ + "search/books/search/";
 
 export const ___BOOK_HINTS_ENDPOINT___ =
-  ___BASE_ENDPOINT___ + "search/hints/book/";
+  ___SERVER_ENDPOINT___ + "search/books/hint/";
 export const ___OFFICE_HINTS_ENDPOINT___ =
-  ___BASE_ENDPOINT___ + "search/hints/office/";
+  ___SERVER_ENDPOINT___ + "search/offices/hint/";
 
 export const ___LOGIN_ENDPOINT___ = ___BASE_ENDPOINT___ + "auth/login/";
 export const ___LOGOUT_ENDPOINT___ = ___BASE_ENDPOINT___ + "auth/logout/";

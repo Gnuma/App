@@ -17,7 +17,7 @@ export default class Item extends Component {
     const { isSingle, data } = this.props;
     console.log(data);
     const { price, seller, condition, book, image_ad } = data;
-    const office = seller.office;
+    const office = seller.office || formatOffice(seller.course);
     let mainImage;
     try {
       mainImage = image_ad[0];
@@ -57,7 +57,7 @@ export default class Item extends Component {
           </View>
           <View style={styles.itemBottomContent}>
             <Header4 color="black">{office.name}</Header4>
-            <Header5 style={styles.ml15}>{office.cap}</Header5>
+            <Header5 style={styles.ml15}>{office.address}</Header5>
           </View>
         </View>
       </View>

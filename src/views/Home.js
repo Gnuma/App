@@ -135,8 +135,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    searchRedux: (search_query, cap) =>
-      dispatch(searchActions.search(search_query, cap)),
+    searchRedux: searchOptions => dispatch(searchActions.search(searchOptions)),
     setActiveRedux: isActive =>
       dispatch(searchActions.searchSetActive(isActive)),
     goHomeRedux: () => dispatch(searchActions.searchGoHome())

@@ -30,8 +30,7 @@ export class ListMultiItem extends Component {
 
   goItem = () => {
     const {
-      data: { book },
-      pk
+      data: { book, pk }
     } = this.props;
     const pushAction = StackActions.push({
       routeName: "Item",

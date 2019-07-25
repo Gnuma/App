@@ -74,21 +74,30 @@ export const searchGoHome = () => {
     type: actionTypes.SEARCH_GO_HOME
   };
 };
-
-export const search = (search_query, cap) => {
+/**
+ * searchOptions: {
+ *    //Single
+ *    isbn,
+ *    title,
+ *    //Multi
+ *    keyword
+ * }
+ */
+export const search = searchOptions => {
   return dispatch => {
     Keyboard.dismiss();
 
     let keyName;
     let value;
-    if (search_query.isbn) {
-      keyName = "isbn";
-      value = search_query.isbn;
-      dispatch(searchStart(search_query.title));
+    console.log(searchOptions);
+    if (searchOptions.isbn) {
+      keyName = "book";
+      value = searchOptions.isbn;
+      dispatch(searchStart(searchOptions.title));
     } else {
       keyName = "keyword";
-      value = search_query;
-      dispatch(searchStart(search_query));
+      value = searchOptions.keyword;
+      dispatch(searchStart(searchOptions.keyword));
     }
     axios
       .post(___AD_SEARCH_ENDPOINT___, {
@@ -134,7 +143,7 @@ const searchChangeEpic = action$ =>
         .pipe(
           map(({ response }) => {
             console.log(response);
-            return searchSuggest(response.results);
+            return searchSuggest(response);
           }),
           catchError(error => of(searchFail(error)))
         )
