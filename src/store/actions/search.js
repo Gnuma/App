@@ -78,49 +78,29 @@ export const searchGoHome = () => {
 export const search = (search_query, cap) => {
   return dispatch => {
     Keyboard.dismiss();
-    if (isOffline) {
-      dispatch(searchStart(search_query)); //Unificare
-      if (search_query) {
-        dispatch(
-          searchSuccess(search_query.length > 3 ? singleResults : multiResults)
-        );
-      } else dispatch(searchSuccess(null));
+
+    let keyName;
+    let value;
+    if (search_query.isbn) {
+      keyName = "isbn";
+      value = search_query.isbn;
+      dispatch(searchStart(search_query.title));
     } else {
-      let keyName;
-      let value;
-      if (search_query.isbn) {
-        keyName = "isbn";
-        value = search_query.isbn;
-        dispatch(searchStart(search_query.title));
-      } else {
-        keyName = "keyword";
-        value = search_query;
-        dispatch(searchStart(search_query));
-      }
-      axios
-        .post(___AD_SEARCH_ENDPOINT___, {
-          [keyName]: value
-        })
-        .then(res => {
-          console.log(res);
-          dispatch(searchSuccess(res.data));
-        })
-        .catch(err => {
-          dispatch(searchFail(err));
-        });
+      keyName = "keyword";
+      value = search_query;
+      dispatch(searchStart(search_query));
     }
-    /* Query to search
     axios
-    .post("http://127.0.0.1:8000/gnuma/v1/auth/login/", {
-      search_query,
-      cap
-    })
-    .then(res => {
-      dispatch(searchSuccess(res));
-    })
-    .catch(err => {
-      dispatch(searchFail(err));
-    }); */
+      .post(___AD_SEARCH_ENDPOINT___, {
+        [keyName]: value
+      })
+      .then(res => {
+        console.log(res);
+        dispatch(searchSuccess(res.data));
+      })
+      .catch(err => {
+        dispatch(searchFail(err));
+      });
   };
 };
 

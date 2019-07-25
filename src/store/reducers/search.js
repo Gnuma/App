@@ -58,7 +58,9 @@ const searchSetActive = (state, action) => {
 const searchGoHome = (state, action) => {
   return updateObject(state, {
     showResults: false,
-    searchQuery: ""
+    searchQuery: "",
+    isActive: false,
+    suggestions: []
   });
 };
 

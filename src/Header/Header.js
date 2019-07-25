@@ -11,6 +11,8 @@ import CenterHeader from "./CenterHeader";
 import RightHeader from "./RightHeader";
 import NavigationService from "../navigator/NavigationService";
 import protectedAction from "../utils/protectedAction";
+import SearchHeader from "./SearchHeader";
+import HomeHeader from "./HomeHeader";
 
 export class Header extends Component {
   static propTypes = {
@@ -31,32 +33,32 @@ export class Header extends Component {
   };
 
   resetToHome = () => {
+    Keyboard.dismiss();
     this.props.goHomeRedux();
   };
 
   search = () => {
-    this.props.searchRedux(this.props.searchQuery);
+    if (this.props.searchQuery) this.props.searchRedux(this.props.searchQuery);
+    else this.resetToHome();
   };
 
   setActive = () => {
     this.props.setActiveRedux(true);
-    //this.searchField.focus();
   };
 
-  setInactive = () => {
-    Keyboard.dismiss();
-    this.props.setActiveRedux(false);
+  clearSearchQuery = () => {
+    this.searchField && this.searchField.focus();
+    this.props.handleSearchQueryChange("");
   };
 
-  openSearchField = () => {
-    this.props.setActiveRedux(true);
-  };
+  //openSearchField = () => {
+  //  this.props.setActiveRedux(true);
+  //};
 
   openSettings = () => {
     protectedAction({ SEMIAUTH: true }).then(() =>
       NavigationService.navigate("UserSettings")
     );
-    //NavigationService.navigate("UserSettings");
   };
 
   render() {
@@ -69,27 +71,19 @@ export class Header extends Component {
     const showSearchBar = !!(searchQuery || showResults);
     return (
       <View style={styles.header}>
-        <LeftHeader
-          isActive={isActive}
-          isItem={isItem}
-          handleGoBack={this.setInactive}
-        />
-        <CenterHeader
-          isActive={isActive}
-          showSearchBar={showSearchBar}
-          searchQuery={searchQuery}
-          onChangeText={this.handleChangeText}
-          onSubmitEditing={this.search}
-          resetToHome={this.resetToHome}
-          onFocus={this.setActive}
-          setRef={this.setSearchRef}
-          //focus={this.focus}
-        />
-        <RightHeader
-          setActive={this.openSearchField}
-          openSettings={this.openSettings}
-          visible={!isActive && !showSearchBar}
-        />
+        {isActive || showSearchBar ? (
+          <SearchHeader
+            clearSearchQuery={this.clearSearchQuery}
+            onChangeText={this.handleChangeText}
+            searchQuery={searchQuery}
+            onSubmitEditing={this.search}
+            onFocus={this.setActive}
+            resetToHome={this.resetToHome}
+            setSearchRef={this.setSearchRef}
+          />
+        ) : (
+          <HomeHeader openSettings={this.openSettings} />
+        )}
       </View>
     );
   }
@@ -119,3 +113,27 @@ export default withNavigation(
     mapDispatchToProps
   )(Header)
 );
+
+/*
+        <LeftHeader
+          isActive={isActive}
+          isItem={isItem}
+          handleGoBack={this.setInactive}
+        />
+        <CenterHeader
+          isActive={isActive}
+          showSearchBar={showSearchBar}
+          searchQuery={searchQuery}
+          onChangeText={this.handleChangeText}
+          onSubmitEditing={this.search}
+          resetToHome={this.resetToHome}
+          onFocus={this.setActive}
+          setRef={this.setSearchRef}
+          //focus={this.focus}
+        />
+        <RightHeader
+          setActive={this.openSearchField}
+          openSettings={this.openSettings}
+          visible={!isActive && !showSearchBar}
+        />
+*/

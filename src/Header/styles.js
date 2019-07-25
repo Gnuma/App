@@ -2,11 +2,6 @@ import { StyleSheet } from "react-native";
 import colors from "../styles/colors";
 
 export default StyleSheet.create({
-  logoView: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center"
-  },
   logo: {
     fontWeight: "200",
     letterSpacing: 5
@@ -14,12 +9,10 @@ export default StyleSheet.create({
 
   header: {
     flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
     height: 60,
     backgroundColor: colors.secondary,
     paddingVertical: 3,
-    paddingHorizontal: 15
+    paddingRight: 10
   },
   icon: {
     color: "white"
@@ -42,7 +35,7 @@ export default StyleSheet.create({
   },
   searchInput: {
     fontSize: 18,
-    paddingVertical: 6,
+    paddingVertical: 8,
     paddingHorizontal: 10,
     flex: 1
   },
@@ -54,8 +47,20 @@ export default StyleSheet.create({
     paddingRight: 8
   },
   goBack: {
-    padding: 10,
-    marginLeft: -10,
-    color: colors.white
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    marginHorizontal: 2,
+    borderRadius: 40
+  },
+
+  //NEW
+  headerContainer: {
+    flexDirection: "row",
+    flex: 1,
+    alignItems: "center"
+  },
+  logoContainer: {
+    paddingLeft: 10,
+    flex: 1
   }
 });
