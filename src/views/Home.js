@@ -36,6 +36,10 @@ export class Home extends Component {
     isLoading: PropTypes.bool
   };
 
+  state = {
+    containerLayout: null
+  };
+
   componentDidMount() {
     this._navListener = this.props.navigation.addListener("willFocus", () => {
       StatusBar.setBackgroundColor(colors.darkGreen);
@@ -45,6 +49,9 @@ export class Home extends Component {
   componentWillUnmount() {
     this._navListener.remove();
   }
+
+  setContainerLayout = event =>
+    this.setState({ containerLayout: event.nativeEvent.layout });
 
   render() {
     return (
@@ -75,6 +82,8 @@ export class Home extends Component {
           commentsData={this.props.commentsData}
           goComment={this._onCommentNotificationPress}
           searchOption={this._searchOption}
+          setContainerLayout={this.setContainerLayout}
+          containerLayout={this.state.containerLayout}
         />
       );
     }

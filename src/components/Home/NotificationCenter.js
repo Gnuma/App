@@ -14,6 +14,8 @@ import Button from "../Button";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { ChatType } from "../../utils/constants";
 import { TouchableNativeFeedback } from "react-native-gesture-handler";
+import { NCHeight } from "./MainHome";
+import _ from "lodash";
 
 export default class NotificationCenter extends Component {
   filter = memoize(data => this.formatNotifications(data));
@@ -50,10 +52,18 @@ export default class NotificationCenter extends Component {
 
   render() {
     const { data, orderedData, isActive, show } = this.props;
+    if (!orderedData || _.isEmpty(orderedData)) return null;
 
     return (
       <View>
-        <View style={{ alignItems: "center" }}>
+        <View
+          style={{
+            alignItems: "center",
+            height: NCHeight,
+            backgroundColor: "red",
+            justifyContent: "center"
+          }}
+        >
           <Button
             style={{
               padding: 10,

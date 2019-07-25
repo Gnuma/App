@@ -8,8 +8,11 @@ import {
 } from "react-native";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 import BookTemplate from "./BookTemplate";
-import { sliderWidth, itemWidth } from "./styles";
+import { sliderWidth, wp, itemHorizontalMargin } from "./styles";
 import colors from "../../styles/colors";
+import { NCHeight } from "./MainHome";
+import BookShelfPagination from "./BookShelfPagination";
+import { ___BOOK_IMG_RATIO___ } from "../../utils/constants";
 
 export default class BookShelf extends Component {
   state = {
@@ -17,52 +20,64 @@ export default class BookShelf extends Component {
     activeSlide: 0
   };
 
+  itemWidth = null;
+  itemHeight = null;
+
   _renderItem = ({ item, index }, parallaxProps) => {
     return (
       <BookTemplate
         data={item}
         parallaxProps={parallaxProps}
         onPress={this.props.onPress}
+        itemWidth={this.itemWidth}
+        itemHeight={this.itemHeight}
       />
     );
   };
 
   render() {
     const { activeSlide } = this.state;
+    const { containerLayout } = this.props;
+    if (!containerLayout) return null;
+    const vh = containerLayout.height - NCHeight - PaginationHeight;
+    this.itemWidth = wp(60);
+    this.itemHeight = wp(60) * ___BOOK_IMG_RATIO___ + LabelHeight;
+    if (this.itemHeight > vh) {
+      this.itemHeight = vh;
+      this.itemWidth = (this.itemHeight - LabelHeight) / ___BOOK_IMG_RATIO___;
+    }
+
     return (
-      <View style={{ flex: 1, justifyContent: "center" }}>
-        <View>
-          <Carousel
-            ref={c => (this.bookShelf = c)}
-            data={data}
-            renderItem={this._renderItem}
-            sliderWidth={sliderWidth}
-            itemWidth={itemWidth}
-            hasParallaxImages={true}
-            inactiveSlideScale={0.82}
-            inactiveSlideOpacity={0.8}
-            onSnapToItem={index => this.setState({ activeSlide: index })}
-          />
-          <Pagination
-            dotsLength={data.length}
-            activeDotIndex={activeSlide}
-            //containerStyle={styles.paginationContainer}
-            dotColor={colors.black}
-            dotStyle={{
-              width: 7,
-              height: 14
-            }}
-            inactiveDotColor={colors.black}
-            inactiveDotOpacity={0.4}
-            inactiveDotScale={0.6}
-            carouselRef={this.bookShelf}
-            tappableDots={!!this._slider1Ref}
-          />
+      <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <View>
+            <Carousel
+              data={data}
+              renderItem={this._renderItem}
+              sliderWidth={sliderWidth}
+              itemWidth={this.itemWidth}
+              hasParallaxImages={true}
+              inactiveSlideScale={0.82}
+              inactiveSlideOpacity={0.8}
+              onSnapToItem={index => this.setState({ activeSlide: index })}
+            />
+          </View>
+        </View>
+        <View
+          style={{
+            height: PaginationHeight,
+            justifyContent: "center"
+          }}
+        >
+          <BookShelfPagination data={data} focus={activeSlide} />
         </View>
       </View>
     );
   }
 }
+
+const PaginationHeight = 40;
+export const LabelHeight = 60;
 
 const data = [
   {

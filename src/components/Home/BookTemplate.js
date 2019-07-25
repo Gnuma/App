@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import { View, Platform, StyleSheet, Dimensions, Ima } from "react-native";
 import { ParallaxImage } from "react-native-snap-carousel";
-import { slideHeight, itemWidth, itemHorizontalMargin } from "./styles";
+import { itemHorizontalMargin } from "./styles";
 import { Header1, Header2 } from "../Text";
 import colors from "../../styles/colors";
 import Button from "../Button";
+import { LabelHeight } from "./BookShelf";
 
 const IS_IOS = Platform.OS === "ios";
 
@@ -36,15 +37,16 @@ export default class BookTemplate extends Component {
 
   render() {
     const {
-      data: { title, startingPrice: price }
+      data: { title, startingPrice: price },
+      itemWidth,
+      itemHeight
     } = this.props;
     return (
       <View
         style={{
           width: itemWidth,
-          height: slideHeight,
-          paddingHorizontal: itemHorizontalMargin,
-          paddingTop: 5
+          height: itemHeight,
+          padding: 5
         }}
       >
         <Button
@@ -65,7 +67,13 @@ export default class BookTemplate extends Component {
             {this.image}
           </View>
         </Button>
-        <View style={{ justifyContent: "center", paddingTop: 10 }}>
+        <View
+          style={{
+            justifyContent: "center",
+            height: LabelHeight,
+            marginTop: 10
+          }}
+        >
           <Header1
             color={"primary"}
             numberOfLines={1}

@@ -22,26 +22,14 @@ export default class MainHome extends Component {
   showNC = () => this.setState({ NCActive: true });
   hideNC = () => this.setState({ NCActive: false });
 
-  componentDidUpdate(prevProps) {
-    if (this.hasNewNotification(this.props.commentsOrdered)) {
-      Animated.timing(this.state.NCAnimation, {
-        toValue: 1,
-        duration: 2000
-        //useNativeDriver: true
-      }).start();
-    }
-  }
-
-  hasNewNotification = commentsOrdered =>
-    commentsOrdered && !_.isEmpty(commentsOrdered);
-
   render() {
     const {
       openSearchBar,
       commentsOrdered,
       commentsData,
       goComment,
-      searchOption
+      searchOption,
+      containerLayout
     } = this.props;
 
     return (
@@ -54,31 +42,39 @@ export default class MainHome extends Component {
             style={{
               justifyContent: "center",
               alignItems: "center",
-              paddingVertical: 25
+              paddingTop: 25,
+              paddingBottom: 10
             }}
           >
             <SearchLink onPress={openSearchBar} />
           </View>
-          {commentsOrdered && !_.isEmpty(commentsOrdered) ? (
+          <View
+            style={{ flex: 1, marginBottom: 10 }}
+            onLayout={this.props.setContainerLayout}
+          >
             <NotificationCenter
               data={commentsData}
               orderedData={commentsOrdered}
               commentHandler={goComment}
               isActive={this.state.NCActive}
               show={this.showNC}
-              animation={this.state.NCAnimation}
             />
-          ) : null}
-          <View
-            style={{ flex: 1, justifyContent: "center" }}
-            pointerEvents={this.state.NCActive ? "none" : "auto"}
-          >
-            <BookShelf onPress={searchOption} />
+            <View
+              style={{ flex: 1 }}
+              pointerEvents={this.state.NCActive ? "none" : "auto"}
+            >
+              <BookShelf
+                onPress={searchOption}
+                containerLayout={containerLayout}
+              />
+            </View>
           </View>
         </View>
       </TouchableWithoutFeedback>
     );
   }
+
+  //commentsOrdered && !_.isEmpty(commentsOrdered)
 
   onNCPlaceholderLayout = event => {
     console.log(event.nativeEvent.layout);
@@ -87,3 +83,5 @@ export default class MainHome extends Component {
     });
   };
 }
+
+export const NCHeight = 50;
