@@ -4,7 +4,8 @@ import {
   View,
   StyleSheet,
   TouchableWithoutFeedback,
-  Animated
+  Animated,
+  Easing
 } from "react-native";
 import SearchLink from "./SearchLink";
 import NotificationCenter from "./NotificationCenter";
@@ -13,11 +14,26 @@ import _ from "lodash";
 import colors from "../../styles/colors";
 
 export default class MainHome extends Component {
-  state = {
-    NCLayout: null,
-    NCActive: false,
-    NCAnimation: new Animated.Value(0)
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      NCLayout: null,
+      NCActive: false,
+      initAnimation: new Animated.Value(props.containerLayout ? 0 : 1)
+    };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.containerLayout && this.props.containerLayout) {
+      Animated.timing(this.state.initAnimation, {
+        duration: 400,
+        toValue: 0,
+        easing: Easing.ease,
+        useNativeDriver: true
+      }).start();
+    }
+  }
 
   showNC = () => this.setState({ NCActive: true });
   hideNC = () => this.setState({ NCActive: false });
@@ -37,13 +53,14 @@ export default class MainHome extends Component {
         style={StyleSheet.absoluteFill}
         onPress={this.hideNC}
       >
-        <View style={{ justifyContent: "center", flex: 1 }}>
+        <View style={{ flex: 1 }}>
           <View
             style={{
               justifyContent: "center",
               alignItems: "center",
               paddingTop: 25,
-              paddingBottom: 10
+              paddingBottom: 10,
+              elevation: 0
             }}
           >
             <SearchLink onPress={openSearchBar} />
@@ -69,6 +86,14 @@ export default class MainHome extends Component {
               />
             </View>
           </View>
+          <Animated.View
+            style={{
+              ...StyleSheet.absoluteFill,
+              backgroundColor: colors.white,
+              opacity: this.state.initAnimation
+            }}
+            pointerEvents="none"
+          />
         </View>
       </TouchableWithoutFeedback>
     );

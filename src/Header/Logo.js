@@ -7,7 +7,7 @@ export default class Logo extends Component {
   render() {
     return (
       <Header1 color="white" style={styles.logo}>
-        Quipu
+        Civity
       </Header1>
     );
   }
