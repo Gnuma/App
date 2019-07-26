@@ -1,5 +1,6 @@
 import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
+import update from "immutability-helper";
 
 const initialState = {
   results: null, //search items results
@@ -8,7 +9,11 @@ const initialState = {
   searchQuery: "", //search query,
   isActive: false,
   showResults: false,
-  suggestions: []
+  suggestions: [],
+  recent: {
+    order: [],
+    keys: {}
+  }
 };
 
 const searchSetSearchQuery = (state, action) => {
@@ -64,6 +69,13 @@ const searchGoHome = (state, action) => {
   });
 };
 
+const searchUpdateHistory = (state, { payload: { recent } }) =>
+  update(state, {
+    recent: {
+      $set: recent
+    }
+  });
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.SEARCH_START:
@@ -86,6 +98,9 @@ const reducer = (state = initialState, action) => {
 
     case actionTypes.SEARCH_GO_HOME:
       return searchGoHome(state, action);
+
+    case actionTypes.SEARCH_UPDATE_HISTORY:
+      return searchUpdateHistory(state, action);
 
     default:
       return state;

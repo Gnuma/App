@@ -11,9 +11,11 @@ import {
   ___BOOK_HINTS_ENDPOINT___,
   ___AD_SEARCH_ENDPOINT___
 } from "../constants";
-import { isIsbn } from "../utility";
+import { isIsbn, setItem } from "../utility";
+import update from "immutability-helper";
 
 const isOffline = false;
+export const searchRecentKey = "@auth:searchRecent";
 
 export const searchSetSearchQuery = search_query => {
   return {
@@ -74,6 +76,17 @@ export const searchGoHome = () => {
     type: actionTypes.SEARCH_GO_HOME
   };
 };
+
+export const searchUpdateHistory = recent => {
+  setItem(searchRecentKey, recent);
+  return {
+    type: actionTypes.SEARCH_UPDATE_HISTORY,
+    payload: {
+      recent
+    }
+  };
+};
+
 /**
  * searchOptions: {
  *    //Single
@@ -84,13 +97,29 @@ export const searchGoHome = () => {
  * }
  */
 export const search = searchOptions => {
-  return dispatch => {
+  return (dispatch, getState) => {
     Keyboard.dismiss();
 
     let keyName;
     let value;
     console.log(searchOptions);
     if (searchOptions.isbn) {
+      try {
+        const recent = formatHistoryUpdate(
+          getState().search.recent,
+          searchOptions
+        );
+        dispatch(searchUpdateHistory(recent));
+      } catch (error) {
+        console.log(error);
+        dispatch(
+          searchUpdateHistory({
+            order: [],
+            keys: {}
+          })
+        );
+      }
+
       keyName = "book";
       value = searchOptions.isbn;
       dispatch(searchStart(searchOptions.title));
@@ -151,3 +180,25 @@ const searchChangeEpic = action$ =>
   );
 
 export const searchEpics = [searchChangeEpic];
+
+const SEARCH_HISTORY_LENGTH = 4;
+const formatHistoryUpdate = ({ order, keys }, { isbn, ...rest }) => {
+  for (var index = 0; index < order.length; index++)
+    if (order[index].isbn == isbn) break;
+  if (index !== order.length) {
+    let { isbn: deprecatedIsbn } = order[index];
+    order = update(order, { $splice: [[index, 1]] });
+    delete keys[deprecatedIsbn];
+  } else if (order.length >= SEARCH_HISTORY_LENGTH) {
+    index = order.length - 1;
+    let { isbn: deprecatedIsbn } = order[index];
+    order = update(order, { $splice: [[index, 1]] });
+    delete keys[deprecatedIsbn];
+  }
+  order = update(order, { $unshift: [{ isbn, ...rest }] });
+  keys[isbn] = true;
+  return {
+    order,
+    keys
+  };
+};

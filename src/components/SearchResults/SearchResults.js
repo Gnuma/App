@@ -9,44 +9,44 @@ import Icon from "react-native-vector-icons/FontAwesome";
 
 export class SearchResults extends Component {
   render() {
-    const { suggestions } = this.props;
+    const { suggestions, searchHistory, searchQuery } = this.props;
     return (
       <FlatList
         keyboardShouldPersistTaps={"handled"}
-        data={suggestions}
-        renderItem={({ item }) => {
-          return (
-            <Button
-              style={{
-                padding: 15,
-                flexDirection: "row"
-              }}
-              onPress={() =>
-                this.goSearch({ isbn: item.isbn, title: item.title })
-              }
-            >
-              <View
-                style={{ flexDirection: "row", flex: 1, alignItems: "center" }}
-              >
-                <Icon
-                  name="history"
-                  size={24}
-                  style={{ color: colors.black }}
-                />
-                <Header3
-                  style={{ paddingLeft: 15, color: colors.black }}
-                  numberOfLines={1}
-                >
-                  {item.title}
-                </Header3>
-              </View>
-            </Button>
-          );
-        }}
+        data={searchQuery ? suggestions : searchHistory.order}
+        renderItem={this.renderItem}
         keyExtractor={this._keyExtractor}
       />
     );
   }
+
+  renderItem = ({ item }) => {
+    const { searchHistory } = this.props;
+    console.log(searchHistory);
+    return (
+      <Button
+        style={{
+          padding: 15,
+          flexDirection: "row"
+        }}
+        onPress={() => this.goSearch(item)}
+      >
+        <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
+          <Icon
+            name={searchHistory.keys[item.isbn] ? "history" : "search"}
+            size={24}
+            style={{ color: colors.black }}
+          />
+          <Header3
+            style={{ paddingLeft: 15, color: colors.black }}
+            numberOfLines={1}
+          >
+            {item.title}
+          </Header3>
+        </View>
+      </Button>
+    );
+  };
 
   goSearch = searchOptions => {
     this.props.searchRedux(searchOptions);

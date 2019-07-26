@@ -4,11 +4,16 @@ import { ofType } from "redux-observable";
 import { fromEvent } from "rxjs";
 import { switchMap, map, filter } from "rxjs/operators";
 import { authDelayedLogin } from "./auth";
+import { getItem } from "../utility";
+import { searchRecentKey, searchUpdateHistory } from "./search";
 
 export const settingsStart = () => dispatch => {
   dispatch({
     type: actionTypes.SETTINGS_START
   });
+  getItem(searchRecentKey)
+    .then(recent => recent && dispatch(searchUpdateHistory(recent)))
+    .catch(err => console.log(err));
 };
 
 export const saveNavState = () => navState => ({

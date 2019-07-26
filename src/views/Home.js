@@ -67,6 +67,8 @@ export class Home extends Component {
         <SearchResults
           searchRedux={this.props.searchRedux}
           suggestions={this.props.suggestions}
+          searchHistory={this.props.searchHistory}
+          searchQuery={this.props.searchQuery}
         />
       );
     } else if (this.props.showResults) {
@@ -126,7 +128,9 @@ const mapStateToProps = state => ({
   isSearchActive: state.search.isActive,
   results: state.search.results,
   suggestions: state.search.suggestions,
+  searchHistory: state.search.recent,
   showResults: state.search.showResults,
+  searchQuery: state.search.searchQuery,
   isLoading: state.search.loading,
   notifications: state.notifications.notifications, //TAke out
   commentsData: state.comments.data,
