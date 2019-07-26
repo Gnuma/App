@@ -3,7 +3,7 @@ import { Text, StyleSheet, View, Dimensions } from "react-native";
 import Picker from "./TextInputPicker";
 import PropTypes from "prop-types";
 import SolidButton from "./SolidButton";
-import { Header3 } from "./Text";
+import { Header3, Header4 } from "./Text";
 import { StatusBar } from "./StatusBar";
 import update from "immutability-helper";
 import OutlinedInput from "./Form/OutlinedInput";
@@ -11,6 +11,11 @@ import { OfficeTypes } from "../utils/constants";
 import { FlatList } from "react-native-gesture-handler";
 import colors from "../styles/colors";
 import Button from "../components/Button";
+import { Subject, of } from "rxjs";
+import { switchMap, map, catchError } from "rxjs/operators";
+import { ajax } from "rxjs/ajax";
+import { ___OFFICE_HINTS_ENDPOINT___ } from "../store/constants";
+import Icon from "react-native-vector-icons/FontAwesome5";
 
 export default class OfficePicker extends Component {
   static propTypes = {
@@ -29,11 +34,22 @@ export default class OfficePicker extends Component {
   constructor(props) {
     super(props);
 
-    console.log(props);
+    this.officeQuery = createOfficeQuerySubject();
+
     this.state = {
       officeOptions: [],
       courseOptions: []
     };
+  }
+
+  componentDidMount() {
+    this.officeQuerySubscription = this.officeQuery.subscribe(
+      this.officeQuerySubscriber
+    );
+  }
+
+  componentWillUnmount() {
+    this.officeQuerySubscription && this.officeQuerySubscription.unsubscribe();
   }
 
   goBack = () => {
@@ -44,9 +60,10 @@ export default class OfficePicker extends Component {
 
   changeOfficeText = text => {
     //API
-    this.setState({
-      officeOptions: mockOfficeOptions
-    });
+    //this.setState({
+    //  officeOptions: mockOfficeOptions
+    //});
+    this.officeQuery.next(text);
   };
 
   setOffice = office => {
@@ -132,9 +149,21 @@ export default class OfficePicker extends Component {
 
   renderOfficeOption = item => {
     return (
-      <Header3 color={"black"} style={{ margin: 10 }}>
-        {item.name}
-      </Header3>
+      <View style={{ flexDirection: "row", padding: 10, alignItems: "center" }}>
+        <Icon
+          name={item.officetype == "SP" ? "school" : "graduation-cap"}
+          style={{ color: colors.black }}
+          size={20}
+        />
+        <View style={{ paddingLeft: 8 }}>
+          <Header3 color={"black"} numberOfLines={1}>
+            {item.name},
+          </Header3>
+          <Header4 color={"black"} numberOfLines={1}>
+            {item.address}
+          </Header4>
+        </View>
+      </View>
     );
   };
 
@@ -144,6 +173,16 @@ export default class OfficePicker extends Component {
         {item.name}
       </Header3>
     );
+  };
+
+  officeQuerySubscriber = {
+    next: options => {
+      this.setState({ officeOptions: options });
+    },
+    error: err => {
+      console.log(err);
+      this.setState({ options: [] });
+    }
   };
 }
 
@@ -292,3 +331,20 @@ export const canStateContinue = ({ office, status, year, course }) => {
       return canYearContinue(year);
   }
 };
+
+const createOfficeQuerySubject = () =>
+  new Subject().pipe(
+    switchMap(value =>
+      ajax
+        .post(___OFFICE_HINTS_ENDPOINT___, {
+          keyword: value
+        })
+        .pipe(
+          map(res => {
+            console.log(res);
+            return res.response;
+          }),
+          catchError(error => of([]))
+        )
+    )
+  );

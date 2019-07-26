@@ -93,6 +93,9 @@ export default class BookTemplate extends Component {
   }
 
   _onBookPick = () => {
-    this.props.onPress(this.props.data.title);
+    this.props.onPress({
+      isbn: this.props.data.isbn,
+      title: this.props.data.title
+    });
   };
 }

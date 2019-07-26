@@ -24,7 +24,9 @@ export class SelectBook extends Component {
             keyword: value
           })
           .pipe(
-            map(res => res.response.results),
+            map(res => {
+              return res.response;
+            }),
             catchError(error => of([]))
           )
       )
@@ -119,8 +121,9 @@ export class SelectBook extends Component {
   };
 
   _goCreateBook = () => {
-    //this.props.navigation.navigate("CreateBook");
+    this.props.navigation.navigate("CreateBook");
 
+    /*
     //TEST
     this.props.selectBookRedux({
       isbn: 9788808831538,
@@ -129,6 +132,7 @@ export class SelectBook extends Component {
     });
     this.props.navigation.navigate("VendiInfos");
     //TEST
+    */
   };
 
   resetSearchBar = () => this.handleChange("");

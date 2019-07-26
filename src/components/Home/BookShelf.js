@@ -83,7 +83,8 @@ const data = [
   {
     title: "Matematica Verde 3",
     startingPrice: 13,
-    img: "../../media/imgs/mockHomeBook.png"
+    img: "../../media/imgs/mockHomeBook.png",
+    isbn: 3123
   },
   {
     title: "Il Blu e il Rosso",
