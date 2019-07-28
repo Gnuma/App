@@ -23,8 +23,8 @@ export class OfficeChange extends Component {
       this.state = {
         status: 0,
         office,
-        course,
-        year
+        course: {},
+        year: undefined
       };
     } else {
       this.state = {

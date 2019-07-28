@@ -30,7 +30,6 @@ export default class OfficePicker extends Component {
     setYear: PropTypes.func,
 
     status: PropTypes.number,
-
     goBack: PropTypes.func
   };
 
@@ -203,7 +202,6 @@ const OfficeState = ({ value, ...props }) => {
       value={value.name}
       {...props}
       placeholder={"Seleziona la tua università o istituto"}
-      
     />
   );
 };
