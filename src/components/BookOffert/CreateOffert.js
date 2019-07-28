@@ -34,7 +34,7 @@ export default (CreateOffert = ({
               onPress={focusPrice}
             >
               <Icon
-                name="pencil"
+                name="pen"
                 size={22}
                 style={{
                   color: colors.black

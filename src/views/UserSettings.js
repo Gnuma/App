@@ -268,7 +268,7 @@ const UserInfoPanel = ({
         >
           {username}
         </Header1>
-        <Icon name={"pencil"} size={25} style={{ color: colors.primary }} />
+        <Icon name={"pen"} size={25} style={{ color: colors.primary }} />
       </View>
       <View
         style={{ flexDirection: "row", marginTop: 10, alignItems: "flex-end" }}
@@ -307,7 +307,7 @@ const UserOfficePanel = ({
         >
           {office}
         </Header2>
-        <Icon name={"pencil"} size={25} style={{ color: colors.primary }} />
+        <Icon name={"pen"} size={25} style={{ color: colors.primary }} />
       </View>
       <View
         style={{ flexDirection: "row", marginTop: 10, alignItems: "flex-end" }}
@@ -335,7 +335,7 @@ UserPhonePanel = ({ phone = "1234567890", isActive = false, onPress }) => {
         >
           {phone}
         </Header2>
-        <Icon name={"pencil"} size={25} style={{ color: colors.primary }} />
+        <Icon name={"pen"} size={25} style={{ color: colors.primary }} />
       </View>
       <View
         style={{

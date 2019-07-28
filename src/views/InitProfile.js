@@ -14,22 +14,6 @@ import { ajax } from "rxjs/ajax";
 import { AndroidBackHandler } from "react-navigation-backhandler";
 
 export class InitProfile extends Component {
-  constructor(props) {
-    super(props);
-    this.officeQuery = new Subject().pipe(
-      switchMap(value =>
-        ajax
-          .post(___OFFICE_HINTS_ENDPOINT___, {
-            keyword: value
-          })
-          .pipe(
-            map(res => res.response),
-            catchError(error => of([]))
-          )
-      )
-    );
-  }
-
   state = {
     status: 0, //0: office, 1: course | class, 2: year,
     office: {},
@@ -89,46 +73,6 @@ export class InitProfile extends Component {
     }
   };
 
-  /*
-  componentDidMount() {
-    this.querySubscription = this.officeQuery.subscribe(
-      options => {
-        console.log(options);
-        this.setState({ options });
-      },
-      err => {
-        console.log(err);
-        this.setState({ options: [] });
-      }
-    );
-  }
-
-  componentWillUnmount() {
-    this.querySubscription && this.querySubscription.unsubscribe();
-  }
-
-  _onSelectOffice = office => {
-    this.setState({
-      office: office,
-      officeQueryValue: office.name
-    });
-  };
-
-  _onOpenApp = () => {
-    if (this.state.office !== undefined) {
-      this.props.appInitRedux(this.state.office);
-      this.props.navigation.navigate("App");
-    }
-  };
-
-  _onOfficeQueryChange = text => {
-    this.setState({
-      officeQueryValue: text
-    });
-    this.officeQuery.next(text);
-  };
-
-  */
   render() {
     const { office, course, year, status } = this.state;
     return (

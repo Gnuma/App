@@ -11,11 +11,12 @@ class HomeHeader extends Component {
   static propTypes = {
     title: PropTypes.string,
     icon: PropTypes.string,
-    goBack: PropTypes.func
+    goBack: PropTypes.func,
+    textStyle: PropTypes.object
   };
 
   render() {
-    const { title, icon } = this.props;
+    const { title, icon, textStyle } = this.props;
     return (
       <View style={{ elevation: 0 }}>
         <View style={styles.container}>
@@ -23,7 +24,9 @@ class HomeHeader extends Component {
             <Icon name={icon} size={24} style={styles.backIcon} />
           </Button>
           <View>
-            <Header1 color={"primary"}>{title}</Header1>
+            <Header1 color={"primary"} style={textStyle}>
+              {title}
+            </Header1>
           </View>
         </View>
       </View>

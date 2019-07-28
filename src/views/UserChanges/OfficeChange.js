@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { View, Text, ScrollView } from "react-native";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import * as authActions from "../../store/actions/auth";
 import OfficePicker, { canStateContinue } from "../../components/OfficePicker";
 import BasicHeader from "../../components/BasicHeader";
 import SolidButton from "../../components/SolidButton";
@@ -12,18 +13,28 @@ import FullButton from "../../components/FullButton";
 
 export class OfficeChange extends Component {
   static propTypes = {};
-
-  state = {
-    status: 0, //0: office, 1: course | class, 2: year,
-    office: {
-      name: "Liceo Classico Giulio Cesare",
-      address: "Via dell'uno",
-      type: "school",
-      id: 5
-    },
-    course: {},
-    year: undefined
-  };
+  constructor(props) {
+    super(props);
+    if (this.props.office) {
+      const {
+        course: { year, ...course },
+        ...office
+      } = this.props.office;
+      this.state = {
+        status: 0,
+        office,
+        course,
+        year
+      };
+    } else {
+      this.state = {
+        status: 0,
+        office: {},
+        course: {},
+        year: undefined
+      };
+    }
+  }
 
   setItem = (key, value) => {
     this.setState({
@@ -60,9 +71,22 @@ export class OfficeChange extends Component {
   };
 
   complete = () => {
-    this.props.navigation.goBack(null);
+    if (
+      this.state.office != undefined &&
+      this.state.year != undefined &&
+      this.state.course != undefined
+    ) {
+      const office = {
+        ...this.state.office,
+        course: {
+          ...this.state.course,
+          year: this.state.year
+        }
+      };
+      this.props.appInitRedux(office);
+      this.props.navigation.goBack(null);
+    }
   };
-
   render() {
     const { office, course, year, status } = this.state;
     const canContinue = canStateContinue(this.state);
@@ -72,6 +96,7 @@ export class OfficeChange extends Component {
           <BasicHeader
             title={"Modifica il tuo istituto o scuola"}
             goBack={this.goBack}
+            textStyle={{ fontSize: 24 }}
           />
           <View style={{ flex: 1 }}>
             <ScrollView keyboardShouldPersistTaps="always">
@@ -100,9 +125,13 @@ export class OfficeChange extends Component {
   }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  office: state.auth.office
+});
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = dispatch => ({
+  appInitRedux: office => dispatch(authActions.authAppInit(office, true))
+});
 
 export default connect(
   mapStateToProps,
@@ -121,7 +150,7 @@ const ContinueButton = ({ onPress, active, text }) => {
       <FullButton
         onPress={onPress}
         value={text}
-        icon={active == "Salva" ? "pencil" : "chevron-right"}
+        icon={active == "Salva" ? "pen" : "chevron-right"}
         iconStyle={{
           color: active ? colors.white : colors.black
         }}

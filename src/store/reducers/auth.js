@@ -69,7 +69,10 @@ const authSetPhone = (state, { payload: { phone } }) =>
     isActive: { $set: false }
   });
 
-const logoutSuccess = (state, action) => initialState;
+const logoutSuccess = (state, action) => {
+  const { office } = state;
+  return update(initialState, { $merge: { office } });
+};
 
 const authValidateAccount = (state, action) =>
   update(state, {

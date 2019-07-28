@@ -98,7 +98,7 @@ export default class TextInputPicker extends Component {
               }}
               onPress={this._focusInput}
             >
-              <Icon name="pencil" size={22} />
+              <Icon name="pen" size={22} />
             </Button>
           </View>
         </View>

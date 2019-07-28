@@ -1,4 +1,3 @@
-
 import React, { Component } from "react";
 import { View, TextInput, StyleSheet } from "react-native";
 import PropTypes from "prop-types";
@@ -97,5 +96,5 @@ export default class OutlinedInput extends Component {
 }
 
 OutlinedInput.defaultProps = {
-  icon: "pencil"
+  icon: "pen"
 };

@@ -14,7 +14,10 @@ import Button from "../components/Button";
 import { Subject, of } from "rxjs";
 import { switchMap, map, catchError } from "rxjs/operators";
 import { ajax } from "rxjs/ajax";
-import { ___OFFICE_HINTS_ENDPOINT___ } from "../store/constants";
+import {
+  ___OFFICE_HINTS_ENDPOINT___,
+  ___COURSE_HINTS_ENDPOINT___
+} from "../store/constants";
 import Icon from "react-native-vector-icons/FontAwesome5";
 
 export default class OfficePicker extends Component {
@@ -34,7 +37,8 @@ export default class OfficePicker extends Component {
   constructor(props) {
     super(props);
 
-    this.officeQuery = createOfficeQuerySubject();
+    this.officeQuery = createQuerySubject("OFFICE");
+    this.courseQuery = createQuerySubject("COURSE");
 
     this.state = {
       officeOptions: [],
@@ -46,10 +50,14 @@ export default class OfficePicker extends Component {
     this.officeQuerySubscription = this.officeQuery.subscribe(
       this.officeQuerySubscriber
     );
+    this.courseQuerySubscription = this.courseQuery.subscribe(
+      this.courseQuerySubscriber
+    );
   }
 
   componentWillUnmount() {
     this.officeQuerySubscription && this.officeQuerySubscription.unsubscribe();
+    this.courseQuerySubscription && this.courseQuerySubscription.unsubscribe();
   }
 
   goBack = () => {
@@ -59,10 +67,6 @@ export default class OfficePicker extends Component {
   };
 
   changeOfficeText = text => {
-    //API
-    //this.setState({
-    //  officeOptions: mockOfficeOptions
-    //});
     this.officeQuery.next(text);
   };
 
@@ -71,10 +75,7 @@ export default class OfficePicker extends Component {
   };
 
   changeUnCourseText = text => {
-    //API
-    this.setState({
-      courseOptions: mockUnCourseOptions
-    });
+    this.courseQuery.next(text);
   };
 
   changeScCourseText = text => {
@@ -107,7 +108,7 @@ export default class OfficePicker extends Component {
       case 1:
         return (
           <CourseState
-            isUn={office.type == OfficeTypes.UNIVERSITY}
+            isUn={office.officetype == OfficeTypes.UNIVERSITY}
             value={course}
             options={courseOptions}
             changeUnCourseText={this.changeUnCourseText}
@@ -135,7 +136,7 @@ export default class OfficePicker extends Component {
           status={status}
           data={[
             "Istituto o università",
-            office.type === OfficeTypes.UNIVERSITY
+            office.officetype === OfficeTypes.UNIVERSITY
               ? "Corso di laurea"
               : "Classe",
             "Anno di studi"
@@ -151,7 +152,7 @@ export default class OfficePicker extends Component {
     return (
       <View style={{ flexDirection: "row", padding: 10, alignItems: "center" }}>
         <Icon
-          name={item.officetype == "SP" ? "school" : "graduation-cap"}
+          name={item.officetype == "UN" ? "graduation-cap" : "school"}
           style={{ color: colors.black }}
           size={20}
         />
@@ -181,7 +182,17 @@ export default class OfficePicker extends Component {
     },
     error: err => {
       console.log(err);
-      this.setState({ options: [] });
+      this.setState({ officeOptions: [] });
+    }
+  };
+
+  courseQuerySubscriber = {
+    next: options => {
+      this.setState({ courseOptions: options });
+    },
+    error: err => {
+      console.log(err);
+      this.setState({ courseOptions: [] });
     }
   };
 }
@@ -238,6 +249,7 @@ const YearState = ({ value, setYear, options }) => {
       columnWrapperStyle={{ flex: 1, justifyContent: "space-around" }}
       data={options}
       renderItem={({ item, index }) => {
+        const year = index + 1;
         return (
           <Button
             style={{
@@ -250,10 +262,10 @@ const YearState = ({ value, setYear, options }) => {
               justifyContent: "center",
               alignItems: "center"
             }}
-            onPress={() => setYear(index)}
+            onPress={() => setYear(year)}
           >
             <Header3 color="black">{item}</Header3>
-            {value == index && (
+            {value == year && (
               <View
                 style={{
                   ...StyleSheet.absoluteFill,
@@ -332,19 +344,27 @@ export const canStateContinue = ({ office, status, year, course }) => {
   }
 };
 
-const createOfficeQuerySubject = () =>
+const createQuerySubject = type =>
   new Subject().pipe(
     switchMap(value =>
       ajax
-        .post(___OFFICE_HINTS_ENDPOINT___, {
-          keyword: value
-        })
+        .post(
+          type == "OFFICE"
+            ? ___OFFICE_HINTS_ENDPOINT___
+            : ___COURSE_HINTS_ENDPOINT___,
+          {
+            keyword: value
+          }
+        )
         .pipe(
           map(res => {
             console.log(res);
             return res.response;
           }),
-          catchError(error => of([]))
+          catchError(error => {
+            console.log(error);
+            return of([]);
+          })
         )
     )
   );

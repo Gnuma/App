@@ -28,17 +28,17 @@ export const LEVEL_DATA = {
 export const CONDITIONS_DATA = {
   0: {
     text: "Ottimo",
-    percentage: 270,
+    percentage: 359.99,
     color: colors.secondary
   },
   1: {
     text: "Buono",
-    percentage: 180,
+    percentage: 225,
     color: colors.lightYellow
   },
   2: {
     text: "Usurato",
-    percentage: 90,
+    percentage: 135,
     color: colors.red
   },
   3: {
@@ -60,8 +60,8 @@ export const ChatStatus = {
 };
 
 export const OfficeTypes = {
-  UNIVERSITY: "university",
-  SCHOOL: "school"
+  UNIVERSITY: "UN",
+  SCHOOL: "SP"
 };
 
 export const SellType = {

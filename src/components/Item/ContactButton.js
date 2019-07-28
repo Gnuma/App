@@ -54,7 +54,7 @@ export class ContactButton extends Component {
         >
           <FullButton
             value={isOwner ? "Modifica Vendita" : "Contatta Ora"}
-            icon={isOwner ? "pencil" : "send"}
+            icon={isOwner ? "pen" : "send"}
             contentStyle={{ flex: 1, textAlign: "center" }}
             onPress={this.props.onContact}
           />

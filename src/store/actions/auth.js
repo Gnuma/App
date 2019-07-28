@@ -51,6 +51,7 @@ export const authCompleted = () => {
 export const loginSuccess = (token, userData, isDelayed) => {
   setItem(tokenKey, token);
   setItem(userDataKey, userData);
+  setItem(officeKey, userData.office);
   axios.defaults.headers.common["Authorization"] = "Token " + token; // for all requests
   return {
     type: actionTypes.LOGIN_SUCCESS,

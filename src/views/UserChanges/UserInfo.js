@@ -177,7 +177,7 @@ const SaveButton = ({ save, active }) => {
       <FullButton
         onPress={save}
         value="Salva"
-        icon="pencil"
+        icon="pen"
         iconStyle={{
           color: active ? colors.white : colors.black
         }}

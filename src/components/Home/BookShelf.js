@@ -13,6 +13,7 @@ import colors from "../../styles/colors";
 import { NCHeight } from "./MainHome";
 import BookShelfPagination from "./BookShelfPagination";
 import { ___BOOK_IMG_RATIO___ } from "../../utils/constants";
+import { Header3 } from "../Text";
 
 export default class BookShelf extends Component {
   state = {
@@ -60,6 +61,7 @@ export default class BookShelf extends Component {
               inactiveSlideScale={0.82}
               inactiveSlideOpacity={0.8}
               onSnapToItem={index => this.setState({ activeSlide: index })}
+              enableMomentum={true}
             />
           </View>
         </View>

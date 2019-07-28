@@ -31,9 +31,15 @@ export default class OfficeButton extends Component {
           >
             {office ? (
               <View style={{ flex: 1 }}>
-                <Header3 color="black">{office.name},</Header3>
-                <Header4 color="black" style={{ marginLeft: 16 }}>
-                  {office.course.name}
+                <Header3 numberOfLines={2} color="black">
+                  {office.name}, {office.course.year}° {office.course.name}
+                </Header3>
+                <Header4
+                  color="black"
+                  numberOfLines={1}
+                  style={{ marginLeft: 16 }}
+                >
+                  {office.address}
                 </Header4>
               </View>
             ) : (
@@ -65,7 +71,7 @@ export default class OfficeButton extends Component {
                 alignItems: "center"
               }}
             >
-              <Icon name={"pencil"} size={22} />
+              <Icon name={"pen"} size={22} />
             </View>
           </Button>
         </View>
