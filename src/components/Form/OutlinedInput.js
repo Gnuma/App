@@ -16,7 +16,12 @@ export default class OutlinedInput extends Component {
     inputStyle: PropTypes.any,
     containerStyle: PropTypes.any,
     borderFocus: PropTypes.bool,
-    isPhone: PropTypes.bool
+    isPhone: PropTypes.bool,
+    hideClearButton: PropTypes.bool
+  };
+
+  state = {
+    focused: false
   };
 
   _onChange = text => {
@@ -27,22 +32,50 @@ export default class OutlinedInput extends Component {
     this.input.focus();
   };
 
+  onButtonPress = () => {
+    this._focusInput();
+    if (!this.props.hideClearButton && this.props.value) this._onChange("");
+  };
+
   _setInputRef = input => {
     this.input = input;
+  };
+
+  onFocus = () => {
+    this.setState({
+      focused: true
+    });
+    this.props.onFocus && this.props.onFocus();
+  };
+
+  onBlur = () => {
+    this.setState({
+      focused: false
+    });
+    this.props.onBlur && this.props.onBlur();
   };
 
   render() {
     const {
       style,
       placeholder,
-      icon,
       inputType,
       inputStyle,
       containerStyle,
       borderFocus,
+      hideClearButton,
+
+      onFocus,
+      onBlur,
+
       ...rest
     } = this.props;
     let { value } = this.props;
+
+    const icon =
+      !hideClearButton && this.state.focused && value
+        ? "times"
+        : this.props.icon;
 
     return (
       <View
@@ -75,6 +108,8 @@ export default class OutlinedInput extends Component {
             keyboardType={inputType}
             {...rest}
             value={value}
+            onFocus={this.onFocus}
+            onBlur={this.onBlur}
           />
           <Button
             style={{
@@ -86,12 +121,18 @@ export default class OutlinedInput extends Component {
               justifyContent: "center",
               alignItems: "center"
             }}
-            onPress={this._focusInput}
+            onPress={this.onButtonPress}
           >
             {icon == "pen" ? (
-              <Icon5 name={icon} size={22} />
+              <Icon5 name={icon} size={22} style={{ color: colors.black }} />
             ) : (
-              <Icon name={icon} size={22} />
+              <Icon
+                name={icon}
+                size={22}
+                style={{
+                  color: icon == "check" ? colors.secondary : colors.black
+                }}
+              />
             )}
           </Button>
         </View>

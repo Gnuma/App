@@ -18,7 +18,7 @@ import {
   ___OFFICE_HINTS_ENDPOINT___,
   ___COURSE_HINTS_ENDPOINT___
 } from "../store/constants";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon5 from "react-native-vector-icons/FontAwesome5";
 
 export default class OfficePicker extends Component {
   static propTypes = {
@@ -151,7 +151,7 @@ export default class OfficePicker extends Component {
   renderOfficeOption = item => {
     return (
       <View style={{ flexDirection: "row", padding: 10, alignItems: "center" }}>
-        <Icon
+        <Icon5
           name={item.officetype == "UN" ? "graduation-cap" : "school"}
           style={{ color: colors.black }}
           size={20}
@@ -203,6 +203,7 @@ const OfficeState = ({ value, ...props }) => {
       value={value.name}
       {...props}
       placeholder={"Seleziona la tua università o istituto"}
+      
     />
   );
 };
@@ -229,7 +230,7 @@ const CourseState = ({
         <OutlinedInput
           value={value.name}
           {...props}
-          placeholder="Classe (es: A)"
+          placeholder="Sezione (es: A)"
           onTextChange={changeScCourseText}
           containerStyle={{ width: 200 }}
           autoCapitalize="characters"

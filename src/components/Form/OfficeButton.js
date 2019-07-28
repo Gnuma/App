@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import PropTypes from "prop-types";
 import Button from "../Button";
 import { Header3, Header4 } from "../Text";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import Icon5 from "react-native-vector-icons/FontAwesome5";
 
 export default class OfficeButton extends Component {
   static propTypes = {

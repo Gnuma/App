@@ -44,6 +44,14 @@ export default class TextInputPicker extends Component {
     this.input && this.input.focus();
   };
 
+  onButtonPress = () => {
+    if (this.state.isActive) {
+      this.onTextChange("");
+    } else {
+      this._focusInput();
+    }
+  };
+
   onSelection = item => {
     this.setState({
       isActive: false
@@ -60,6 +68,15 @@ export default class TextInputPicker extends Component {
   render() {
     const { isActive, text } = this.state;
     const { options, style, placeholder } = this.props;
+    let icon;
+    if (isActive && text) {
+      icon = "times";
+    } else if (this.props.value) {
+      icon = "check";
+    } else {
+      icon = "pen";
+    }
+
     return (
       <View style={[{ padding: 8 }, style]}>
         <View style={{ flexDirection: "row" }}>
@@ -96,9 +113,15 @@ export default class TextInputPicker extends Component {
                 justifyContent: "center",
                 alignItems: "center"
               }}
-              onPress={this._focusInput}
+              onPress={this.onButtonPress}
             >
-              <Icon5 name="pen" size={22} />
+              <Icon5
+                name={icon}
+                size={22}
+                style={{
+                  color: icon == "check" ? colors.secondary : colors.black
+                }}
+              />
             </Button>
           </View>
         </View>
