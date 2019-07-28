@@ -3,6 +3,7 @@ package com.app;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import cl.json.RNSharePackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 
 import com.existfragger.rnimagesize.RNImageSizePackage;
@@ -37,6 +38,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNSharePackage(),
             new RNDeviceInfo(),
             new RNImageSizePackage(),
             new RNSoundPackage(),

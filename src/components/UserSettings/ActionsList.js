@@ -4,10 +4,11 @@ import { Header3 } from "../Text";
 import SolidButton from "../SolidButton";
 import Card from "../Card";
 import styles from "./styles";
+import Share from "react-native-share";
 
 export default class ActionsList extends Component {
   render() {
-    const { logout, } = this.props;
+    const { logout } = this.props;
 
     return (
       <View
@@ -17,7 +18,7 @@ export default class ActionsList extends Component {
           alignItems: "center"
         }}
       >
-        <SolidButton style={styles.actionButton}>
+        <SolidButton style={styles.actionButton} onPress={this.share}>
           <Header3 color="black" style={styles.actionText}>
             Invita un amico
           </Header3>
@@ -30,4 +31,14 @@ export default class ActionsList extends Component {
       </View>
     );
   }
+
+  share = () => {
+    Share.open(shareOptions);
+  };
 }
+
+const shareOptions = {
+  url: "www.civity.it",
+  message: "Entra in Civity!\n La 1ª app di annunci per libri scolastici.\n",
+  title: "Civity"
+};

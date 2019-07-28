@@ -24,6 +24,7 @@
     "react-native-gifted-chat": "^0.7.2",
     "react-native-image-size": "^1.1.1",
     "react-native-progress-circle": "^2.0.1",
+    "react-native-share": "^1.2.1",
     "react-native-snap-carousel": "^3.7.5",
     "react-native-sortable-list": "0.0.22",
     "react-native-sound": "^0.10.12",
