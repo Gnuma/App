@@ -13,6 +13,7 @@ import { connect } from "react-redux";
 import BasicHeader from "../components/BasicHeader";
 import { Header2, Header1, Header3 } from "../components/Text";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Icon5 from "react-native-vector-icons/FontAwesome5";
 import colors from "../styles/colors";
 import LevelList from "../components/UserSettings/LevelList";
 import SolidButton from "../components/SolidButton";
@@ -268,7 +269,7 @@ const UserInfoPanel = ({
         >
           {username}
         </Header1>
-        <Icon name={"pen"} size={25} style={{ color: colors.primary }} />
+        <Icon5 name={"pen"} size={25} style={{ color: colors.primary }} />
       </View>
       <View
         style={{ flexDirection: "row", marginTop: 10, alignItems: "flex-end" }}
@@ -307,7 +308,7 @@ const UserOfficePanel = ({
         >
           {office}
         </Header2>
-        <Icon name={"pen"} size={25} style={{ color: colors.primary }} />
+        <Icon5 name={"pen"} size={25} style={{ color: colors.primary }} />
       </View>
       <View
         style={{ flexDirection: "row", marginTop: 10, alignItems: "flex-end" }}
@@ -335,7 +336,7 @@ UserPhonePanel = ({ phone = "1234567890", isActive = false, onPress }) => {
         >
           {phone}
         </Header2>
-        <Icon name={"pen"} size={25} style={{ color: colors.primary }} />
+        <Icon5 name={"pen"} size={25} style={{ color: colors.primary }} />
       </View>
       <View
         style={{

@@ -3,6 +3,7 @@ import { View, TextInput, StyleSheet } from "react-native";
 import PropTypes from "prop-types";
 import Button from "../Button";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Icon5 from "react-native-vector-icons/FontAwesome5";
 import colors from "../../styles/colors";
 
 export default class OutlinedInput extends Component {
@@ -87,7 +88,11 @@ export default class OutlinedInput extends Component {
             }}
             onPress={this._focusInput}
           >
-            <Icon name={icon} size={22} />
+            {icon == "pen" ? (
+              <Icon5 name={icon} size={22} />
+            ) : (
+              <Icon name={icon} size={22} />
+            )}
           </Button>
         </View>
       </View>

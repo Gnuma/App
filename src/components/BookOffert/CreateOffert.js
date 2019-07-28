@@ -4,7 +4,7 @@ import { OffertInfo, DecisionBox } from "./General";
 import Card from "../Card";
 import { Header3 } from "../Text";
 import Button from "../Button";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon5 from "react-native-vector-icons/FontAwesome5";
 import PriceInput from "../Sell/PriceInput";
 import FullButton from "../FullButton";
 import colors from "../../styles/colors";
@@ -33,7 +33,7 @@ export default (CreateOffert = ({
               style={{ borderRadius: 13, padding: 4 }}
               onPress={focusPrice}
             >
-              <Icon
+              <Icon5
                 name="pen"
                 size={22}
                 style={{

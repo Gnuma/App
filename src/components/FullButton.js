@@ -4,6 +4,7 @@ import { Header3 } from "./Text";
 import colors from "../styles/colors";
 import { TouchableNativeFeedback } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Icon5 from "react-native-vector-icons/FontAwesome5";
 
 export default ({
   style,
@@ -30,9 +31,12 @@ export default ({
       <Header3 color="white" style={contentStyle}>
         {value}
       </Header3>
-      {icon ? (
-        <Icon name={icon} size={iconSize} style={[styles.icon, iconStyle]} />
-      ) : null}
+      {icon &&
+        (icon === "pen" ? (
+          <Icon5 name={icon} size={iconSize} style={[styles.icon, iconStyle]} />
+        ) : (
+          <Icon name={icon} size={iconSize} style={[styles.icon, iconStyle]} />
+        ))}
     </TouchableNativeFeedback>
   );
 };

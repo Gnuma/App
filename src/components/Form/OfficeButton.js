@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import PropTypes from "prop-types";
 import Button from "../Button";
 import { Header3, Header4 } from "../Text";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/FontAwesome5";
 
 export default class OfficeButton extends Component {
   static propTypes = {
@@ -71,7 +71,7 @@ export default class OfficeButton extends Component {
                 alignItems: "center"
               }}
             >
-              <Icon name={"pen"} size={22} />
+              <Icon5 name={"pen"} size={22} />
             </View>
           </Button>
         </View>

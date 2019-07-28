@@ -3,7 +3,7 @@ import { Text, View, TextInput, FlatList, Keyboard } from "react-native";
 import PropTypes from "prop-types";
 import Button from "./Button";
 import colors from "../styles/colors";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon5 from "react-native-vector-icons/FontAwesome5";
 import { Header3 } from "./Text";
 import Divider from "./Divider";
 import NativeButton from "../components/NativeButton";
@@ -98,7 +98,7 @@ export default class TextInputPicker extends Component {
               }}
               onPress={this._focusInput}
             >
-              <Icon name="pen" size={22} />
+              <Icon5 name="pen" size={22} />
             </Button>
           </View>
         </View>

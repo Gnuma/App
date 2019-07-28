@@ -151,7 +151,6 @@ android {
 
 dependencies {
     implementation project(':react-native-device-info')
-    implementation project(':@react-native-community_blur')
     implementation project(':react-native-image-size')
     implementation project(':react-native-sound')
     implementation project(':react-native-audio')
